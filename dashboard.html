@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FUNDING ARB // LIVE DASHBOARD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 44px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--yellow);
+      letter-spacing: 2px;
+      margin-right: 32px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 16px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav a:hover { color: var(--white); }
+    nav a.active {
+      color: var(--yellow);
+      border-bottom-color: var(--yellow);
+    }
+
+    /* MAIN LAYOUT */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px 24px 40px;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 3px;
+      color: var(--white);
+    }
+
+    /* LIVE INDICATOR */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--green);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: livePulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .exchange-dots {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .exchange-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    .exchange-item.connected { color: var(--white); }
+
+    .ex-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+
+    .ex-dot.on { background: var(--green); }
+
+    .top-bar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .stat-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-chip-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .stat-chip-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--white);
+    }
+
+    .refresh-countdown {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .countdown-bar-wrap {
+      width: 80px;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .countdown-bar {
+      height: 100%;
+      background: var(--yellow);
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+
+    .section-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* TABLES */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--surface2);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th:first-child { border-radius: 4px 0 0 0; }
+    thead th:last-child { border-radius: 0 4px 0 0; }
+
+    tbody tr {
+      border-bottom: 1px solid #1a1a1a;
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+    td {
+      padding: 10px 14px;
+      white-space: nowrap;
+      color: var(--white);
+    }
+
+    td.coin {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: var(--yellow);
+    }
+
+    td.exchange {
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    /* Spread colors */
+    .spread-green { color: var(--green); }
+    .spread-yellow { color: var(--yellow); }
+    .spread-white { color: var(--white); }
+
+    /* Executable */
+    .exec-yes { color: var(--green); font-size: 14px; }
+    .exec-no { color: var(--muted); font-size: 14px; }
+
+    /* PnL */
+    .pnl-pos { color: var(--green); }
+    .pnl-neg { color: var(--red); }
+    .pnl-zero { color: var(--muted); }
+
+    /* Status pills */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .pill-healthy {
+      background: rgba(0,255,135,0.12);
+      color: var(--green);
+      border: 1px solid rgba(0,255,135,0.3);
+    }
+
+    .pill-compressed {
+      background: rgba(255,225,53,0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(255,225,53,0.3);
+    }
+
+    .pill-inverted {
+      background: rgba(255,59,59,0.12);
+      color: var(--red);
+      border: 1px solid rgba(255,59,59,0.3);
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 18px;
+    }
+
+    .stat-card-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-card-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .stat-card-value.pos { color: var(--green); }
+    .stat-card-value.neg { color: var(--red); }
+    .stat-card-value.accent { color: var(--yellow); }
+
+    /* EMPTY / ERROR STATES */
+    .empty-state {
+      padding: 32px;
+      text-align: center;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .error-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--red);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255,59,59,0.2);
+      border-radius: 4px;
+      background: rgba(255,59,59,0.05);
+    }
+
+    /* FADE ANIMATION on data refresh */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    /* LOADING SKELETON */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 3px;
+      height: 14px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* LAST UPDATE */
+    .last-update {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 16px;
+      text-align: right;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-brand">ARB//</span>
+    <a href="dashboard.html" class="active">DASHBOARD</a>
+    <a href="rates.html">RATE CHARTS</a>
+    <a href="report.html">TRADE REPORT</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <h1 class="page-title">LIVE DASHBOARD</h1>
+      <span class="live-badge">
+        <span class="live-dot"></span>
+        LIVE
+      </span>
+    </div>
+
+    <!-- TOP BAR: system health -->
+    <div class="top-bar" id="topBar">
+      <div class="exchange-dots" id="exchangeDots">
+        <div class="exchange-item"><div class="ex-dot"></div><span>LOADING…</span></div>
+      </div>
+      <div class="top-bar-divider"></div>
+      <div class="stat-chip" id="chipRates">
+        <span class="stat-chip-label">Rates Collected</span>
+        <span class="stat-chip-value">—</span>
+      </div>
+      <div class="stat-chip" id="chipUptime">
+        <span class="stat-chip-label">Uptime</span>
+        <span class="stat-chip-value">—</span>
+      </div>
+      <div class="stat-chip" id="chipLastUpdate">
+        <span class="stat-chip-label">Last Update</span>
+        <span class="stat-chip-value">—</span>
+      </div>
+      <div class="refresh-countdown">
+        <span id="countdownLabel">30s</span>
+        <div class="countdown-bar-wrap">
+          <div class="countdown-bar" id="countdownBar" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPPORTUNITIES -->
+    <div class="section" id="oppsSection">
+      <div class="section-header">
+        <span class="section-title">LIVE OPPORTUNITIES</span>
+        <span class="section-count" id="oppsCount">top 20 • sorted by spread</span>
+      </div>
+      <div id="oppsContainer">
+        <div class="empty-state">Loading opportunities…</div>
+      </div>
+    </div>
+
+    <!-- OPEN PAPER TRADES -->
+    <div class="section" id="tradesSection">
+      <div class="section-header">
+        <span class="section-title">OPEN PAPER TRADES</span>
+        <span class="section-count" id="tradesCount">—</span>
+      </div>
+      <div id="tradesContainer">
+        <div class="empty-state">Loading trades…</div>
+      </div>
+    </div>
+
+    <!-- SYSTEM STATS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">SYSTEM STATS</span>
+      </div>
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card">
+          <div class="stat-card-label">Total P&amp;L</div>
+          <div class="stat-card-value" id="statPnl">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Win Rate</div>
+          <div class="stat-card-value accent" id="statWinRate">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Avg Spread</div>
+          <div class="stat-card-value accent" id="statAvgSpread">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Total Trades</div>
+          <div class="stat-card-value accent" id="statTrades">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Capital Deployed</div>
+          <div class="stat-card-value accent" id="statCapital">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="last-update" id="lastUpdate">—</div>
+
+  </div>
+
+  <script>
+    // ─── API BASE ───────────────────────────────────────────────────────────
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API = isLocal
+      ? 'http://localhost:3124'
+      : 'https://mvp-polymarket-alpha-bot.onrender.com';
+
+    // ─── CONSTANTS ──────────────────────────────────────────────────────────
+    const REFRESH_SEC = 30;
+    const EXCLUDED_EXCHANGES = ['drift'];
+    const EXCLUDED_COINS = ['SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','MSTRX','QQQX','PAXG','XAUT'];
+
+    // ─── STATE ──────────────────────────────────────────────────────────────
+    let countdownSec = REFRESH_SEC;
+    let refreshTimer = null;
+    let countdownInterval = null;
+
+    // ─── HELPERS ────────────────────────────────────────────────────────────
+    const fmt = (n, d=2) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) : '—';
+    const fmtPct = (n, d=4) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) + '%' : '—';
+    const fmtUSD = (n) => (typeof n === 'number' && isFinite(n))
+      ? (n >= 0 ? '+$' : '-$') + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
+      : '—';
+    const fmtUSDPlain = (n) => (typeof n === 'number' && isFinite(n))
+      ? '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
+      : '—';
+
+    function fmtAge(openedAt) {
+      if (!openedAt) return '—';
+      const ms = Date.now() - new Date(openedAt).getTime();
+      const h = Math.floor(ms / 3600000);
+      const m = Math.floor((ms % 3600000) / 60000);
+      if (h > 24) return Math.floor(h/24) + 'd ' + (h%24) + 'h';
+      if (h > 0) return h + 'h ' + m + 'm';
+      return m + 'm';
+    }
+
+    function fmtUptime(seconds) {
+      if (!seconds && seconds !== 0) return '—';
+      const s = Math.round(seconds);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      if (d > 0) return d + 'd ' + h + 'h';
+      if (h > 0) return h + 'h ' + m + 'm';
+      return m + 'm ' + (s % 60) + 's';
+    }
+
+    function getSpreadClass(pct) {
+      if (typeof pct !== 'number') return 'spread-white';
+      if (pct > 1) return 'spread-green';
+      if (pct >= 0.5) return 'spread-yellow';
+      return 'spread-white';
+    }
+
+    function getTradeStatus(trade) {
+      // Determine status from spread comparison
+      const entry = trade.entrySpread ?? trade.entry_spread ?? 0;
+      const current = trade.currentSpread ?? trade.current_spread ?? trade.grossSpread ?? 0;
+      if (current <= 0) return 'INVERTED';
+      if (current < entry * 0.5) return 'COMPRESSED';
+      return 'HEALTHY';
+    }
+
+    function statusPill(status) {
+      const map = {
+        HEALTHY: 'pill-healthy',
+        COMPRESSED: 'pill-compressed',
+        INVERTED: 'pill-inverted',
+      };
+      return `<span class="pill ${map[status] || 'pill-compressed'}">${status}</span>`;
+    }
+
+    // ─── FETCH ALL ───────────────────────────────────────────────────────────
+    async function fetchAll() {
+      const [status, opps, trades, stats] = await Promise.allSettled([
+        fetch(`${API}/api/status`).then(r => r.json()),
+        fetch(`${API}/api/opportunities`).then(r => r.json()),
+        fetch(`${API}/api/paper-trades`).then(r => r.json()),
+        fetch(`${API}/api/stats`).then(r => r.json()),
+      ]);
+      return {
+        status: status.status === 'fulfilled' ? status.value : null,
+        opps:   opps.status   === 'fulfilled' ? opps.value   : null,
+        trades: trades.status === 'fulfilled' ? trades.value : null,
+        stats:  stats.status  === 'fulfilled' ? stats.value  : null,
+      };
+    }
+
+    // ─── RENDER STATUS BAR ────────────────────────────────────────────────────
+    function renderStatus(statusData, oppsData) {
+      const dotsEl = document.getElementById('exchangeDots');
+      const chipRates = document.getElementById('chipRates');
+      const chipUptime = document.getElementById('chipUptime');
+      const chipLastUpdate = document.getElementById('chipLastUpdate');
+
+      if (!statusData) {
+        dotsEl.innerHTML = '<span style="color:var(--red);font-family:DM Mono,monospace;font-size:11px;">API unreachable</span>';
+        return;
+      }
+
+      // Build exchange dots
+      // statusData may be an object like { exchanges: {hyperliquid: {connected:true}, ...}, uptime: 123, totalRates: 456 }
+      // or it may be a flat object or array — handle multiple shapes
+      let exchanges = {};
+      if (statusData.exchanges) {
+        exchanges = statusData.exchanges;
+      } else if (Array.isArray(statusData)) {
+        statusData.forEach(ex => { exchanges[ex.name || ex.exchange] = ex; });
+      } else {
+        // Try to infer from keys that look like exchange names
+        const knownKeys = ['hyperliquid','binance','bybit','okx','gate','bitget','mexc','kucoin','phemex','bitmex','coinbase','kraken'];
+        knownKeys.forEach(k => { if (statusData[k] !== undefined) exchanges[k] = statusData[k]; });
+        // If still empty, show whatever keys are present
+        if (Object.keys(exchanges).length === 0) {
+          Object.entries(statusData).forEach(([k,v]) => {
+            if (typeof v === 'object' && v !== null) exchanges[k] = v;
+          });
+        }
+      }
+
+      let dotsHTML = '';
+      const exEntries = Object.entries(exchanges);
+      if (exEntries.length === 0) {
+        dotsHTML = '<span style="color:var(--muted);font-family:DM Mono,monospace;font-size:11px;">no exchange data</span>';
+      } else {
+        exEntries.forEach(([name, info]) => {
+          const connected = info === true || info?.connected === true || info?.status === 'connected' || info?.ok === true;
+          dotsHTML += `
+            <div class="exchange-item ${connected ? 'connected' : ''}">
+              <div class="ex-dot ${connected ? 'on' : ''}"></div>
+              <span>${name.toUpperCase()}</span>
+            </div>`;
+        });
+      }
+      dotsEl.innerHTML = dotsHTML;
+
+      // Chips
+      const totalRates = statusData.totalRates ?? statusData.total_rates ?? statusData.ratesCollected ?? (oppsData ? (Array.isArray(oppsData) ? oppsData.length : null) : null);
+      chipRates.innerHTML = `
+        <span class="stat-chip-label">Rates Collected</span>
+        <span class="stat-chip-value">${totalRates != null ? totalRates.toLocaleString() : '—'}</span>`;
+
+      const uptime = statusData.uptime ?? statusData.uptimeSeconds;
+      chipUptime.innerHTML = `
+        <span class="stat-chip-label">Uptime</span>
+        <span class="stat-chip-value">${fmtUptime(uptime)}</span>`;
+
+      const lastUpdate = statusData.lastUpdate ?? statusData.last_update ?? statusData.updatedAt;
+      const luStr = lastUpdate ? new Date(lastUpdate).toLocaleTimeString() : new Date().toLocaleTimeString();
+      chipLastUpdate.innerHTML = `
+        <span class="stat-chip-label">Last Update</span>
+        <span class="stat-chip-value">${luStr}</span>`;
+    }
+
+    // ─── RENDER OPPORTUNITIES ─────────────────────────────────────────────────
+    function renderOpportunities(data) {
+      const container = document.getElementById('oppsContainer');
+      const countEl = document.getElementById('oppsCount');
+
+      if (!data) {
+        container.innerHTML = '<div class="error-state">Failed to load opportunities</div>';
+        return;
+      }
+
+      let rows = Array.isArray(data) ? data : (data.opportunities ?? data.data ?? []);
+
+      // Filter: exclude Drift and tokenized stocks
+      rows = rows.filter(r => {
+        const longEx = (r.longExchange ?? r.long_exchange ?? '').toLowerCase();
+        const shortEx = (r.shortExchange ?? r.short_exchange ?? '').toLowerCase();
+        const coin = (r.coin ?? r.symbol ?? '').toUpperCase().replace('-PERP','').replace('/USDT','').replace('USDT','');
+        if (EXCLUDED_EXCHANGES.some(ex => longEx.includes(ex) || shortEx.includes(ex))) return false;
+        if (EXCLUDED_COINS.includes(coin)) return false;
+        return true;
+      });
+
+      // Sort by grossSpread desc
+      rows.sort((a, b) => {
+        const ag = a.grossSpread ?? a.gross_spread ?? a.spread ?? 0;
+        const bg = b.grossSpread ?? b.gross_spread ?? b.spread ?? 0;
+        return bg - ag;
+      });
+
+      // Top 20
+      rows = rows.slice(0, 20);
+      countEl.textContent = `${rows.length} of top 20 • sorted by gross spread`;
+
+      if (rows.length === 0) {
+        container.innerHTML = '<div class="empty-state">No opportunities found</div>';
+        return;
+      }
+
+      const rowsHTML = rows.map(r => {
+        const coin = (r.coin ?? r.symbol ?? '—').replace('-PERP','').replace('/USDT','').replace('USDT','');
+        const longEx = (r.longExchange ?? r.long_exchange ?? '—').toUpperCase();
+        const shortEx = (r.shortExchange ?? r.short_exchange ?? '—').toUpperCase();
+        const gross = r.grossSpread ?? r.gross_spread ?? r.spread ?? 0;
+        const net = r.netSpread ?? r.net_spread ?? (gross - 0.1);
+        const apr = r.apr ?? r.annualizedReturn ?? r.annualized ?? (net * 365 / 1);
+        const exec = r.executable ?? r.isExecutable ?? (gross > 0.1);
+
+        const spreadCls = getSpreadClass(gross);
+        const execHTML = exec
+          ? '<span class="exec-yes">✓</span>'
+          : '<span class="exec-no">✗</span>';
+
+        return `<tr>
+          <td class="coin">${coin}</td>
+          <td class="exchange">${longEx}</td>
+          <td class="exchange">${shortEx}</td>
+          <td class="${spreadCls}">${fmt(gross, 4)}%</td>
+          <td class="${getSpreadClass(net)}">${fmt(net, 4)}%</td>
+          <td class="${spreadCls}">${fmt(apr, 2)}%</td>
+          <td>${execHTML}</td>
+        </tr>`;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="table-wrap fade-in">
+          <table>
+            <thead>
+              <tr>
+                <th>Coin</th>
+                <th>Long Exchange</th>
+                <th>Short Exchange</th>
+                <th>Gross Spread %</th>
+                <th>Net Spread %</th>
+                <th>APR %</th>
+                <th>Executable</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHTML}</tbody>
+          </table>
+        </div>`;
+    }
+
+    // ─── RENDER PAPER TRADES ─────────────────────────────────────────────────
+    function renderTrades(data) {
+      const container = document.getElementById('tradesContainer');
+      const countEl = document.getElementById('tradesCount');
+
+      if (!data) {
+        container.innerHTML = '<div class="error-state">Failed to load paper trades</div>';
+        return;
+      }
+
+      let trades = Array.isArray(data) ? data : (data.trades ?? data.data ?? data.paperTrades ?? []);
+
+      // Exclude Drift
+      trades = trades.filter(t => {
+        const route = (t.route ?? t.longExchange ?? t.long_exchange ?? '').toLowerCase();
+        const shortEx = (t.shortExchange ?? t.short_exchange ?? '').toLowerCase();
+        if (route.includes('drift') || shortEx.includes('drift')) return false;
+        if (t.exchange && t.exchange.toLowerCase().includes('drift')) return false;
+        return true;
+      });
+
+      // Sort by P&L desc
+      trades.sort((a, b) => {
+        const ap = a.pnl ?? a.unrealizedPnl ?? a.unrealized_pnl ?? 0;
+        const bp = b.pnl ?? b.unrealizedPnl ?? b.unrealized_pnl ?? 0;
+        return bp - ap;
+      });
+
+      countEl.textContent = `${trades.length} open positions`;
+
+      if (trades.length === 0) {
+        container.innerHTML = '<div class="empty-state">No open paper trades</div>';
+        return;
+      }
+
+      const rowsHTML = trades.map(t => {
+        const coin = (t.coin ?? t.symbol ?? '—').replace('-PERP','').replace('/USDT','').replace('USDT','');
+        const route = t.route ?? `${(t.longExchange ?? t.long_exchange ?? '?').toUpperCase()} → ${(t.shortExchange ?? t.short_exchange ?? '?').toUpperCase()}`;
+        const entrySpread = t.entrySpread ?? t.entry_spread ?? t.openSpread ?? 0;
+        const currentSpread = t.currentSpread ?? t.current_spread ?? t.grossSpread ?? t.spread ?? 0;
+        const pnl = t.pnl ?? t.unrealizedPnl ?? t.unrealized_pnl ?? 0;
+        const perDay = t.dailyPnl ?? t.daily_pnl ?? t.perDay ?? (pnl / Math.max(1, (Date.now() - new Date(t.openedAt ?? t.createdAt ?? Date.now()).getTime()) / 86400000));
+        const age = fmtAge(t.openedAt ?? t.createdAt ?? t.opened_at);
+        const status = t.status ?? getTradeStatus(t);
+
+        const pnlClass = pnl > 0 ? 'pnl-pos' : pnl < 0 ? 'pnl-neg' : 'pnl-zero';
+        const perDayClass = perDay > 0 ? 'pnl-pos' : perDay < 0 ? 'pnl-neg' : 'pnl-zero';
+
+        return `<tr>
+          <td class="coin">${coin}</td>
+          <td class="exchange" style="font-size:12px;">${route}</td>
+          <td class="${getSpreadClass(entrySpread)}">${fmt(entrySpread, 4)}%</td>
+          <td class="${getSpreadClass(currentSpread)}">${fmt(currentSpread, 4)}%</td>
+          <td class="${pnlClass}">${fmtUSD(pnl)}</td>
+          <td class="${perDayClass}">${fmtUSD(perDay)}/d</td>
+          <td style="color:var(--muted)">${age}</td>
+          <td>${statusPill(status)}</td>
+        </tr>`;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="table-wrap fade-in">
+          <table>
+            <thead>
+              <tr>
+                <th>Coin</th>
+                <th>Route</th>
+                <th>Entry %</th>
+                <th>Current %</th>
+                <th>P&amp;L</th>
+                <th>$/Day</th>
+                <th>Age</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHTML}</tbody>
+          </table>
+        </div>`;
+    }
+
+    // ─── RENDER STATS ────────────────────────────────────────────────────────
+    function renderStats(data) {
+      if (!data) return;
+
+      const stats = data.stats ?? data;
+
+      const totalPnl = stats.totalPnl ?? stats.total_pnl ?? stats.pnl ?? null;
+      const winRate = stats.winRate ?? stats.win_rate ?? null;
+      const avgSpread = stats.avgSpread ?? stats.avg_spread ?? stats.averageSpread ?? null;
+      const totalTrades = stats.totalTrades ?? stats.total_trades ?? stats.tradeCount ?? null;
+      const capital = stats.capitalDeployed ?? stats.capital_deployed ?? stats.capital ?? null;
+
+      // P&L
+      const pnlEl = document.getElementById('statPnl');
+      if (totalPnl !== null) {
+        pnlEl.textContent = fmtUSD(totalPnl);
+        pnlEl.className = 'stat-card-value ' + (totalPnl >= 0 ? 'pos' : 'neg');
+      } else {
+        pnlEl.textContent = '—';
+        pnlEl.className = 'stat-card-value';
+      }
+
+      document.getElementById('statWinRate').textContent = winRate !== null ? fmt(winRate * (winRate > 1 ? 1 : 100), 1) + '%' : '—';
+      document.getElementById('statAvgSpread').textContent = avgSpread !== null ? fmt(avgSpread, 4) + '%' : '—';
+      document.getElementById('statTrades').textContent = totalTrades !== null ? totalTrades.toLocaleString() : '—';
+      document.getElementById('statCapital').textContent = capital !== null ? fmtUSDPlain(capital) : '—';
+    }
+
+    // ─── MAIN REFRESH ────────────────────────────────────────────────────────
+    async function refresh() {
+      const { status, opps, trades, stats } = await fetchAll();
+      renderStatus(status, opps);
+      renderOpportunities(opps);
+      renderTrades(trades);
+      renderStats(stats);
+
+      document.getElementById('lastUpdate').textContent =
+        'Last refreshed: ' + new Date().toLocaleTimeString();
+    }
+
+    // ─── COUNTDOWN ───────────────────────────────────────────────────────────
+    function startCountdown() {
+      countdownSec = REFRESH_SEC;
+      const bar = document.getElementById('countdownBar');
+      const label = document.getElementById('countdownLabel');
+
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        countdownSec--;
+        const pct = (countdownSec / REFRESH_SEC) * 100;
+        bar.style.width = pct + '%';
+        label.textContent = countdownSec + 's';
+
+        if (countdownSec <= 0) {
+          clearInterval(countdownInterval);
+          refresh().then(() => startCountdown());
+        }
+      }, 1000);
+    }
+
+    // ─── INIT ────────────────────────────────────────────────────────────────
+    refresh().then(() => startCountdown());
+  </script>
+
+</body>
+</html>
