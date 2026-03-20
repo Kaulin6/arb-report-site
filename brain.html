@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brain Optimizer — Funding Arb</title>
+  <style>
+    :root {
+      --bg: #0d0d12;
+      --surface: #16161e;
+      --surface2: #1e1e2a;
+      --border: #2a2a38;
+      --accent: #7c6aff;
+      --accent2: #4ade80;
+      --accent3: #f59e0b;
+      --accent4: #f87171;
+      --text: #e2e2f0;
+      --muted: #6b6b80;
+      --tag-bg: #1e2a3a;
+      --tag-text: #7dd3fc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    nav a:hover, nav a.active { color: var(--text); }
+    nav .brand { color: var(--accent); font-weight: 700; font-size: 15px; margin-right: 8px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; }
+    header h1 span { color: var(--accent); }
+    .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* KPI grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .kpi-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .kpi-value { font-size: 26px; font-weight: 700; }
+    .kpi-value.green { color: var(--accent2); }
+    .kpi-value.amber { color: var(--accent3); }
+    .kpi-value.red { color: var(--accent4); }
+    .kpi-value.purple { color: var(--accent); }
+    .kpi-sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    /* Recommendation highlight box */
+    .recommend-box {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+    .recommend-box h3 { color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+    .recommend-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .recommend-item { display: flex; flex-direction: column; gap: 2px; }
+    .recommend-item .label { font-size: 12px; color: var(--muted); }
+    .recommend-item .value { font-size: 18px; font-weight: 700; color: var(--accent2); }
+
+    /* Section */
+    .section { margin-bottom: 32px; }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title .icon { font-size: 16px; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); }
+    thead th {
+      background: var(--surface2);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-green { background: #14532d; color: #4ade80; }
+    .badge-amber { background: #451a03; color: #f59e0b; }
+    .badge-red { background: #450a0a; color: #f87171; }
+    .badge-purple { background: #2e1065; color: #c4b5fd; }
+    .badge-blue { background: #1e3a5f; color: #7dd3fc; }
+
+    /* Threshold chart */
+    .threshold-chart { display: flex; flex-direction: column; gap: 8px; }
+    .threshold-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .threshold-label { width: 80px; font-size: 12px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .threshold-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 24px; position: relative; overflow: hidden; }
+    .threshold-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+    .threshold-bar.best { background: linear-gradient(90deg, #4f46e5, #7c6aff); }
+    .threshold-bar.good { background: linear-gradient(90deg, #1d6a3a, #4ade80); opacity: 0.8; }
+    .threshold-bar.ok { background: linear-gradient(90deg, #7a3a00, #f59e0b); opacity: 0.7; }
+    .threshold-bar.bad { background: linear-gradient(90deg, #6b0000, #f87171); opacity: 0.6; }
+    .threshold-meta { width: 200px; font-size: 12px; flex-shrink: 0; }
+    .threshold-meta .win { color: var(--accent2); }
+    .threshold-meta .count { color: var(--muted); }
+
+    /* Grid 2 columns */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* Trend indicator */
+    .trend-up { color: var(--accent2); }
+    .trend-down { color: var(--accent4); }
+    .trend-neutral { color: var(--muted); }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+    /* hot pairs today */
+    .hot-list { display: flex; flex-direction: column; gap: 6px; }
+    .hot-row {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hot-coin { font-weight: 700; font-size: 14px; }
+    .hot-pair { font-size: 12px; color: var(--muted); }
+    .hot-spread { font-weight: 600; color: var(--accent2); font-size: 14px; }
+    .hot-count { font-size: 12px; color: var(--muted); }
+
+    /* Tooltip via title */
+    [title] { cursor: help; }
+
+    footer { color: var(--muted); font-size: 12px; text-align: center; padding: 24px; border-top: 1px solid var(--border); margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="index.html">🧠 Arb</a>
+  <a href="index.html">Home</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a href="report.html">Report</a>
+  <a href="pnl.html">P&amp;L</a>
+  <a href="cashcarry.html">Cash-Carry</a>
+  <a href="matrix.html">Matrix</a>
+  <a href="pair.html">Pair Deep-Dive</a>
+  <a href="brain.html" class="active">Brain</a>
+</nav>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>🧠 Brain <span>Optimizer</span></h1>
+      <div class="meta" id="gen-time">Loading analysis…</div>
+    </div>
+    <button class="btn" id="refresh-btn" onclick="refreshBrain()">↺ Re-run Analysis</button>
+  </header>
+
+  <!-- KPI Row -->
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi skeleton" style="height:90px"></div>
+    <div class="kpi skeleton" style="height:90px"></div>
+    <div class="kpi skeleton" style="height:90px"></div>
+    <div class="kpi skeleton" style="height:90px"></div>
+    <div class="kpi skeleton" style="height:90px"></div>
+  </div>
+
+  <!-- Recommendation -->
+  <div class="recommend-box" id="recommend-box" style="display:none">
+    <h3>⚡ Optimizer Recommendations</h3>
+    <div class="recommend-row" id="recommend-row"></div>
+  </div>
+
+  <!-- Trend -->
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-title"><span class="icon">📈</span> Performance Trend (7d vs prior 7d)</div>
+      <div class="table-wrap" id="trend-table"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span class="icon">🔥</span> Hot Pairs Today (last 24h)</div>
+      <div class="hot-list" id="hot-list"></div>
+    </div>
+  </div>
+
+  <!-- Entry Threshold Chart -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🎯</span> Entry Threshold Analysis</div>
+    <div class="threshold-chart" id="threshold-chart"></div>
+  </div>
+
+  <!-- Grid: Best Pairs + Best Coins -->
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-title"><span class="icon">🏆</span> Best Exchange Pairs</div>
+      <div class="table-wrap" id="pairs-table"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span class="icon">🪙</span> Best Coins</div>
+      <div class="table-wrap" id="coins-table"></div>
+    </div>
+  </div>
+
+  <!-- Hold Time + Leverage -->
+  <div class="grid-2">
+    <div class="section">
+      <div class="section-title"><span class="icon">⏱</span> Hold Time Analysis</div>
+      <div class="table-wrap" id="holdtime-table"></div>
+    </div>
+    <div class="section">
+      <div class="section-title"><span class="icon">⚡</span> Leverage Analysis</div>
+      <div class="table-wrap" id="leverage-table"></div>
+    </div>
+  </div>
+
+  <!-- Entry Spread Buckets -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📊</span> Entry Spread Buckets (Closed Trades)</div>
+    <div class="table-wrap" id="buckets-table"></div>
+  </div>
+
+  <footer>Brain Optimizer · Auto-refreshes every 6 hours · Data from paper trade history</footer>
+</div>
+
+<script>
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? ''
+  : 'https://funding-arb-v3.onrender.com';
+
+function fmt(n, d=4) { return (typeof n === 'number' && !isNaN(n)) ? n.toFixed(d) : '—'; }
+function fmtPct(n, d=3) { return (typeof n === 'number' && !isNaN(n)) ? (n * 100).toFixed(d) + '%' : '—'; }
+function fmtUsd(n) { return (typeof n === 'number' && !isNaN(n)) ? '$' + n.toFixed(2) : '—'; }
+function fmtBadge(val, lo, hi) {
+  if (val >= hi) return `<span class="badge badge-green">${val}%</span>`;
+  if (val >= lo) return `<span class="badge badge-amber">${val}%</span>`;
+  return `<span class="badge badge-red">${val}%</span>`;
+}
+function pnlColor(v) { return v > 0 ? 'green' : v < 0 ? 'red' : 'amber'; }
+
+async function loadBrain() {
+  let data;
+  try {
+    const r = await fetch(`${API}/api/brain`);
+    data = await r.json();
+  } catch(e) {
+    document.getElementById('gen-time').textContent = 'Failed to load brain data: ' + e.message;
+    return;
+  }
+  render(data);
+}
+
+function render(d) {
+  // Meta
+  document.getElementById('gen-time').textContent =
+    `Analysis generated at ${d.generatedAt ? new Date(d.generatedAt).toLocaleString() : '—'} · Took ${d.analysisMs || '—'}ms`;
+
+  const ov = d.overall || {};
+
+  // KPIs
+  const wr = ov.winRate ?? 0;
+  document.getElementById('kpi-grid').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Total Closed Trades</div>
+      <div class="kpi-value purple">${ov.total_closed ?? '—'}</div>
+      <div class="kpi-sub">Paper trade history</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Win Rate</div>
+      <div class="kpi-value ${wr >= 60 ? 'green' : wr >= 45 ? 'amber' : 'red'}">${wr}%</div>
+      <div class="kpi-sub">${ov.total_winners ?? 0} winners</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total P&L</div>
+      <div class="kpi-value ${(ov.total_pnl||0) >= 0 ? 'green' : 'red'}">${fmtUsd(ov.total_pnl)}</div>
+      <div class="kpi-sub">Avg ${fmtUsd(ov.avg_pnl)} per trade</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg APR</div>
+      <div class="kpi-value ${(ov.avg_apr||0) > 0 ? 'green' : 'amber'}">${typeof ov.avg_apr === 'number' ? (ov.avg_apr * 100).toFixed(1) + '%' : '—'}</div>
+      <div class="kpi-sub">Annualized return</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Rec. Entry Threshold</div>
+      <div class="kpi-value purple">${d.recommendedEntryThresholdPct ?? '—'}</div>
+      <div class="kpi-sub">Gross spread to enter</div>
+    </div>
+  `;
+
+  // Recommend box
+  document.getElementById('recommend-box').style.display = 'block';
+  document.getElementById('recommend-row').innerHTML = `
+    <div class="recommend-item">
+      <div class="label">Entry Threshold</div>
+      <div class="value">${d.recommendedEntryThresholdPct ?? '—'}</div>
+    </div>
+    <div class="recommend-item">
+      <div class="label">Top Exchange Pair</div>
+      <div class="value" style="font-size:14px">${d.topExchangePairs?.[0]?.pair ?? '—'}</div>
+    </div>
+    <div class="recommend-item">
+      <div class="label">Best Coin</div>
+      <div class="value" style="font-size:14px">${d.topCoins?.[0]?.coin ?? '—'}</div>
+    </div>
+    <div class="recommend-item">
+      <div class="label">Trend</div>
+      <div class="value ${d.recentTrend?.improving ? 'green' : 'red'}" style="font-size:14px">
+        ${d.recentTrend?.improving ? '▲ Improving' : '▼ Declining'}
+      </div>
+    </div>
+  `;
+
+  // Trend
+  const t = d.recentTrend || {};
+  const l7 = t.last7d || {}, p7 = t.prior7d || {};
+  document.getElementById('trend-table').innerHTML = `
+    <table>
+      <thead><tr><th>Period</th><th>Trades</th><th>Avg P&L</th><th>Total P&L</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Last 7 days</td>
+          <td>${l7.count ?? '—'}</td>
+          <td class="${(l7.avg_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(l7.avg_pnl)}</td>
+          <td class="${(l7.total_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(l7.total_pnl)}</td>
+        </tr>
+        <tr>
+          <td>Prior 7 days</td>
+          <td>${p7.count ?? '—'}</td>
+          <td class="${(p7.avg_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(p7.avg_pnl)}</td>
+          <td class="${(p7.total_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(p7.total_pnl)}</td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+
+  // Hot pairs today
+  const hot = d.hotPairsToday || d.fullAnalysis?.hotCoinsToday || [];
+  document.getElementById('hot-list').innerHTML = hot.length === 0
+    ? '<div style="color:var(--muted);padding:12px">No hot pairs yet</div>'
+    : hot.slice(0, 10).map(p => `
+      <div class="hot-row">
+        <div>
+          <div class="hot-coin">${p.coin}</div>
+          <div class="hot-pair">${p.long_exchange} ↔ ${p.short_exchange}</div>
+        </div>
+        <div>
+          <div class="hot-spread" title="Avg net spread">${fmtPct(p.avg_net_spread)}</div>
+          <div class="hot-count">${p.appearances} appearances</div>
+        </div>
+      </div>
+    `).join('');
+
+  // Threshold chart
+  const ts = d.fullAnalysis?.thresholdStats || [];
+  const maxCount = Math.max(...ts.map(t => t.count), 1);
+  const bestThresh = d.recommendedEntryThreshold;
+  document.getElementById('threshold-chart').innerHTML = ts.map(t => {
+    const barClass = t.threshold === bestThresh ? 'best' : t.winRate >= 60 ? 'good' : t.winRate >= 45 ? 'ok' : 'bad';
+    const barWidth = Math.max(5, Math.round((t.count / maxCount) * 100));
+    return `
+      <div class="threshold-row">
+        <div class="threshold-label">${t.thresholdPct}</div>
+        <div class="threshold-bar-wrap">
+          <div class="threshold-bar ${barClass}" style="width:${barWidth}%">
+            ${t.count >= 10 ? t.count + ' trades' : ''}
+          </div>
+        </div>
+        <div class="threshold-meta">
+          <span class="win">${t.winRate}% win</span>
+          &nbsp;·&nbsp;
+          <span class="${(t.avgPnl||0) >= 0 ? 'trend-up' : 'trend-down'}">avg ${fmtUsd(t.avgPnl)}</span>
+          ${t.threshold === bestThresh ? '&nbsp;<span class="badge badge-purple">✓ Rec</span>' : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Best exchange pairs
+  const pairs = d.fullAnalysis?.bestExchangePairs || [];
+  document.getElementById('pairs-table').innerHTML = `
+    <table>
+      <thead><tr><th>Pair</th><th>Trades</th><th>Win %</th><th>Avg P&L</th><th>Total P&L</th><th>Avg APR</th></tr></thead>
+      <tbody>
+        ${pairs.slice(0,10).map(p => {
+          const wr2 = p.trade_count > 0 ? Math.round((p.winners / p.trade_count) * 100) : 0;
+          return `<tr>
+            <td>${p.pair}</td>
+            <td>${p.trade_count}</td>
+            <td>${fmtBadge(wr2, 45, 60)}</td>
+            <td class="${(p.avg_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(p.avg_pnl)}</td>
+            <td class="${(p.total_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(p.total_pnl)}</td>
+            <td>${typeof p.avg_apr === 'number' ? (p.avg_apr * 100).toFixed(1) + '%' : '—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  // Best coins
+  const coins = d.fullAnalysis?.bestCoins || [];
+  document.getElementById('coins-table').innerHTML = `
+    <table>
+      <thead><tr><th>Coin</th><th>Trades</th><th>Win %</th><th>Avg P&L</th><th>Total P&L</th></tr></thead>
+      <tbody>
+        ${coins.slice(0,12).map(c => {
+          const wr3 = c.trade_count > 0 ? Math.round((c.winners / c.trade_count) * 100) : 0;
+          return `<tr>
+            <td><strong>${c.coin}</strong></td>
+            <td>${c.trade_count}</td>
+            <td>${fmtBadge(wr3, 45, 60)}</td>
+            <td class="${(c.avg_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(c.avg_pnl)}</td>
+            <td class="${(c.total_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(c.total_pnl)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  // Hold time
+  const holds = d.fullAnalysis?.holdTimeBuckets || [];
+  document.getElementById('holdtime-table').innerHTML = `
+    <table>
+      <thead><tr><th>Hold Time</th><th>Trades</th><th>Win %</th><th>Avg P&L</th><th>Avg APR</th></tr></thead>
+      <tbody>
+        ${holds.map(h => {
+          const wr4 = h.trade_count > 0 ? Math.round((h.winners / h.trade_count) * 100) : 0;
+          return `<tr>
+            <td>${h.hold_bucket}</td>
+            <td>${h.trade_count}</td>
+            <td>${fmtBadge(wr4, 45, 60)}</td>
+            <td class="${(h.avg_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(h.avg_pnl)}</td>
+            <td>${typeof h.avg_apr === 'number' ? (h.avg_apr * 100).toFixed(1) + '%' : '—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  // Leverage
+  const levs = d.fullAnalysis?.leverageStats || [];
+  document.getElementById('leverage-table').innerHTML = `
+    <table>
+      <thead><tr><th>Leverage</th><th>Trades</th><th>Win %</th><th>Avg P&L</th><th>Total P&L</th></tr></thead>
+      <tbody>
+        ${levs.map(l => {
+          const wr5 = l.trade_count > 0 ? Math.round(((l.winners||0) / l.trade_count) * 100) : 0;
+          return `<tr>
+            <td><strong>${l.leverage}x</strong></td>
+            <td>${l.trade_count}</td>
+            <td>${fmtBadge(wr5, 45, 60)}</td>
+            <td class="${(l.avg_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(l.avg_pnl)}</td>
+            <td class="${(l.total_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(l.total_pnl)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+
+  // Entry buckets
+  const buckets = d.fullAnalysis?.entryBuckets || [];
+  document.getElementById('buckets-table').innerHTML = `
+    <table>
+      <thead><tr><th>Spread Bucket</th><th>Trades</th><th>Win %</th><th>Avg P&L</th><th>Total P&L</th><th>Avg APR</th><th>Avg Hold</th></tr></thead>
+      <tbody>
+        ${buckets.map(b => {
+          const wr6 = b.trade_count > 0 ? Math.round(((b.winners||0) / b.trade_count) * 100) : 0;
+          return `<tr>
+            <td><strong>${b.bucket}</strong></td>
+            <td>${b.trade_count}</td>
+            <td>${fmtBadge(wr6, 45, 60)}</td>
+            <td class="${(b.avg_net_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(b.avg_net_pnl)}</td>
+            <td class="${(b.total_pnl||0) >= 0 ? 'trend-up' : 'trend-down'}">${fmtUsd(b.total_pnl)}</td>
+            <td>${typeof b.avg_apr === 'number' ? (b.avg_apr * 100).toFixed(1) + '%' : '—'}</td>
+            <td>${typeof b.avg_hold_hours === 'number' ? b.avg_hold_hours.toFixed(1) + 'h' : '—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+async function refreshBrain() {
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running…';
+  try {
+    const r = await fetch(`${API}/api/brain/refresh`, { method: 'POST' });
+    const d = await r.json();
+    if (d.ok) {
+      await loadBrain();
+    }
+  } catch (e) {
+    alert('Refresh failed: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = '↺ Re-run Analysis';
+}
+
+loadBrain();
+</script>
+</body>
+</html>
