@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>P&L TIMELINE — FUNDING ARB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+    .topbar-nav { display: flex; gap: 24px; }
+    .topbar-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .topbar-nav a:hover { color: var(--yellow); }
+    .topbar-nav a.active { color: var(--green); }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .pulse {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    .page-header {
+      margin-bottom: 36px;
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 4px;
+      color: var(--white);
+      line-height: 1;
+    }
+    .page-title span { color: var(--green); }
+    .page-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    /* ─── STAT CARDS ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--green);
+    }
+    .stat-card.yellow::before { background: var(--yellow); }
+    .stat-card.orange::before { background: var(--orange); }
+    .stat-card.red::before { background: var(--red); }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--green);
+      line-height: 1;
+    }
+    .stat-card.yellow .stat-value { color: var(--yellow); }
+    .stat-card.orange .stat-value { color: var(--orange); }
+    .stat-card.red .stat-value { color: var(--red); }
+    .stat-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ─── CHART ─── */
+    .chart-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px 28px 20px;
+      margin-bottom: 36px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: var(--white);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      background: rgba(0,255,135,0.1);
+      color: var(--green);
+      border: 1px solid rgba(0,255,135,0.3);
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 340px;
+    }
+
+    /* ─── TABLE ─── */
+    .table-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 36px;
+      overflow: hidden;
+    }
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(0,255,135,0.05);
+    }
+    .table-wrap {
+      overflow-x: auto;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+    }
+    thead th {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(42,42,42,0.5);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    td {
+      padding: 9px 12px;
+      color: var(--white);
+      white-space: nowrap;
+    }
+    td.pos { color: var(--green); }
+    td.neg { color: var(--red); }
+    td.muted { color: var(--muted); }
+    .type-badge {
+      display: inline-block;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 2px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .type-badge.funding {
+      background: rgba(0,255,135,0.1);
+      color: var(--green);
+      border: 1px solid rgba(0,255,135,0.25);
+    }
+    .type-badge.close {
+      background: rgba(255,225,53,0.1);
+      color: var(--yellow);
+      border: 1px solid rgba(255,225,53,0.25);
+    }
+
+    /* ─── LOADING / ERROR ─── */
+    .loading-state {
+      text-align: center;
+      padding: 80px 20px;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+    }
+    .loading-state .spinner {
+      display: inline-block;
+      width: 24px; height: 24px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      font-family: 'DM Mono', monospace;
+      color: var(--red);
+      font-size: 13px;
+    }
+
+    /* ─── EMPTY ─── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .empty-state strong {
+      display: block;
+      font-size: 18px;
+      color: var(--border);
+      margin-bottom: 8px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .container { padding: 24px 16px; }
+      .topbar { padding: 12px 16px; }
+      .topbar-nav { display: none; }
+      .page-title { font-size: 36px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">⚡ FUNDING ARB</div>
+  <nav class="topbar-nav">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/rates.html">Rate Charts</a>
+    <a href="/report.html">Trade Report</a>
+    <a href="/pnl.html" class="active">P&L Timeline</a>
+    <a href="/explainer.html">How It Works</a>
+  </nav>
+  <div class="topbar-status">
+    <div class="pulse"></div>
+    <span id="last-updated">—</span>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="container">
+
+  <div class="page-header">
+    <h1 class="page-title">P&L <span>TIMELINE</span></h1>
+    <p class="page-subtitle">CUMULATIVE EARNINGS HISTORY — ALL FUNDING PAYMENTS &amp; CLOSED TRADES</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Earned</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub" id="stat-breakdown">funding + trade pnl</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">Avg Per Day</div>
+      <div class="stat-value" id="stat-avg-day">—</div>
+      <div class="stat-sub" id="stat-days">across active days</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">Best Day</div>
+      <div class="stat-value" id="stat-best-day">—</div>
+      <div class="stat-sub" id="stat-best-day-date">—</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Biggest Single Payment</div>
+      <div class="stat-value" id="stat-biggest">—</div>
+      <div class="stat-sub" id="stat-biggest-coin">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Payments</div>
+      <div class="stat-value" id="stat-payments">—</div>
+      <div class="stat-sub">funding events logged</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">Closed Trades</div>
+      <div class="stat-value" id="stat-trades">—</div>
+      <div class="stat-sub" id="stat-fees">total fees paid</div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-section">
+    <div class="section-title">
+      CUMULATIVE P&L
+      <span class="badge" id="chart-badge">LOADING</span>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <div>Loading P&L data…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-section">
+    <div class="section-title">
+      EVENT LOG
+      <span class="badge" id="table-badge">ALL</span>
+    </div>
+    <div class="table-controls">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="funding">Funding</button>
+      <button class="filter-btn" data-filter="close">Trades</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Coin</th>
+            <th>Exchange Pair</th>
+            <th>Amount</th>
+            <th>Cumulative</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="events-tbody">
+          <tr><td colspan="7" class="empty-state"><strong>—</strong>No data yet</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ─── API AUTO-DETECT ───────────────────────────────────────────────────────────
+const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const API_BASE = isLocal
+  ? 'http://localhost:3124'
+  : 'https://mvp-polymarket-alpha-bot.onrender.com';
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function fmtUsd(n) {
+  if (n == null || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  let s;
+  if (abs >= 1000) s = '$' + (n / 1000).toFixed(2) + 'K';
+  else s = '$' + n.toFixed(4);
+  return s;
+}
+
+function fmtUsdShort(n) {
+  if (n == null || isNaN(n)) return '—';
+  const abs = Math.abs(n);
+  const sign = n < 0 ? '-' : '';
+  if (abs >= 1000) return sign + '$' + (abs / 1000).toFixed(2) + 'K';
+  return sign + '$' + abs.toFixed(2);
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts * 1000).toLocaleString('en-US', {
+    month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+    hour12: false
+  });
+}
+
+function dayKey(ts) {
+  const d = new Date(ts * 1000);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ─── RENDER STATS ─────────────────────────────────────────────────────────────
+function renderStats(data) {
+  const { events, totalPnl, totalFunding, totalClosedPnl, totalFees, tradeCount, paymentCount } = data;
+
+  document.getElementById('stat-total').textContent = fmtUsdShort(totalPnl);
+  document.getElementById('stat-breakdown').textContent =
+    `${fmtUsdShort(totalFunding)} funding + ${fmtUsdShort(totalClosedPnl)} trades`;
+
+  document.getElementById('stat-payments').textContent = paymentCount;
+  document.getElementById('stat-trades').textContent = tradeCount;
+  document.getElementById('stat-fees').textContent = `${fmtUsdShort(totalFees)} fees paid`;
+
+  // Days span
+  if (events.length > 1) {
+    const first = events[0].ts;
+    const last = events[events.length - 1].ts;
+    const daySpan = Math.max(1, (last - first) / 86400);
+    const avgPerDay = totalPnl / daySpan;
+    document.getElementById('stat-avg-day').textContent = fmtUsdShort(avgPerDay);
+    document.getElementById('stat-days').textContent = `over ${daySpan.toFixed(1)} days`;
+  } else {
+    document.getElementById('stat-avg-day').textContent = fmtUsdShort(totalPnl);
+    document.getElementById('stat-days').textContent = '< 1 day of data';
+  }
+
+  // Best day
+  const byDay = {};
+  for (const e of events) {
+    const dk = dayKey(e.ts);
+    const amt = e.type === 'funding' ? (e.amount || 0) : (e.netPnl || 0);
+    byDay[dk] = (byDay[dk] || 0) + amt;
+  }
+  const bestDay = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0];
+  if (bestDay) {
+    document.getElementById('stat-best-day').textContent = fmtUsdShort(bestDay[1]);
+    document.getElementById('stat-best-day-date').textContent = bestDay[0];
+  }
+
+  // Biggest single funding payment
+  const fundingEvents = events.filter(e => e.type === 'funding');
+  if (fundingEvents.length > 0) {
+    const biggest = fundingEvents.reduce((max, e) => (e.amount || 0) > (max.amount || 0) ? e : max, fundingEvents[0]);
+    document.getElementById('stat-biggest').textContent = fmtUsdShort(biggest.amount);
+    document.getElementById('stat-biggest-coin').textContent =
+      `${biggest.coin} · ${biggest.longEx} / ${biggest.shortEx}`;
+  } else if (tradeCount > 0) {
+    const tradeEvents = events.filter(e => e.type === 'close');
+    if (tradeEvents.length > 0) {
+      const biggest = tradeEvents.reduce((max, e) => (e.netPnl || 0) > (max.netPnl || 0) ? e : max, tradeEvents[0]);
+      document.getElementById('stat-biggest').textContent = fmtUsdShort(biggest.netPnl);
+      document.getElementById('stat-biggest-coin').textContent =
+        `${biggest.coin} · closed trade`;
+    }
+  }
+}
+
+// ─── RENDER CHART ─────────────────────────────────────────────────────────────
+let chartInstance = null;
+
+function renderChart(events) {
+  const wrap = document.getElementById('chart-wrap');
+
+  if (!events || events.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><strong>📊</strong>No events yet — run the bot to generate P&L data</div>`;
+    document.getElementById('chart-badge').textContent = 'NO DATA';
+    return;
+  }
+
+  wrap.innerHTML = '<canvas id="pnl-chart"></canvas>';
+  const canvas = document.getElementById('pnl-chart');
+  canvas.style.height = '100%';
+
+  const labels = events.map(e => new Date(e.ts * 1000));
+  const values = events.map(e => e.cumulative);
+
+  // Color stops: green if total positive, yellow if mixed
+  const maxVal = Math.max(...values);
+  const minVal = Math.min(...values);
+
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Cumulative P&L',
+        data: values,
+        borderColor: '#00ff87',
+        backgroundColor: (ctx) => {
+          const chart = ctx.chart;
+          const { ctx: c, chartArea } = chart;
+          if (!chartArea) return 'rgba(0,255,135,0.08)';
+          const gradient = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, 'rgba(0,255,135,0.25)');
+          gradient.addColorStop(1, 'rgba(0,255,135,0.01)');
+          return gradient;
+        },
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointRadius: events.length > 200 ? 0 : 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: '#00ff87',
+        pointBorderColor: '#0a0a0a',
+        pointBorderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeInOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111',
+          borderColor: '#2a2a2a',
+          borderWidth: 1,
+          titleFont: { family: 'DM Mono', size: 11 },
+          bodyFont: { family: 'DM Mono', size: 12 },
+          titleColor: '#555',
+          bodyColor: '#f5f2eb',
+          padding: 12,
+          callbacks: {
+            title: (items) => {
+              const d = items[0].parsed.x;
+              return new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+            },
+            label: (item) => {
+              const v = item.parsed.y;
+              const sign = v >= 0 ? '+' : '';
+              return ` ${sign}$${v.toFixed(4)}`;
+            },
+            afterLabel: (item) => {
+              const e = events[item.dataIndex];
+              if (!e) return '';
+              if (e.type === 'funding') return ` ${e.coin} funding · ${e.longEx}/${e.shortEx}`;
+              return ` ${e.coin} trade closed · net ${fmtUsdShort(e.netPnl)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { tooltipFormat: 'MMM d HH:mm', displayFormats: { hour: 'MMM d HH:mm', day: 'MMM d' } },
+          grid: { color: 'rgba(42,42,42,0.5)', drawBorder: false },
+          ticks: {
+            color: '#555',
+            font: { family: 'DM Mono', size: 11 },
+            maxTicksLimit: 8,
+          }
+        },
+        y: {
+          position: 'right',
+          grid: { color: 'rgba(42,42,42,0.5)', drawBorder: false },
+          ticks: {
+            color: '#555',
+            font: { family: 'DM Mono', size: 11 },
+            callback: (v) => '$' + v.toFixed(2)
+          }
+        }
+      }
+    }
+  });
+
+  document.getElementById('chart-badge').textContent = `${events.length} EVENTS`;
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────────
+let allEvents = [];
+let currentFilter = 'all';
+
+function renderTable(events, filter) {
+  const tbody = document.getElementById('events-tbody');
+  const filtered = filter === 'all' ? events : events.filter(e => e.type === filter);
+
+  document.getElementById('table-badge').textContent =
+    filter === 'all' ? `ALL (${events.length})` :
+    filter === 'funding' ? `FUNDING (${filtered.length})` :
+    `TRADES (${filtered.length})`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><strong>—</strong>No ${filter} events</div></td></tr>`;
+    return;
+  }
+
+  // Show newest first
+  const rows = [...filtered].reverse().map(e => {
+    const timeStr = fmtDate(e.ts);
+    const typeBadge = e.type === 'funding'
+      ? '<span class="type-badge funding">FUNDING</span>'
+      : '<span class="type-badge close">TRADE</span>';
+
+    const amount = e.type === 'funding' ? (e.amount || 0) : (e.netPnl || 0);
+    const amountStr = fmtUsdShort(amount);
+    const amountClass = amount >= 0 ? 'pos' : 'neg';
+
+    const cumStr = fmtUsdShort(e.cumulative);
+    const cumClass = e.cumulative >= 0 ? 'pos' : 'neg';
+
+    let details = '';
+    if (e.type === 'funding') {
+      details = `${(e.periodHours || 0).toFixed(1)}h · spread ${((e.spread || 0) * 100).toFixed(3)}%`;
+    } else {
+      const dur = e.openedAt && e.closedAt
+        ? ((e.closedAt - e.openedAt) / 3600).toFixed(1) + 'h'
+        : '—';
+      details = `${dur} · ${e.leverage || 1}x · APR ${(e.apr || 0).toFixed(1)}%`;
+    }
+
+    return `<tr>
+      <td class="muted">${timeStr}</td>
+      <td>${typeBadge}</td>
+      <td>${e.coin || '—'}</td>
+      <td class="muted">${e.longEx || '—'} / ${e.shortEx || '—'}</td>
+      <td class="${amountClass}">${amountStr}</td>
+      <td class="${cumClass}">${cumStr}</td>
+      <td class="muted" style="font-size:11px">${details}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = rows.join('');
+}
+
+// ─── FILTER BUTTONS ───────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderTable(allEvents, currentFilter);
+  });
+});
+
+// ─── FETCH & INIT ─────────────────────────────────────────────────────────────
+async function load() {
+  try {
+    const res = await fetch(`${API_BASE}/api/pnl-history`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    allEvents = data.events || [];
+    renderStats(data);
+    renderChart(allEvents);
+    renderTable(allEvents, currentFilter);
+
+    const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    document.getElementById('last-updated').textContent = `UPDATED ${now}`;
+
+  } catch (err) {
+    console.error('Failed to load P&L data:', err);
+    document.getElementById('chart-wrap').innerHTML = `
+      <div class="error-state">
+        ⚠ Could not load from ${API_BASE}/api/pnl-history<br>
+        <span style="color:#555;font-size:11px;margin-top:8px;display:block">${err.message}</span>
+      </div>`;
+    document.getElementById('events-tbody').innerHTML =
+      `<tr><td colspan="7"><div class="error-state">API unavailable</div></td></tr>`;
+  }
+}
+
+load();
+// Refresh every 60s
+setInterval(load, 60_000);
+</script>
+</body>
+</html>
