@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FUNDING ARB // WATCHLIST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+      --surface3: #1a1a1a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 44px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--yellow);
+      letter-spacing: 2px;
+      margin-right: 32px;
+      text-decoration: none;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 14px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    nav a:hover { color: var(--white); }
+    nav a.active {
+      color: var(--yellow);
+      border-bottom-color: var(--yellow);
+    }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 18px;
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+    }
+    .page-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ─── SECTIONS ─── */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .section-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      text-transform: uppercase;
+    }
+    .section-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* ─── ADD FORM ─── */
+    .add-form {
+      padding: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .form-group input,
+    .form-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 8px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 120px;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--yellow);
+    }
+    .form-group input::placeholder { color: var(--muted); }
+    .form-group select option { background: #1a1a1a; }
+    .form-group input[type="number"] { width: 100px; }
+    .form-group input[name="coin"] { width: 120px; text-transform: uppercase; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--yellow);
+      color: #000;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: #ffd700; transform: translateY(-1px); }
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid #3a1a1a;
+      padding: 4px 10px;
+      font-size: 10px;
+    }
+    .btn-danger:hover { background: #1a0a0a; border-color: var(--red); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      font-size: 10px;
+    }
+    .btn-ghost:hover { color: var(--white); border-color: #444; }
+    .btn-add {
+      background: rgba(0,255,135,0.08);
+      color: var(--green);
+      border: 1px solid rgba(0,255,135,0.2);
+      padding: 4px 10px;
+      font-size: 10px;
+    }
+    .btn-add:hover { background: rgba(0,255,135,0.15); }
+
+    /* ─── WATCHLIST TABLE ─── */
+    .watch-table-wrap {
+      overflow-x: auto;
+    }
+    .watch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+    }
+    .watch-table th {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .watch-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #1a1a1a;
+      vertical-align: top;
+    }
+    .watch-table tr:last-child td { border-bottom: none; }
+    .watch-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Flash animation when spread crosses threshold */
+    @keyframes flashGreen {
+      0%   { background-color: rgba(0,255,135,0); }
+      20%  { background-color: rgba(0,255,135,0.18); }
+      100% { background-color: rgba(0,255,135,0); }
+    }
+    .watch-table tr.flash-green td {
+      animation: flashGreen 1.5s ease-out;
+    }
+
+    /* ─── PILL / STATUS ─── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pill-green {
+      background: rgba(0,255,135,0.12);
+      color: var(--green);
+      border: 1px solid rgba(0,255,135,0.25);
+    }
+    .pill-yellow {
+      background: rgba(255,225,53,0.10);
+      color: var(--yellow);
+      border: 1px solid rgba(255,225,53,0.25);
+    }
+    .pill-gray {
+      background: rgba(80,80,80,0.15);
+      color: var(--muted);
+      border: 1px solid #333;
+    }
+    .pill-red {
+      background: rgba(255,59,59,0.10);
+      color: var(--red);
+      border: 1px solid rgba(255,59,59,0.2);
+    }
+
+    .spread-val {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .spread-green { color: var(--green); }
+    .spread-yellow { color: var(--yellow); }
+    .spread-muted { color: var(--muted); }
+
+    .trend-arrow { font-size: 14px; }
+    .trend-up { color: var(--green); }
+    .trend-down { color: var(--red); }
+    .trend-flat { color: var(--muted); }
+
+    .coin-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+    .route-text {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .route-exchange {
+      display: inline-block;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin: 0 2px;
+    }
+    .route-long { background: rgba(0,255,135,0.1); color: var(--green); }
+    .route-short { background: rgba(255,59,59,0.1); color: var(--red); }
+
+    /* ─── INLINE TARGET EDIT ─── */
+    .target-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed #444;
+      color: var(--yellow);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      width: 56px;
+      text-align: right;
+      outline: none;
+      padding: 1px 2px;
+    }
+    .target-input:focus { border-bottom-color: var(--yellow); }
+
+    /* ─── NOTES ─── */
+    .notes-area {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: #aaa;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 6px 8px;
+      resize: vertical;
+      width: 100%;
+      min-height: 44px;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.5;
+    }
+    .notes-area:focus { border-color: #444; color: var(--white); }
+    .notes-area::placeholder { color: #3a3a3a; }
+
+    /* ─── QUICK ADD ─── */
+    .quick-add-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+      padding: 16px;
+    }
+    .quick-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .quick-card:hover { border-color: #3a3a3a; }
+    .quick-card-left { flex: 1; }
+    .quick-coin {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+    .quick-route {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .quick-spread {
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--green);
+      margin-right: 12px;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+    .empty-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 20px;
+      background: var(--surface2);
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ─── REFRESH BTN ─── */
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 4px 10px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { color: var(--white); border-color: #444; }
+    .refresh-btn.spinning { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* ─── LOADING ─── */
+    .loading-row td {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .add-form { flex-direction: column; }
+      .form-group input, .form-group select { width: 100% !important; min-width: unset; }
+      nav { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-brand">ARB //</a>
+    <a href="index.html">HOME</a>
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="rates.html">RATE CHARTS</a>
+    <a href="report.html">TRADE REPORT</a>
+    <a href="pnl.html">P&amp;L HISTORY</a>
+    <a href="watchlist.html" class="active">WATCHLIST</a>
+    <a href="golive.html">GO LIVE</a>
+    <a href="explainer.html">EXPLAINER</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-title">WATCHLIST</div>
+      <div class="page-subtitle">SPREAD ALERTS &amp; PAIR MONITORING</div>
+      <div style="flex:1"></div>
+      <button class="refresh-btn" id="refreshBtn" onclick="refresh()">↻ REFRESH</button>
+    </div>
+
+    <!-- ADD PAIR FORM -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">ADD PAIR</span>
+        <span class="section-meta">MANUALLY ADD A PAIR TO MONITOR</span>
+      </div>
+      <div class="add-form" id="addForm">
+        <div class="form-group">
+          <label>COIN</label>
+          <input type="text" id="coinInput" name="coin" placeholder="BTC" maxlength="12" />
+        </div>
+        <div class="form-group">
+          <label>LONG EXCHANGE</label>
+          <select id="longSelect">
+            <option value="">— SELECT —</option>
+            <option value="hyperliquid">Hyperliquid</option>
+            <option value="coinbase">Coinbase</option>
+            <option value="bitget">Bitget</option>
+            <option value="mexc">MEXC</option>
+            <option value="woox">WOO X</option>
+            <option value="kraken">Kraken</option>
+            <option value="gateio">Gate.io</option>
+            <option value="bingx">BingX</option>
+            <option value="okx">OKX</option>
+            <option value="dydx">dYdX</option>
+            <option value="aevo">Aevo</option>
+            <option value="backpack">Backpack</option>
+            <option value="paradex">Paradex</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>SHORT EXCHANGE</label>
+          <select id="shortSelect">
+            <option value="">— SELECT —</option>
+            <option value="hyperliquid">Hyperliquid</option>
+            <option value="coinbase">Coinbase</option>
+            <option value="bitget">Bitget</option>
+            <option value="mexc">MEXC</option>
+            <option value="woox">WOO X</option>
+            <option value="kraken">Kraken</option>
+            <option value="gateio">Gate.io</option>
+            <option value="bingx">BingX</option>
+            <option value="okx">OKX</option>
+            <option value="dydx">dYdX</option>
+            <option value="aevo">Aevo</option>
+            <option value="backpack">Backpack</option>
+            <option value="paradex">Paradex</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>TARGET SPREAD %</label>
+          <input type="number" id="targetInput" min="0" step="0.01" value="0.5" placeholder="0.5" />
+        </div>
+        <div class="form-group" style="align-self: flex-end;">
+          <button class="btn btn-primary" onclick="addPair()">+ ADD TO WATCHLIST</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WATCHLIST TABLE -->
+    <div class="section" id="watchlistSection">
+      <div class="section-header">
+        <span class="section-title">⭐ MY WATCHLIST</span>
+        <span class="section-meta" id="watchCount">0 PAIRS</span>
+      </div>
+      <div class="watch-table-wrap">
+        <table class="watch-table" id="watchTable">
+          <thead>
+            <tr>
+              <th>PAIR</th>
+              <th>ROUTE</th>
+              <th>TARGET</th>
+              <th>CURRENT SPREAD</th>
+              <th>STATUS</th>
+              <th>TREND</th>
+              <th>NOTES</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="watchBody">
+            <tr class="loading-row"><td colspan="8">LOADING WATCHLIST...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="status-bar">
+        <div class="status-dot"></div>
+        <span id="lastUpdate">—</span>
+        <span style="flex:1"></span>
+        <span id="aboveCount" style="color: var(--green);">— ABOVE TARGET</span>
+        <span>|</span>
+        <span id="belowCount" style="color: var(--muted);">— BELOW TARGET</span>
+      </div>
+    </div>
+
+    <!-- QUICK ADD -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">⚡ QUICK ADD — TOP OPPORTUNITIES</span>
+        <span class="section-meta" id="quickMeta">FETCHING LIVE DATA...</span>
+      </div>
+      <div id="quickAddGrid" class="quick-add-grid">
+        <!-- populated by JS -->
+        <div style="grid-column:1/-1; text-align:center; padding:32px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px;">
+          FETCHING OPPORTUNITIES...
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+
+<script>
+  const STORAGE_KEY = 'arb_watchlist';
+  const NOTES_KEY   = 'arb_watchlist_notes';
+  const EXCHANGES   = ['hyperliquid','coinbase','bitget','mexc','woox','kraken','gateio','bingx','okx','dydx','aevo','backpack','paradex'];
+  const EXCLUDED    = ['drift'];
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let watchlist = []; // [{coin, long, short, targetSpread}]
+  let notes     = {}; // {key: text}
+  let liveData  = {}; // {key: {spread, prev}}
+  let refreshInterval = null;
+
+  function makeKey(item) {
+    return `${item.coin.toUpperCase()}_${item.long}_${item.short}`;
+  }
+
+  // ── Persistence ────────────────────────────────────────────────────────────
+  function loadWatchlist() {
+    try { watchlist = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { watchlist = []; }
+    try { notes     = JSON.parse(localStorage.getItem(NOTES_KEY)   || '{}'); } catch(e) { notes = {}; }
+  }
+
+  function saveWatchlist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(watchlist));
+  }
+
+  function saveNotes() {
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+  }
+
+  // ── API ────────────────────────────────────────────────────────────────────
+  async function fetchOpportunities() {
+    try {
+      const r = await fetch('/api/opportunities');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      // handle both {opportunities:[...]} and [...]
+      const arr = Array.isArray(data) ? data : (data.opportunities || data.data || []);
+      return arr.filter(o => {
+        const exLong  = (o.longExchange  || o.long_exchange  || '').toLowerCase();
+        const exShort = (o.shortExchange || o.short_exchange || '').toLowerCase();
+        const coin    = (o.coin || o.symbol || '').toLowerCase();
+        const isExcluded = EXCLUDED.some(ex => exLong.includes(ex) || exShort.includes(ex) || coin.includes('tokenized'));
+        return !isExcluded;
+      });
+    } catch(e) {
+      console.warn('fetchOpportunities error:', e);
+      return [];
+    }
+  }
+
+  function normalizeOpp(o) {
+    return {
+      coin:      (o.coin || o.symbol || '').toUpperCase().replace(/-PERP$/i,'').replace(/\/.*$/,''),
+      long:      (o.longExchange  || o.long_exchange  || '').toLowerCase(),
+      short:     (o.shortExchange || o.short_exchange || '').toLowerCase(),
+      spread:    parseFloat(o.spread || o.annualizedSpread || o.rate || o.funding_rate || 0),
+    };
+  }
+
+  // Build a lookup map from live opps: key → spread
+  function buildLiveMap(opps) {
+    const map = {};
+    opps.forEach(o => {
+      const n = normalizeOpp(o);
+      const k = `${n.coin}_${n.long}_${n.short}`;
+      map[k] = n.spread;
+    });
+    return map;
+  }
+
+  // ── Spread fetch for watchlist item ───────────────────────────────────────
+  async function refreshSpreads() {
+    const spinner = document.getElementById('refreshBtn');
+    spinner.textContent = '↻ REFRESHING...';
+
+    const opps = await fetchOpportunities();
+    const liveMap = buildLiveMap(opps);
+
+    // Update liveData with prev
+    watchlist.forEach(item => {
+      const k = makeKey(item);
+      const prev = liveData[k] ? liveData[k].spread : null;
+      const cur  = liveMap[k] !== undefined ? liveMap[k] : null;
+      liveData[k] = { spread: cur, prev };
+    });
+
+    renderWatchlist();
+    renderQuickAdd(opps);
+
+    document.getElementById('lastUpdate').textContent = 'UPDATED ' + new Date().toLocaleTimeString();
+    spinner.textContent = '↻ REFRESH';
+  }
+
+  // ── Render Watchlist ──────────────────────────────────────────────────────
+  function renderWatchlist() {
+    const tbody = document.getElementById('watchBody');
+    document.getElementById('watchCount').textContent = watchlist.length + ' PAIR' + (watchlist.length !== 1 ? 'S' : '');
+
+    if (watchlist.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <div class="empty-text">NO PAIRS ADDED YET — USE THE FORM ABOVE OR QUICK ADD BELOW</div>
+        </div>
+      </td></tr>`;
+      document.getElementById('aboveCount').textContent = '— ABOVE TARGET';
+      document.getElementById('belowCount').textContent = '— BELOW TARGET';
+      return;
+    }
+
+    let aboveCount = 0, belowCount = 0;
+    const rows = [];
+
+    watchlist.forEach((item, idx) => {
+      const k     = makeKey(item);
+      const live  = liveData[k] || {};
+      const cur   = live.spread;
+      const prev  = live.prev;
+      const note  = notes[k] || '';
+      const tgt   = parseFloat(item.targetSpread) || 0;
+
+      // Status
+      const hasData = cur !== null && cur !== undefined;
+      const above   = hasData && cur >= tgt;
+      const near    = hasData && !above && tgt > 0 && cur >= tgt * 0.8;
+      // Track crossing
+      const wasBelowNowAbove = prev !== null && prev !== undefined && prev < tgt && cur >= tgt;
+      if (above) aboveCount++; else belowCount++;
+
+      // Status pill
+      let statusPill;
+      if (!hasData) {
+        statusPill = `<span class="pill pill-gray">NO DATA</span>`;
+      } else if (above) {
+        statusPill = `<span class="pill pill-green">▲ ABOVE</span>`;
+      } else if (near) {
+        statusPill = `<span class="pill pill-yellow">~ NEAR</span>`;
+      } else {
+        statusPill = `<span class="pill pill-gray">▼ BELOW</span>`;
+      }
+
+      // Spread value
+      let spreadHtml;
+      if (!hasData) {
+        spreadHtml = `<span class="spread-muted" style="font-family:'DM Mono',monospace; font-size:12px;">—</span>`;
+      } else {
+        const cls = above ? 'spread-green' : near ? 'spread-yellow' : 'spread-muted';
+        spreadHtml = `<span class="spread-val ${cls}">${cur.toFixed(4)}%</span>`;
+      }
+
+      // Trend
+      let trendHtml = `<span class="trend-arrow trend-flat">—</span>`;
+      if (prev !== null && prev !== undefined && cur !== null && cur !== undefined) {
+        if (cur > prev + 0.001) trendHtml = `<span class="trend-arrow trend-up">↑</span>`;
+        else if (cur < prev - 0.001) trendHtml = `<span class="trend-arrow trend-down">↓</span>`;
+        else trendHtml = `<span class="trend-arrow trend-flat">→</span>`;
+      }
+
+      const flashClass = wasBelowNowAbove ? 'flash-green' : '';
+
+      rows.push(`
+        <tr data-idx="${idx}" class="${flashClass}" id="row-${k}">
+          <td>
+            <div class="coin-name">${item.coin.toUpperCase()}</div>
+          </td>
+          <td>
+            <div class="route-text">
+              <span class="route-exchange route-long">L: ${item.long}</span>
+              <span class="route-exchange route-short">S: ${item.short}</span>
+            </div>
+          </td>
+          <td>
+            <input class="target-input" type="number" min="0" step="0.01"
+              value="${tgt.toFixed(2)}"
+              title="Edit target spread"
+              onchange="updateTarget(${idx}, this.value)"
+              onblur="updateTarget(${idx}, this.value)"
+            />
+            <span style="font-family:'DM Mono',monospace; font-size:10px; color: var(--muted);">%</span>
+          </td>
+          <td>${spreadHtml}</td>
+          <td>${statusPill}</td>
+          <td>${trendHtml}</td>
+          <td style="min-width:160px; max-width:220px;">
+            <textarea class="notes-area" placeholder="notes..."
+              onchange="updateNote('${k}', this.value)"
+              oninput="updateNote('${k}', this.value)"
+              rows="2"
+            >${note}</textarea>
+          </td>
+          <td>
+            <button class="btn btn-danger" onclick="removePair(${idx})">✕ REMOVE</button>
+          </td>
+        </tr>
+      `);
+    });
+
+    tbody.innerHTML = rows.join('');
+    document.getElementById('aboveCount').textContent = aboveCount + ' ABOVE TARGET';
+    document.getElementById('belowCount').textContent = belowCount + ' BELOW TARGET';
+
+    // Re-trigger flash animation for crossing rows
+    watchlist.forEach((item, idx) => {
+      const k = makeKey(item);
+      const row = document.getElementById('row-' + k);
+      if (row && row.classList.contains('flash-green')) {
+        // Re-trigger by removing and re-adding
+        row.classList.remove('flash-green');
+        void row.offsetWidth;
+        row.classList.add('flash-green');
+      }
+    });
+  }
+
+  // ── Render Quick Add ──────────────────────────────────────────────────────
+  function renderQuickAdd(opps) {
+    const grid = document.getElementById('quickAddGrid');
+    const meta = document.getElementById('quickMeta');
+
+    const top15 = opps
+      .map(normalizeOpp)
+      .filter(o => o.coin && o.long && o.short && o.spread > 0)
+      .sort((a,b) => b.spread - a.spread)
+      .slice(0, 15);
+
+    if (top15.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:32px; color: var(--muted); font-family: 'DM Mono', monospace; font-size:11px;">NO OPPORTUNITIES AVAILABLE</div>`;
+      meta.textContent = '0 OPPORTUNITIES';
+      return;
+    }
+
+    meta.textContent = `TOP ${top15.length} OF ${opps.length} LIVE OPPORTUNITIES`;
+
+    grid.innerHTML = top15.map(o => {
+      const alreadyWatched = watchlist.some(w =>
+        w.coin.toUpperCase() === o.coin.toUpperCase() &&
+        w.long === o.long && w.short === o.short
+      );
+      return `
+        <div class="quick-card">
+          <div class="quick-card-left">
+            <div class="quick-coin">${o.coin}</div>
+            <div class="quick-route">
+              <span class="route-exchange route-long">L: ${o.long}</span>
+              <span class="route-exchange route-short">S: ${o.short}</span>
+            </div>
+          </div>
+          <span class="quick-spread">${o.spread.toFixed(4)}%</span>
+          <button class="btn ${alreadyWatched ? 'btn-ghost' : 'btn-add'}"
+            onclick="quickAdd('${o.coin}','${o.long}','${o.short}',${o.spread.toFixed(4)})"
+            ${alreadyWatched ? 'disabled title="Already watching"' : ''}>
+            ${alreadyWatched ? '✓' : '+ ADD'}
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Actions ───────────────────────────────────────────────────────────────
+  function addPair() {
+    const coin   = document.getElementById('coinInput').value.trim().toUpperCase();
+    const long   = document.getElementById('longSelect').value;
+    const short  = document.getElementById('shortSelect').value;
+    const target = parseFloat(document.getElementById('targetInput').value) || 0.5;
+
+    if (!coin) { alert('Enter a coin symbol.'); return; }
+    if (!long)  { alert('Select a long exchange.'); return; }
+    if (!short) { alert('Select a short exchange.'); return; }
+    if (long === short) { alert('Long and short exchanges must differ.'); return; }
+
+    const key = `${coin}_${long}_${short}`;
+    const exists = watchlist.some(w => makeKey(w) === key);
+    if (exists) { alert('This pair is already in your watchlist.'); return; }
+
+    watchlist.push({ coin, long, short, targetSpread: target });
+    saveWatchlist();
+
+    // Clear form
+    document.getElementById('coinInput').value = '';
+    document.getElementById('longSelect').value = '';
+    document.getElementById('shortSelect').value = '';
+    document.getElementById('targetInput').value = '0.5';
+
+    refresh();
+  }
+
+  function quickAdd(coin, long, short, spread) {
+    const key = `${coin.toUpperCase()}_${long}_${short}`;
+    const exists = watchlist.some(w => makeKey(w) === key);
+    if (exists) return;
+
+    // Pre-fill form
+    document.getElementById('coinInput').value = coin;
+    const longSel = document.getElementById('longSelect');
+    const shortSel = document.getElementById('shortSelect');
+    for (let opt of longSel.options)  if (opt.value === long)  opt.selected = true;
+    for (let opt of shortSel.options) if (opt.value === short) opt.selected = true;
+    document.getElementById('targetInput').value = Math.max(0.1, (spread * 0.8).toFixed(2));
+
+    // Auto-add
+    watchlist.push({ coin: coin.toUpperCase(), long, short, targetSpread: Math.max(0.1, spread * 0.8) });
+    saveWatchlist();
+    refresh();
+    document.getElementById('watchlistSection').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function removePair(idx) {
+    const item = watchlist[idx];
+    if (!item) return;
+    const k = makeKey(item);
+    delete notes[k];
+    delete liveData[k];
+    watchlist.splice(idx, 1);
+    saveWatchlist();
+    saveNotes();
+    renderWatchlist();
+  }
+
+  function updateTarget(idx, val) {
+    if (!watchlist[idx]) return;
+    watchlist[idx].targetSpread = parseFloat(val) || 0;
+    saveWatchlist();
+    renderWatchlist();
+  }
+
+  function updateNote(key, val) {
+    notes[key] = val;
+    saveNotes();
+  }
+
+  async function refresh() {
+    await refreshSpreads();
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  loadWatchlist();
+  renderWatchlist();
+  refresh();
+
+  // Auto-refresh every 60 seconds
+  refreshInterval = setInterval(refresh, 60000);
+</script>
+
+</body>
+</html>
