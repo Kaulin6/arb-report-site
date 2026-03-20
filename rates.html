@@ -81,9 +81,48 @@
       50% { opacity: 0.3; }
     }
 
-    /* ── Nav back ── */
+    /* ── Nav bar ── */
+    .topnav {
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 44px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topnav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--yellow);
+      letter-spacing: 2px;
+      margin-right: 28px;
+    }
+    .topnav a {
+      color: #666;
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 14px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .topnav a:hover { color: var(--white); }
+    .topnav a.active {
+      color: var(--yellow);
+      border-bottom-color: var(--yellow);
+    }
+
+    /* ── Nav back (kept for compat) ── */
     .nav-back {
-      padding: 14px 40px 0;
+      display: none;
     }
 
     .nav-back a {
@@ -329,6 +368,17 @@
   </style>
 </head>
 <body>
+
+<nav class="topnav">
+  <span class="topnav-brand">ARB//</span>
+  <a href="/">HUB</a>
+  <a href="dashboard.html">DASHBOARD</a>
+  <a href="rates.html" class="active">RATE CHARTS</a>
+  <a href="report.html">TRADE REPORT</a>
+  <a href="pnl.html">P&L HISTORY</a>
+  <a href="golive.html">GO LIVE</a>
+  <a href="explainer.html">EXPLAINER</a>
+</nav>
 
 <header>
   <h1>FUNDING RATE HISTORY</h1>
