@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POLYMARKET ARB // YES+NO SCANNER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --white: #f5f2eb;
+      --muted: #555;
+      --muted2: #333;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --surface: #0f0f0f;
+      --surface2: #141414;
+      --surface3: #181818;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: #0a0a0a;
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      height: 42px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      overflow-x: auto;
+      gap: 4px;
+    }
+    nav::-webkit-scrollbar { display: none; }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--yellow);
+      letter-spacing: 0.05em;
+      margin-right: 16px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .nav-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 3px;
+      white-space: nowrap;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-link:hover { color: var(--white); background: #161616; }
+    .nav-link.active { color: var(--yellow); background: rgba(255,225,53,0.07); }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 1;
+      color: var(--white);
+      letter-spacing: 0.03em;
+    }
+
+    .page-title span {
+      color: var(--yellow);
+    }
+
+    .page-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .page-subtitle span {
+      color: var(--green);
+    }
+
+    /* ── LIVE STATS ── */
+    .stats-bar {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .stat-value.green { color: var(--green); }
+    .stat-value.yellow { color: var(--yellow); }
+
+    .live-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ── EXPLAINER ── */
+    .explainer {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--yellow);
+      border-radius: 6px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .explainer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      gap: 12px;
+    }
+
+    .explainer-header:hover { background: rgba(255,255,255,0.02); }
+
+    .explainer-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--yellow);
+    }
+
+    .explainer-toggle {
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+
+    .explainer-toggle.open { transform: rotate(180deg); }
+
+    .explainer-body {
+      padding: 0 16px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .explainer-body.open {
+      max-height: 300px;
+      padding: 0 16px 16px;
+    }
+
+    .explainer-body p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #aaa;
+      line-height: 1.65;
+    }
+
+    .explainer-body strong { color: var(--white); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-label {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .filter-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--yellow);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 140px;
+      height: 3px;
+      background: var(--border2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--yellow);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+    .filter-number {
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 5px 8px;
+      width: 80px;
+      outline: none;
+    }
+    .filter-number:focus { border-color: var(--yellow); }
+
+    .type-toggle {
+      display: flex;
+      gap: 2px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 2px;
+    }
+
+    .type-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    .type-btn:hover { color: var(--white); }
+    .type-btn.active { background: var(--surface3); color: var(--yellow); }
+
+    .search-input {
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 6px 10px;
+      width: 220px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--yellow); }
+    .search-input::placeholder { color: var(--muted); }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .status-left {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .status-right {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .countdown {
+      color: var(--yellow);
+      font-weight: 500;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border2);
+    }
+
+    th {
+      padding: 10px 12px;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s;
+    }
+
+    th:hover { color: var(--white); }
+    th.sorted { color: var(--yellow); }
+
+    th .sort-icon {
+      margin-left: 4px;
+      opacity: 0.5;
+      font-size: 8px;
+    }
+
+    th.sorted .sort-icon { opacity: 1; color: var(--yellow); }
+
+    td {
+      padding: 9px 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tbody tr {
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { filter: brightness(1.3); }
+
+    /* BUY-BOTH rows: subtle green tint */
+    tbody tr.buy-both {
+      background: rgba(0, 255, 135, 0.04);
+    }
+
+    /* SELL-BOTH rows: subtle yellow tint */
+    tbody tr.sell-both {
+      background: rgba(255, 225, 53, 0.03);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .badge-buy {
+      background: rgba(0, 255, 135, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 135, 0.25);
+    }
+
+    .badge-sell {
+      background: rgba(255, 225, 53, 0.1);
+      color: var(--yellow);
+      border: 1px solid rgba(255, 225, 53, 0.22);
+    }
+
+    .profit-high { color: var(--green); font-weight: 500; }
+    .profit-mid { color: var(--yellow); }
+    .profit-low { color: var(--white); }
+
+    .link-cell {
+      color: var(--muted);
+      font-size: 14px;
+      transition: color 0.15s;
+    }
+    tbody tr:hover .link-cell { color: var(--yellow); }
+
+    .market-name {
+      max-width: 340px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--white);
+      font-size: 12px;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    .empty-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      color: var(--white);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .empty-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── LOADING ── */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--border2);
+      border-top-color: var(--yellow);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── DISCLAIMER ── */
+    .disclaimer {
+      border: 1px solid rgba(255, 59, 59, 0.35);
+      border-left: 3px solid var(--red);
+      background: rgba(255, 59, 59, 0.04);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+    }
+
+    .disclaimer-title {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .disclaimer p {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      color: #999;
+      line-height: 1.6;
+    }
+
+    /* ── REFRESH PROGRESS ── */
+    .refresh-bar {
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .refresh-fill {
+      height: 100%;
+      background: var(--yellow);
+      border-radius: 1px;
+      transition: width 1s linear;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .filter-bar { flex-direction: column; align-items: flex-start; }
+      .search-input { width: 100%; }
+      td, th { padding: 8px 8px; }
+      .market-name { max-width: 180px; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-bar { gap: 16px; }
+      .stat-value { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">ARB ⚡</a>
+  <a href="/" class="nav-link">Hub</a>
+  <a href="/dashboard.html" class="nav-link">Scanner</a>
+  <a href="/matrix.html" class="nav-link">Matrix</a>
+  <a href="/rates.html" class="nav-link">Charts</a>
+  <a href="/report.html" class="nav-link">Report</a>
+  <a href="/pnl.html" class="nav-link">P&amp;L</a>
+  <a href="/cashcarry.html" class="nav-link">Cash-Carry</a>
+  <a href="/polymarket.html" class="nav-link active">Polymarket</a>
+  <a href="/brain.html" class="nav-link">Brain</a>
+  <a href="/golive.html" class="nav-link">Go Live</a>
+</nav>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="page-title">POLYMARKET <span>ARB</span></div>
+        <div class="page-subtitle">YES + NO ≠ $1.00 → <span>free money</span></div>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-label">Markets Scanned</div>
+          <div class="stat-value" id="stat-scanned">—</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Opps Found</div>
+          <div class="stat-value green" id="stat-opps">—</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Last Updated</div>
+          <div class="stat-value yellow" id="stat-updated" style="font-size:13px;margin-top:4px;">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLAINER -->
+  <div class="explainer">
+    <div class="explainer-header" onclick="toggleExplainer()">
+      <span class="explainer-title">📖 How Polymarket Arb Works</span>
+      <span class="explainer-toggle" id="explainer-toggle">▼</span>
+    </div>
+    <div class="explainer-body" id="explainer-body">
+      <p>
+        Polymarket YES + NO shares for the same event should always cost exactly <strong>$1.00</strong> total — one of them pays out.
+        If <strong>YES=$0.40</strong> and <strong>NO=$0.82</strong> (combined $1.22), you can <strong>SELL BOTH</strong> for $1.22 and buy back at $1.00 when it resolves — pocketing <strong>$0.22/share</strong>.
+        <br><br>
+        If combined is <em>below</em> $1.00, you <strong>BUY BOTH</strong> and collect $1.00 at resolution for guaranteed profit.
+        <br><br>
+        <strong>Note:</strong> SELL-BOTH requires selling/shorting on Polymarket's CLOB, which needs MATIC + an approved wallet. BUY-BOTH is pure arb but rare.
+      </p>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-label">Min Volume</div>
+      <input type="range" id="vol-slider" min="0" max="6" step="1" value="3" oninput="onVolSlider()">
+      <div class="filter-value" id="vol-display">$1,000</div>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Min Profit/Share</div>
+      <input type="number" class="filter-number" id="min-profit" value="0.01" step="0.005" min="0" max="1" oninput="onFilterChange()">
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Type</div>
+      <div class="type-toggle">
+        <button class="type-btn active" id="btn-ALL" onclick="setType('ALL')">All</button>
+        <button class="type-btn" id="btn-BUY-BOTH" onclick="setType('BUY-BOTH')">Buy-Both</button>
+        <button class="type-btn" id="btn-SELL-BOTH" onclick="setType('SELL-BOTH')">Sell-Both</button>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <div class="filter-label">Search</div>
+      <input type="text" class="search-input" id="search-input" placeholder="filter markets…" oninput="onFilterChange()">
+    </div>
+
+    <div style="margin-left:auto">
+      <button onclick="loadData()" style="background:rgba(255,225,53,0.08);border:1px solid rgba(255,225,53,0.2);color:var(--yellow);font-family:'DM Mono',monospace;font-size:11px;padding:7px 14px;border-radius:4px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;">↺ Refresh</button>
+    </div>
+  </div>
+
+  <!-- STATUS / COUNTDOWN -->
+  <div class="status-bar">
+    <div class="status-left" id="status-text">Loading markets…</div>
+    <div class="status-right">Next refresh in <span class="countdown" id="countdown">30s</span></div>
+  </div>
+
+  <!-- REFRESH PROGRESS BAR -->
+  <div class="refresh-bar">
+    <div class="refresh-fill" id="refresh-fill" style="width:100%"></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap" id="table-wrap">
+    <div class="loading-state" id="loading-state">
+      <div class="spinner"></div>
+      <div class="loading-text">SCANNING POLYMARKET…</div>
+    </div>
+    <table id="arb-table" style="display:none">
+      <thead>
+        <tr>
+          <th onclick="sortBy('question')" id="th-question">MARKET <span class="sort-icon">↕</span></th>
+          <th onclick="sortBy('type')" id="th-type">TYPE <span class="sort-icon">↕</span></th>
+          <th onclick="sortBy('yes')" id="th-yes">YES $ <span class="sort-icon">↕</span></th>
+          <th onclick="sortBy('no')" id="th-no">NO $ <span class="sort-icon">↕</span></th>
+          <th onclick="sortBy('combined')" id="th-combined">COMBINED $ <span class="sort-icon">↕</span></th>
+          <th onclick="sortBy('profit')" id="th-profit" class="sorted">PROFIT/SHARE <span class="sort-icon">↓</span></th>
+          <th onclick="sortBy('returnPct')" id="th-returnPct">RETURN % <span class="sort-icon">↕</span></th>
+          <th onclick="sortBy('volume')" id="th-volume">VOLUME <span class="sort-icon">↕</span></th>
+          <th>LINK</th>
+        </tr>
+      </thead>
+      <tbody id="arb-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No Opportunities Found</div>
+      <div class="empty-sub">Adjust filters or wait for the next refresh</div>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    <div class="disclaimer-title">⚠ Important Risk Disclosure</div>
+    <p>
+      <strong>SELL-BOTH</strong> requires short selling on Polymarket's CLOB — you need an approved wallet and MATIC for gas.
+      <strong>BUY-BOTH</strong> opportunities are rare but represent pure arb when they appear.
+      Always check liquidity before entering large positions. Prices shown are best-available asks and may not reflect actual executable depth.
+      This tool is for informational purposes only and does not constitute financial advice.
+    </p>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  const BASE = 'https://gamma-api.polymarket.com';
+
+  // ── Volume slider steps ──
+  const VOL_STEPS = [0, 100, 500, 1000, 5000, 10000, 50000];
+
+  function onVolSlider() {
+    const idx = parseInt(document.getElementById('vol-slider').value);
+    const val = VOL_STEPS[idx];
+    document.getElementById('vol-display').textContent = val >= 1000 ? `$${(val/1000).toFixed(0)}k` : `$${val}`;
+    onFilterChange();
+  }
+
+  function getMinVol() {
+    const idx = parseInt(document.getElementById('vol-slider').value);
+    return VOL_STEPS[idx];
+  }
+
+  function getMinProfit() {
+    return parseFloat(document.getElementById('min-profit').value) || 0;
+  }
+
+  // ── Type filter ──
+  let currentType = 'ALL';
+  function setType(t) {
+    currentType = t;
+    ['ALL','BUY-BOTH','SELL-BOTH'].forEach(x => {
+      document.getElementById('btn-' + x).classList.toggle('active', x === t);
+    });
+    renderTable();
+  }
+
+  function onFilterChange() { renderTable(); }
+
+  // ── Explainer toggle ──
+  function toggleExplainer() {
+    const body = document.getElementById('explainer-body');
+    const toggle = document.getElementById('explainer-toggle');
+    const open = body.classList.toggle('open');
+    toggle.classList.toggle('open', open);
+  }
+
+  // ── Fetch ──
+  async function fetchMarkets() {
+    const all = [];
+    for (let offset = 0; offset < 400; offset += 100) {
+      const r = await fetch(`${BASE}/markets?limit=100&active=true&order=volume&ascending=false&offset=${offset}`);
+      const d = await r.json();
+      if (!d.length) break;
+      all.push(...d);
+      if (d.length < 100) break;
+    }
+    return all;
+  }
+
+  // ── Arb compute ──
+  function computeArb(markets) {
+    const minVol = getMinVol();
+    const minProfit = getMinProfit();
+    const typeFilter = currentType;
+    const opps = [];
+    for (const m of markets) {
+      const vol = parseFloat(m.volume) || 0;
+      if (vol < minVol) continue;
+      let prices;
+      try { prices = JSON.parse(m.outcomePrices); } catch { continue; }
+      if (!prices || prices.length < 2) continue;
+      const yes = parseFloat(prices[0]);
+      const no = parseFloat(prices[1]);
+      if (isNaN(yes) || isNaN(no)) continue;
+      const combined = yes + no;
+      let type, profit;
+      if (combined < 0.99) { type = 'BUY-BOTH'; profit = 1 - combined; }
+      else if (combined > 1.01) { type = 'SELL-BOTH'; profit = combined - 1; }
+      else continue;
+      if (profit < minProfit) continue;
+      if (typeFilter !== 'ALL' && type !== typeFilter) continue;
+      opps.push({
+        question: m.question || '—',
+        type, yes, no, combined, profit,
+        returnPct: (profit / combined) * 100,
+        volume: vol,
+        url: 'https://polymarket.com/event/' + (m.slug || '')
+      });
+    }
+    return opps.sort((a, b) => b.profit - a.profit);
+  }
+
+  // ── Sort ──
+  let sortKey = 'profit';
+  let sortDir = -1; // -1 = desc
+
+  function sortBy(key) {
+    if (sortKey === key) {
+      sortDir *= -1;
+    } else {
+      sortKey = key;
+      sortDir = key === 'question' || key === 'type' ? 1 : -1;
+    }
+    renderTable();
+  }
+
+  function updateSortHeaders() {
+    const cols = ['question','type','yes','no','combined','profit','returnPct','volume'];
+    cols.forEach(k => {
+      const th = document.getElementById('th-' + k);
+      if (!th) return;
+      th.classList.toggle('sorted', k === sortKey);
+      const icon = th.querySelector('.sort-icon');
+      if (k === sortKey) {
+        icon.textContent = sortDir === 1 ? '↑' : '↓';
+      } else {
+        icon.textContent = '↕';
+      }
+    });
+  }
+
+  // ── Render ──
+  let cachedMarkets = [];
+
+  function renderTable() {
+    const searchQ = document.getElementById('search-input').value.toLowerCase().trim();
+    let opps = computeArb(cachedMarkets);
+
+    if (searchQ) {
+      opps = opps.filter(o => o.question.toLowerCase().includes(searchQ));
+    }
+
+    // Sort
+    opps.sort((a, b) => {
+      const va = a[sortKey], vb = b[sortKey];
+      if (typeof va === 'string') return sortDir * va.localeCompare(vb);
+      return sortDir * (vb - va) * -1;
+    });
+
+    updateSortHeaders();
+
+    const tbody = document.getElementById('arb-body');
+    const table = document.getElementById('arb-table');
+    const empty = document.getElementById('empty-state');
+    const loading = document.getElementById('loading-state');
+
+    loading.style.display = 'none';
+
+    document.getElementById('stat-opps').textContent = opps.length;
+
+    if (!opps.length) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      document.getElementById('status-text').textContent = `No arb opportunities with current filters`;
+      return;
+    }
+
+    empty.style.display = 'none';
+    table.style.display = 'table';
+
+    tbody.innerHTML = opps.map(o => {
+      const name = o.question.length > 45 ? o.question.slice(0, 45) + '…' : o.question;
+      const pctClass = o.returnPct > 5 ? 'profit-high' : o.returnPct > 1 ? 'profit-mid' : 'profit-low';
+      const rowClass = o.type === 'BUY-BOTH' ? 'buy-both' : 'sell-both';
+      const badge = o.type === 'BUY-BOTH'
+        ? `<span class="badge badge-buy">BUY-BOTH</span>`
+        : `<span class="badge badge-sell">SELL-BOTH</span>`;
+      return `
+        <tr class="${rowClass}" onclick="window.open('${escHtml(o.url)}','_blank')">
+          <td><div class="market-name" title="${escHtml(o.question)}">${escHtml(name)}</div></td>
+          <td>${badge}</td>
+          <td>$${o.yes.toFixed(3)}</td>
+          <td>$${o.no.toFixed(3)}</td>
+          <td>$${o.combined.toFixed(3)}</td>
+          <td style="color:var(--green);font-weight:500">$${o.profit.toFixed(4)}</td>
+          <td class="${pctClass}">${o.returnPct.toFixed(2)}%</td>
+          <td>$${fmtVol(o.volume)}</td>
+          <td class="link-cell">→</td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('status-text').textContent = `Showing ${opps.length} opportunities from ${cachedMarkets.length} markets`;
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fmtVol(v) {
+    if (v >= 1e6) return (v/1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return (v/1e3).toFixed(1) + 'k';
+    return v.toFixed(0);
+  }
+
+  // ── Load ──
+  async function loadData() {
+    document.getElementById('loading-state').style.display = 'block';
+    document.getElementById('arb-table').style.display = 'none';
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('stat-scanned').textContent = '…';
+    document.getElementById('stat-opps').textContent = '…';
+    document.getElementById('status-text').textContent = 'Fetching from Polymarket…';
+
+    try {
+      const markets = await fetchMarkets();
+      cachedMarkets = markets;
+      document.getElementById('stat-scanned').textContent = markets.length;
+      const now = new Date();
+      document.getElementById('stat-updated').textContent =
+        now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      renderTable();
+    } catch (err) {
+      document.getElementById('loading-state').innerHTML =
+        `<div class="empty-icon">⚠️</div><div class="empty-title" style="color:var(--red)">FETCH ERROR</div><div class="empty-sub">${err.message}</div>`;
+    }
+
+    resetCountdown();
+  }
+
+  // ── Auto-refresh countdown ──
+  const REFRESH_INTERVAL = 30;
+  let countdownVal = REFRESH_INTERVAL;
+  let countdownTimer = null;
+
+  function resetCountdown() {
+    countdownVal = REFRESH_INTERVAL;
+    updateCountdownUI();
+    clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+      countdownVal--;
+      updateCountdownUI();
+      if (countdownVal <= 0) {
+        loadData();
+      }
+    }, 1000);
+  }
+
+  function updateCountdownUI() {
+    document.getElementById('countdown').textContent = countdownVal + 's';
+    const pct = (countdownVal / REFRESH_INTERVAL) * 100;
+    document.getElementById('refresh-fill').style.width = pct + '%';
+  }
+
+  // ── Init ──
+  onVolSlider();
+  loadData();
+</script>
+</body>
+</html>
