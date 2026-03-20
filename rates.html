@@ -38,6 +38,7 @@
       display: flex;
       align-items: baseline;
       gap: 16px;
+      flex-wrap: wrap;
     }
 
     header h1 {
@@ -47,11 +48,37 @@
       color: var(--yellow);
     }
 
-    header span {
+    header .header-meta {
       font-family: 'DM Mono', monospace;
       font-size: 0.75rem;
       color: var(--muted);
       letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    #lastUpdated {
+      color: var(--green);
+      transition: color 0.3s;
+    }
+
+    #lastUpdated.stale { color: var(--yellow); }
+
+    .live-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     /* ── Nav back ── */
@@ -76,6 +103,43 @@
       padding: 32px 40px 60px;
     }
 
+    /* ── Loading state ── */
+    .loading-state {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .loading-state .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--yellow);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-state {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--red);
+      letter-spacing: 0.06em;
+      padding: 40px 0;
+      text-align: center;
+      border: 1px solid rgba(255,59,59,0.2);
+      background: rgba(255,59,59,0.04);
+    }
+
     /* ── Pair selector tabs ── */
     .pair-tabs {
       display: flex;
@@ -95,6 +159,7 @@
       cursor: pointer;
       transition: all 0.15s ease;
       user-select: none;
+      position: relative;
     }
 
     .pair-tab:hover {
@@ -106,6 +171,16 @@
       background: var(--yellow);
       border-color: var(--yellow);
       color: var(--bg);
+    }
+
+    .pair-tab .apr-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      display: block;
+      margin-top: 1px;
+      opacity: 0.7;
     }
 
     /* ── Chart panel ── */
@@ -148,6 +223,17 @@
       border: 1px solid var(--border);
       padding: 24px;
       position: relative;
+    }
+
+    .chart-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 300px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
     }
 
     .chart-canvas-container {
@@ -225,13 +311,6 @@
       padding-left: 12px;
     }
 
-    /* ── Divider ── */
-    .section-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 40px 0;
-    }
-
     /* ── Scanline overlay ── */
     body::after {
       content: '';
@@ -253,7 +332,10 @@
 
 <header>
   <h1>FUNDING RATE HISTORY</h1>
-  <span>25-PERIOD WINDOW · ALL RATES PER 8H</span>
+  <div class="header-meta">
+    <span>LIVE · TOP 10 PAIRS BY SPREAD · RATES PER 8H</span>
+    <span id="lastUpdated"><span class="live-dot"></span>LOADING…</span>
+  </div>
 </header>
 
 <div class="nav-back">
@@ -261,100 +343,125 @@
 </div>
 
 <main>
-  <!-- Pair selector -->
-  <div class="pair-tabs" id="pairTabs">
-    <button class="pair-tab active" data-pair="BLAST">BLAST</button>
-    <button class="pair-tab" data-pair="ERA">ERA</button>
-    <button class="pair-tab" data-pair="QNT">QNT</button>
-    <button class="pair-tab" data-pair="EDGE">EDGE</button>
-    <button class="pair-tab" data-pair="AI16Z">AI16Z</button>
+  <div id="appRoot">
+    <div class="loading-state">
+      <span class="spinner"></span>FETCHING LIVE DATA…
+    </div>
   </div>
-
-  <!-- Chart panels (one per pair) -->
-  <div id="chartPanels"></div>
 </main>
 
 <script>
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────────────────────────────────────
 
-const pairData = {
-  BLAST: {
-    long: 'coinbase', short: 'bitget',
-    entrySpread: 1.574, currentSpread: 1.574,
-    points: [{"ts":1773280800000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773309600000,"longRate":-0.01564,"shortRate":-0.000742},{"ts":1773338400000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773367200000,"longRate":-0.01564,"shortRate":-0.000246},{"ts":1773396000000,"longRate":-0.01564,"shortRate":-0.000226},{"ts":1773424800000,"longRate":-0.01564,"shortRate":0.000063},{"ts":1773453600000,"longRate":-0.01564,"shortRate":-0.000511},{"ts":1773482400000,"longRate":-0.01564,"shortRate":-0.000701},{"ts":1773511200000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773540000000,"longRate":-0.01564,"shortRate":-0.000509},{"ts":1773568800000,"longRate":-0.01564,"shortRate":-0.000144},{"ts":1773597600000,"longRate":-0.01564,"shortRate":-0.000677},{"ts":1773626400000,"longRate":-0.01564,"shortRate":-0.007184},{"ts":1773655200000,"longRate":-0.01564,"shortRate":-0.015},{"ts":1773684000000,"longRate":-0.01564,"shortRate":-0.002166},{"ts":1773712800000,"longRate":-0.01564,"shortRate":-0.000426},{"ts":1773741600000,"longRate":-0.01564,"shortRate":-0.001453},{"ts":1773770400000,"longRate":-0.01564,"shortRate":-0.001592},{"ts":1773799200000,"longRate":-0.01564,"shortRate":-0.001458},{"ts":1773828000000,"longRate":-0.01564,"shortRate":-0.001218},{"ts":1773856800000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773885600000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773914400000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773943200000,"longRate":-0.01564,"shortRate":0.0001},{"ts":1773972000000,"longRate":-0.01564,"shortRate":0.0001}]
-  },
-  ERA: {
-    long: 'coinbase', short: 'mexc',
-    entrySpread: 0.245, currentSpread: 1.174,
-    points: [{"ts":1773280800000,"longRate":-0.000328,"shortRate":0.00005},{"ts":1773309600000,"longRate":-0.000248,"shortRate":0.00005},{"ts":1773338400000,"longRate":-0.00032,"shortRate":0.00005},{"ts":1773367200000,"longRate":-0.000376,"shortRate":0.00005},{"ts":1773396000000,"longRate":-0.000368,"shortRate":0.00005},{"ts":1773424800000,"longRate":-0.00028,"shortRate":0.00005},{"ts":1773453600000,"longRate":-0.000288,"shortRate":0.00005},{"ts":1773482400000,"longRate":-0.000408,"shortRate":0.00005},{"ts":1773511200000,"longRate":-0.006904,"shortRate":0.00005},{"ts":1773540000000,"longRate":-0.012992,"shortRate":0.00005},{"ts":1773568800000,"longRate":-0.012688,"shortRate":0.00005},{"ts":1773597600000,"longRate":-0.01172,"shortRate":0.00005},{"ts":1773626400000,"longRate":-0.012304,"shortRate":0.00005},{"ts":1773655200000,"longRate":-0.016624,"shortRate":0.00005},{"ts":1773684000000,"longRate":-0.011736,"shortRate":0.000009},{"ts":1773712800000,"longRate":-0.011736,"shortRate":-0.00002},{"ts":1773741600000,"longRate":-0.011736,"shortRate":0.00005},{"ts":1773770400000,"longRate":-0.011736,"shortRate":0.00005},{"ts":1773799200000,"longRate":-0.011736,"shortRate":0.00005},{"ts":1773828000000,"longRate":-0.011736,"shortRate":0.00005},{"ts":1773856800000,"longRate":-0.011736,"shortRate":-0.000022},{"ts":1773885600000,"longRate":-0.011736,"shortRate":0.00005},{"ts":1773914400000,"longRate":-0.011736,"shortRate":0.000049},{"ts":1773943200000,"longRate":-0.011736,"shortRate":0.00005},{"ts":1773972000000,"longRate":-0.011736,"shortRate":0.00005}]
-  },
-  QNT: {
-    long: 'kraken', short: 'bitget',
-    entrySpread: 0.288, currentSpread: 2.395,
-    points: [{"ts":1773280800000,"longRate":0.001759,"shortRate":0.0001},{"ts":1773309600000,"longRate":-0.00328,"shortRate":0.0001},{"ts":1773338400000,"longRate":-0.003915,"shortRate":0.0001},{"ts":1773367200000,"longRate":0.0376,"shortRate":0.0001},{"ts":1773396000000,"longRate":-0.01944,"shortRate":0.0001},{"ts":1773424800000,"longRate":-0.019391,"shortRate":0.0001},{"ts":1773453600000,"longRate":-0.020086,"shortRate":0.0001},{"ts":1773482400000,"longRate":-0.021895,"shortRate":-0.000074},{"ts":1773511200000,"longRate":-0.031677,"shortRate":0.0001},{"ts":1773540000000,"longRate":-0.022696,"shortRate":0.0001},{"ts":1773568800000,"longRate":-0.019738,"shortRate":0.0001},{"ts":1773597600000,"longRate":-0.019238,"shortRate":0.0001},{"ts":1773626400000,"longRate":-0.020229,"shortRate":0.0001},{"ts":1773655200000,"longRate":-0.018312,"shortRate":0.0001},{"ts":1773684000000,"longRate":-0.0182,"shortRate":0.0001},{"ts":1773712800000,"longRate":-0.020953,"shortRate":0.0001},{"ts":1773741600000,"longRate":-0.01851,"shortRate":0.0001},{"ts":1773770400000,"longRate":-0.018481,"shortRate":0.0001},{"ts":1773799200000,"longRate":-0.031857,"shortRate":0.0001},{"ts":1773828000000,"longRate":-0.029669,"shortRate":0.0001},{"ts":1773856800000,"longRate":-0.041666,"shortRate":0.0001},{"ts":1773885600000,"longRate":-0.022504,"shortRate":0.0001},{"ts":1773914400000,"longRate":-0.029497,"shortRate":0.0001},{"ts":1773943200000,"longRate":-0.016039,"shortRate":0.0001},{"ts":1773972000000,"longRate":-0.003398,"shortRate":0.0001}]
-  },
-  EDGE: {
-    long: 'gateio', short: 'coinbase',
-    entrySpread: 0.298, currentSpread: 0.753,
-    points: [{"ts":1773280800000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773309600000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773338400000,"longRate":-0.003835,"shortRate":0.000552},{"ts":1773367200000,"longRate":-0.007957,"shortRate":0.000552},{"ts":1773396000000,"longRate":-0.004068,"shortRate":0.000552},{"ts":1773424800000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773453600000,"longRate":-0.006809,"shortRate":0.000552},{"ts":1773482400000,"longRate":-0.00197,"shortRate":0.000552},{"ts":1773511200000,"longRate":-0.002445,"shortRate":0.000552},{"ts":1773540000000,"longRate":-0.001866,"shortRate":0.000552},{"ts":1773568800000,"longRate":-0.002427,"shortRate":0.000552},{"ts":1773597600000,"longRate":-0.002953,"shortRate":0.000552},{"ts":1773626400000,"longRate":-0.001483,"shortRate":0.000552},{"ts":1773655200000,"longRate":-0.007258,"shortRate":0.000552},{"ts":1773684000000,"longRate":-0.00021,"shortRate":0.000552},{"ts":1773712800000,"longRate":-0.004644,"shortRate":0.000552},{"ts":1773741600000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773770400000,"longRate":-0.000864,"shortRate":0.000552},{"ts":1773799200000,"longRate":-0.00093,"shortRate":0.000552},{"ts":1773828000000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773856800000,"longRate":-0.000099,"shortRate":0.000552},{"ts":1773885600000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773914400000,"longRate":0.000012,"shortRate":0.000552},{"ts":1773943200000,"longRate":-0.006247,"shortRate":0.000552},{"ts":1773972000000,"longRate":-0.008378,"shortRate":0.000552}]
-  },
-  AI16Z: {
-    long: 'hyperliquid', short: 'coinbase',
-    entrySpread: 1.033, currentSpread: 1.033,
-    points: [{"ts":1773280800000,"longRate":0,"shortRate":0.010328},{"ts":1773338400000,"longRate":0,"shortRate":0.010328},{"ts":1773396000000,"longRate":0,"shortRate":0.010328},{"ts":1773453600000,"longRate":0,"shortRate":0.010328},{"ts":1773511200000,"longRate":0,"shortRate":0.010328},{"ts":1773568800000,"longRate":0,"shortRate":0.010328},{"ts":1773626400000,"longRate":0,"shortRate":0.010328},{"ts":1773684000000,"longRate":0,"shortRate":0.010328},{"ts":1773741600000,"longRate":0,"shortRate":0.010328},{"ts":1773799200000,"longRate":0,"shortRate":0.010328},{"ts":1773856800000,"longRate":0,"shortRate":0.010328},{"ts":1773914400000,"longRate":0,"shortRate":0.010328},{"ts":1773972000000,"longRate":0,"shortRate":0.010328}]
+const API_BASE = (() => {
+  const h = window.location.hostname;
+  if (h.includes('onrender.com') || h.includes('github.io')) {
+    return 'https://mvp-polymarket-alpha-bot.onrender.com';
   }
-};
+  return 'http://localhost:3124';
+})();
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+const EXCLUDED_COINS = new Set([
+  'SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','AMZNX','NVDAX','METAX',
+  'MSTRX','QQQX','PAXG','XAUT','CRCLX'
+]);
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-function fmtDate(ts) {
-  const d = new Date(ts);
-  return `${MONTHS[d.getMonth()]} ${d.getDate()}`;
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+
+let lastFetchTime = null;
+let updateTimerInterval = null;
+let activeCharts = {};
+let activePairs = [];
+let currentCoin = null;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
 
 function fmtHour(ts) {
   const d = new Date(ts);
   return `${MONTHS[d.getMonth()]} ${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:00`;
 }
 
-function getStatus(currentSpread, entrySpread) {
-  const ratio = currentSpread / entrySpread;
-  if (currentSpread < 0) return 'INVERTED';
-  if (ratio < 0.5) return 'COMPRESSED';
+function bucket2h(ts) {
+  return Math.floor(ts / (2 * 3600 * 1000)) * (2 * 3600 * 1000);
+}
+
+function joinHistories(longHistory, shortHistory) {
+  // Build map: bucket → {longRate, ts}
+  const longMap = new Map();
+  for (const row of longHistory) {
+    const ts = typeof row.timestamp === 'number' ? row.timestamp
+              : typeof row.ts === 'number' ? row.ts
+              : new Date(row.timestamp || row.ts || row.time).getTime();
+    const b = bucket2h(ts);
+    longMap.set(b, { ts, rate: row.rate ?? row.fundingRate ?? row.funding_rate ?? 0 });
+  }
+
+  const shortMap = new Map();
+  for (const row of shortHistory) {
+    const ts = typeof row.timestamp === 'number' ? row.timestamp
+              : typeof row.ts === 'number' ? row.ts
+              : new Date(row.timestamp || row.ts || row.time).getTime();
+    const b = bucket2h(ts);
+    shortMap.set(b, { ts, rate: row.rate ?? row.fundingRate ?? row.funding_rate ?? 0 });
+  }
+
+  // Find overlapping buckets
+  const joined = [];
+  for (const [b, lv] of longMap.entries()) {
+    if (shortMap.has(b)) {
+      const sv = shortMap.get(b);
+      joined.push({
+        ts: lv.ts,
+        longRate: lv.rate,
+        shortRate: sv.rate,
+      });
+    }
+  }
+
+  joined.sort((a, b) => a.ts - b.ts);
+  return joined;
+}
+
+function getSpreadStatus(grossSpread) {
+  if (grossSpread < 0) return 'INVERTED';
+  if (grossSpread < 0.1) return 'COMPRESSED';
   return 'HEALTHY';
 }
 
-// ── Build fill datasets ───────────────────────────────────────────────────────
-// Chart.js fill between datasets: we split into two overlapping area fills.
-// Green fill = max(longRate, shortRate) and min at shortRate when spread positive
-// We use two fill layers: one green (shortRate - longRate when positive), one red (inverted).
-// Simpler approach: Use a single background fill plugin with custom drawing.
+function secsAgo(ts) {
+  return Math.round((Date.now() - ts) / 1000);
+}
 
-// We'll use the built-in Chart.js fill between datasets approach:
-// Dataset 0: long rate (no fill)
-// Dataset 1: short rate (fill: 0) — but this fills to dataset 0 always one color
-// So instead: we build two helper datasets that represent the upper/lower bound of the spread
-// and color them per-segment using a custom plugin.
+// ─────────────────────────────────────────────────────────────────────────────
+// CHART BUILDER (same fill-between logic as original)
+// ─────────────────────────────────────────────────────────────────────────────
 
-function buildChartConfig(pair, data) {
-  const labels = data.points.map(p => fmtHour(p.ts));
-  const longVals = data.points.map(p => +(p.longRate * 100).toFixed(6));
-  const shortVals = data.points.map(p => +(p.shortRate * 100).toFixed(6));
+function buildChart(canvasId, pair, points) {
+  const labels = points.map((p, i) => {
+    const d = new Date(p.ts);
+    const label = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
+    if (i === 0) return label;
+    const prev = new Date(points[i-1].ts);
+    const prevLabel = `${MONTHS[prev.getMonth()]} ${prev.getDate()}`;
+    return label !== prevLabel ? label : '';
+  });
 
-  // Determine fill color per segment: if spread (shortRate - longRate) >= 0 → green, else red
-  // We'll draw by building an upper/lower fill using a custom gradient segment approach.
-  // For simplicity with Chart.js we use a custom plugin that draws colored fills per-segment.
+  const longVals  = points.map(p => +(p.longRate  * 100).toFixed(6));
+  const shortVals = points.map(p => +(p.shortRate * 100).toFixed(6));
 
   const GREEN_FILL = 'rgba(0, 255, 135, 0.15)';
   const RED_FILL   = 'rgba(255, 59, 59, 0.15)';
-  const GREEN_LINE = 'rgba(0, 255, 135, 0.5)';
-  const RED_LINE   = 'rgba(255, 59, 59, 0.5)';
 
-  // Custom plugin: fill between long and short with per-segment color
   const fillBetweenPlugin = {
-    id: `fillBetween_${pair}`,
+    id: `fillBetween_${canvasId}`,
     beforeDraw(chart) {
       const { ctx, chartArea, scales } = chart;
       if (!chartArea) return;
@@ -370,81 +477,39 @@ function buildChartConfig(pair, data) {
       for (let i = 0; i < nPoints - 1; i++) {
         const x0 = xScale.getPixelForValue(i);
         const x1 = xScale.getPixelForValue(i + 1);
-
         const lY0 = yScale.getPixelForValue(longVals[i]);
         const lY1 = yScale.getPixelForValue(longVals[i + 1]);
         const sY0 = yScale.getPixelForValue(shortVals[i]);
         const sY1 = yScale.getPixelForValue(shortVals[i + 1]);
-
-        const spread0 = shortVals[i] - longVals[i];
-        const spread1 = shortVals[i + 1] - longVals[i + 1];
+        const spread0 = shortVals[i]   - longVals[i];
+        const spread1 = shortVals[i+1] - longVals[i+1];
 
         if (spread0 >= 0 && spread1 >= 0) {
-          // All green
           ctx.beginPath();
-          ctx.moveTo(x0, lY0);
-          ctx.lineTo(x1, lY1);
-          ctx.lineTo(x1, sY1);
-          ctx.lineTo(x0, sY0);
-          ctx.closePath();
-          ctx.fillStyle = GREEN_FILL;
-          ctx.fill();
+          ctx.moveTo(x0, lY0); ctx.lineTo(x1, lY1);
+          ctx.lineTo(x1, sY1); ctx.lineTo(x0, sY0);
+          ctx.closePath(); ctx.fillStyle = GREEN_FILL; ctx.fill();
         } else if (spread0 < 0 && spread1 < 0) {
-          // All red
           ctx.beginPath();
-          ctx.moveTo(x0, sY0);
-          ctx.lineTo(x1, sY1);
-          ctx.lineTo(x1, lY1);
-          ctx.lineTo(x0, lY0);
-          ctx.closePath();
-          ctx.fillStyle = RED_FILL;
-          ctx.fill();
+          ctx.moveTo(x0, sY0); ctx.lineTo(x1, sY1);
+          ctx.lineTo(x1, lY1); ctx.lineTo(x0, lY0);
+          ctx.closePath(); ctx.fillStyle = RED_FILL; ctx.fill();
         } else {
-          // Mixed — find crossing point via linear interpolation
           const t = spread0 / (spread0 - spread1);
           const xCross = x0 + t * (x1 - x0);
           const lYCross = lY0 + t * (lY1 - lY0);
           const sYCross = sY0 + t * (sY1 - sY0);
-          const yCross = (lYCross + sYCross) / 2;
-
+          const yCross  = (lYCross + sYCross) / 2;
           if (spread0 >= 0) {
-            // Green first half
-            ctx.beginPath();
-            ctx.moveTo(x0, lY0);
-            ctx.lineTo(xCross, yCross);
-            ctx.lineTo(xCross, yCross);
-            ctx.lineTo(x0, sY0);
-            ctx.closePath();
-            ctx.fillStyle = GREEN_FILL;
-            ctx.fill();
-            // Red second half
-            ctx.beginPath();
-            ctx.moveTo(xCross, yCross);
-            ctx.lineTo(x1, lY1);
-            ctx.lineTo(x1, sY1);
-            ctx.lineTo(xCross, yCross);
-            ctx.closePath();
-            ctx.fillStyle = RED_FILL;
-            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x0, lY0); ctx.lineTo(xCross, yCross);
+            ctx.lineTo(x0, sY0); ctx.closePath(); ctx.fillStyle = GREEN_FILL; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(xCross, yCross); ctx.lineTo(x1, lY1);
+            ctx.lineTo(x1, sY1); ctx.closePath(); ctx.fillStyle = RED_FILL; ctx.fill();
           } else {
-            // Red first half
-            ctx.beginPath();
-            ctx.moveTo(x0, sY0);
-            ctx.lineTo(xCross, yCross);
-            ctx.lineTo(xCross, yCross);
-            ctx.lineTo(x0, lY0);
-            ctx.closePath();
-            ctx.fillStyle = RED_FILL;
-            ctx.fill();
-            // Green second half
-            ctx.beginPath();
-            ctx.moveTo(xCross, yCross);
-            ctx.lineTo(x1, sY1);
-            ctx.lineTo(x1, lY1);
-            ctx.lineTo(xCross, yCross);
-            ctx.closePath();
-            ctx.fillStyle = GREEN_FILL;
-            ctx.fill();
+            ctx.beginPath(); ctx.moveTo(x0, sY0); ctx.lineTo(xCross, yCross);
+            ctx.lineTo(x0, lY0); ctx.closePath(); ctx.fillStyle = RED_FILL; ctx.fill();
+            ctx.beginPath(); ctx.moveTo(xCross, yCross); ctx.lineTo(x1, sY1);
+            ctx.lineTo(x1, lY1); ctx.closePath(); ctx.fillStyle = GREEN_FILL; ctx.fill();
           }
         }
       }
@@ -452,39 +517,49 @@ function buildChartConfig(pair, data) {
     }
   };
 
-  // Tick label dedup: show date only when it changes
-  const tickLabels = data.points.map((p, i) => {
-    const d = new Date(p.ts);
-    const label = `${MONTHS[d.getMonth()]} ${d.getDate()}`;
-    if (i === 0) return label;
-    const prev = new Date(data.points[i-1].ts);
-    const prevLabel = `${MONTHS[prev.getMonth()]} ${prev.getDate()}`;
-    return label !== prevLabel ? label : '';
-  });
+  const zeroLinePlugin = {
+    id: `zeroLine_${canvasId}`,
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      if (!scales.y) return;
+      const y0 = scales.y.getPixelForValue(0);
+      if (y0 < chartArea.top || y0 > chartArea.bottom) return;
+      ctx.save();
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(chartArea.left, y0); ctx.lineTo(chartArea.right, y0);
+      ctx.stroke(); ctx.restore();
+    }
+  };
 
-  const config = {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+  const ctx = canvas.getContext('2d');
+
+  const chart = new Chart(ctx, {
     type: 'line',
-    plugins: [fillBetweenPlugin],
+    plugins: [fillBetweenPlugin, zeroLinePlugin],
     data: {
-      labels: tickLabels,
+      labels,
       datasets: [
         {
-          label: data.long.toUpperCase(),
+          label: pair.longExchange.toUpperCase(),
           data: longVals,
           borderColor: '#60a5fa',
           borderWidth: 2,
-          pointRadius: 3,
+          pointRadius: points.length > 50 ? 1 : 3,
           pointBackgroundColor: '#60a5fa',
           pointHoverRadius: 5,
           tension: 0.3,
           fill: false,
         },
         {
-          label: data.short.toUpperCase(),
+          label: pair.shortExchange.toUpperCase(),
           data: shortVals,
           borderColor: '#fb923c',
           borderWidth: 2,
-          pointRadius: 3,
+          pointRadius: points.length > 50 ? 1 : 3,
           pointBackgroundColor: '#fb923c',
           pointHoverRadius: 5,
           tension: 0.3,
@@ -495,10 +570,7 @@ function buildChartConfig(pair, data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false,
-      },
+      interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -508,12 +580,12 @@ function buildChartConfig(pair, data) {
           titleColor: '#f5f2eb',
           bodyColor: '#999',
           titleFont: { family: 'DM Mono', size: 11 },
-          bodyFont: { family: 'DM Mono', size: 11 },
+          bodyFont:  { family: 'DM Mono', size: 11 },
           padding: 12,
           callbacks: {
             title(items) {
               const idx = items[0].dataIndex;
-              return fmtHour(data.points[idx].ts);
+              return fmtHour(points[idx].ts);
             },
             label(item) {
               const sign = item.parsed.y >= 0 ? '+' : '';
@@ -532,166 +604,303 @@ function buildChartConfig(pair, data) {
       },
       scales: {
         x: {
-          grid: {
-            color: 'rgba(255,255,255,0.04)',
-            drawTicks: false,
-          },
+          grid: { color: 'rgba(255,255,255,0.04)', drawTicks: false },
           ticks: {
             color: '#555',
             font: { family: 'DM Mono', size: 10 },
             maxRotation: 0,
             autoSkip: false,
-            callback(val, idx) {
-              return tickLabels[idx];
-            }
+            callback(val, idx) { return labels[idx]; }
           },
           border: { color: '#1e1e1e' }
         },
         y: {
-          grid: {
-            color: 'rgba(255,255,255,0.04)',
-            drawTicks: false,
-          },
+          grid: { color: 'rgba(255,255,255,0.04)', drawTicks: false },
           ticks: {
             color: '#555',
             font: { family: 'DM Mono', size: 10 },
-            callback(val) {
-              return (val >= 0 ? '+' : '') + val.toFixed(3) + '%';
-            }
+            callback(val) { return (val >= 0 ? '+' : '') + val.toFixed(3) + '%'; }
           },
-          border: { color: '#1e1e1e', dash: [2, 4] },
-          // Zero line via annotation-like approach using afterDraw
+          border: { color: '#1e1e1e', dash: [2, 4] }
         }
       }
     }
-  };
+  });
 
-  return { config, fillBetweenPlugin };
+  return chart;
 }
 
-// ── Render panels ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// DOM BUILDERS
+// ─────────────────────────────────────────────────────────────────────────────
 
-const panelsContainer = document.getElementById('chartPanels');
-const charts = {};
+function buildTabsHTML(pairs) {
+  return `<div class="pair-tabs" id="pairTabs">
+    ${pairs.map((p, i) => `
+      <button class="pair-tab${i === 0 ? ' active' : ''}" data-idx="${i}">
+        ${p.coin}
+        <span class="apr-badge">${(p.grossSpread * 3 * 365).toFixed(0)}% APR</span>
+      </button>
+    `).join('')}
+  </div>`;
+}
 
-Object.entries(pairData).forEach(([coin, data]) => {
-  const status = getStatus(data.currentSpread, data.entrySpread);
+function buildPanelHTML(pair, idx) {
+  const status      = getSpreadStatus(pair.grossSpread);
   const statusClass = status.toLowerCase();
+  const apr         = (pair.grossSpread * 3 * 365).toFixed(1);
 
-  const panel = document.createElement('div');
-  panel.className = 'chart-panel';
-  panel.id = `panel-${coin}`;
-
-  panel.innerHTML = `
-    <div class="chart-header">
-      <div class="chart-title">
-        ${coin} <span class="arrow">—</span> ${data.long.toUpperCase()} <span class="arrow">→</span> ${data.short.toUpperCase()}
-      </div>
-      <div class="chart-subtitle">GAP = FUNDING RATE YOU COLLECT PER 8H · ${data.points.length} DATA POINTS</div>
-    </div>
-
-    <div class="chart-wrap">
-      <div class="chart-canvas-container">
-        <canvas id="chart-${coin}"></canvas>
-      </div>
-
-      <div class="legend-row">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#60a5fa"></div>
-          LONG · ${data.long.toUpperCase()}
+  return `
+    <div class="chart-panel${idx === 0 ? ' visible' : ''}" id="panel-${idx}">
+      <div class="chart-header">
+        <div class="chart-title">
+          ${pair.coin} <span class="arrow">—</span>
+          ${pair.longExchange.toUpperCase()} <span class="arrow">→</span>
+          ${pair.shortExchange.toUpperCase()}
         </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#fb923c"></div>
-          SHORT · ${data.short.toUpperCase()}
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:rgba(0,255,135,0.5); width:16px"></div>
-          POSITIVE SPREAD
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:rgba(255,59,59,0.5); width:16px"></div>
-          INVERTED
+        <div class="chart-subtitle">
+          GAP = FUNDING RATE COLLECTED PER 8H · LIVE DATA · ${API_BASE.includes('localhost') ? 'LOCAL' : 'RENDER'}
         </div>
       </div>
-    </div>
 
-    <div class="stats-row">
-      <div class="stat-pill">
-        <span class="label">Entry Spread</span>
-        <span class="value">${data.entrySpread.toFixed(3)}%</span>
-      </div>
-      <div class="stat-pill">
-        <span class="label">Current Spread</span>
-        <span class="value">${data.currentSpread.toFixed(3)}%</span>
-      </div>
-      <div class="stat-pill ${statusClass}">
-        <span class="label">Status</span>
-        <span class="value">${status}</span>
-      </div>
-    </div>
+      <div class="chart-wrap">
+        <div id="chart-wrap-${idx}">
+          <div class="chart-loading">
+            <span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid #1e1e1e;border-top-color:#ffe135;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;"></span>
+            LOADING HISTORY…
+          </div>
+        </div>
 
-    <div class="annotation">
-      Green shaded area = funding rate differential you collect each 8h.
-      When lines cross = spread inverted temporarily.
-      Spread = short rate − long rate. Positive = arb earns. Negative = arb pays.
+        <div class="legend-row">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#60a5fa"></div>
+            LONG · ${pair.longExchange.toUpperCase()}
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#fb923c"></div>
+            SHORT · ${pair.shortExchange.toUpperCase()}
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:rgba(0,255,135,0.5);width:16px"></div>
+            POSITIVE SPREAD
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:rgba(255,59,59,0.5);width:16px"></div>
+            INVERTED
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-pill">
+          <span class="label">Gross Spread</span>
+          <span class="value">${(pair.grossSpread * 100).toFixed(4)}%</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Net Spread</span>
+          <span class="value">${(pair.netSpread * 100).toFixed(4)}%</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">APR (Est)</span>
+          <span class="value">${apr}%</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Long Rate</span>
+          <span class="value">${(pair.longRate * 100).toFixed(4)}%</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">Short Rate</span>
+          <span class="value">${(pair.shortRate * 100).toFixed(4)}%</span>
+        </div>
+        <div class="stat-pill ${statusClass}">
+          <span class="label">Status</span>
+          <span class="value">${status}</span>
+        </div>
+      </div>
+
+      <div class="annotation">
+        Green shaded area = funding rate differential collected each 8h.
+        When lines cross = spread inverted temporarily.
+        Spread = short rate − long rate. Positive = arb earns. Negative = arb pays.
+      </div>
     </div>
   `;
+}
 
-  panelsContainer.appendChild(panel);
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA FETCHING
+// ─────────────────────────────────────────────────────────────────────────────
 
-  // Build chart
-  const { config, fillBetweenPlugin } = buildChartConfig(coin, data);
-  const canvas = document.getElementById(`chart-${coin}`);
-  const ctx = canvas.getContext('2d');
+async function fetchOpportunities() {
+  const res = await fetch(`${API_BASE}/api/opportunities`);
+  if (!res.ok) throw new Error(`/api/opportunities returned ${res.status}`);
+  return res.json();
+}
 
-  // Zero-line plugin
-  const zeroLinePlugin = {
-    id: `zeroLine_${coin}`,
-    afterDraw(chart) {
-      const { ctx, chartArea, scales } = chart;
-      if (!scales.y) return;
-      const y0 = scales.y.getPixelForValue(0);
-      if (y0 < chartArea.top || y0 > chartArea.bottom) return;
-      ctx.save();
-      ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(chartArea.left, y0);
-      ctx.lineTo(chartArea.right, y0);
-      ctx.stroke();
-      ctx.restore();
+async function fetchHistory(coin, exchange, limit = 100) {
+  const url = `${API_BASE}/api/history?coin=${encodeURIComponent(coin)}&exchange=${encodeURIComponent(exchange)}&limit=${limit}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`/api/history returned ${res.status} for ${coin}/${exchange}`);
+  return res.json();
+}
+
+async function loadChartForPair(pair, idx) {
+  const wrapEl = document.getElementById(`chart-wrap-${idx}`);
+  if (!wrapEl) return;
+
+  try {
+    const [longHist, shortHist] = await Promise.all([
+      fetchHistory(pair.coin, pair.longExchange, 100),
+      fetchHistory(pair.coin, pair.shortExchange, 100),
+    ]);
+
+    // Normalize: API may return array directly or { data: [...] }
+    const longArr  = Array.isArray(longHist)  ? longHist  : (longHist.data  || longHist.history  || []);
+    const shortArr = Array.isArray(shortHist) ? shortHist : (shortHist.data || shortHist.history || []);
+
+    const points = joinHistories(longArr, shortArr);
+
+    if (points.length < 2) {
+      wrapEl.innerHTML = `<div class="chart-loading" style="color:#555">NO HISTORY DATA · ${points.length} POINTS JOINED</div>`;
+      return;
     }
-  };
 
-  const chart = new Chart(ctx, {
-    ...config,
-    plugins: [fillBetweenPlugin, zeroLinePlugin, ...(config.plugins || [])]
+    wrapEl.innerHTML = `<div class="chart-canvas-container"><canvas id="canvas-${idx}"></canvas></div>`;
+
+    const chart = buildChart(`canvas-${idx}`, pair, points);
+    if (chart) activeCharts[idx] = chart;
+
+    // Update subtitle with point count
+    const subtitle = document.querySelector(`#panel-${idx} .chart-subtitle`);
+    if (subtitle) {
+      subtitle.textContent = `GAP = FUNDING RATE COLLECTED PER 8H · ${points.length} DATA POINTS · LIVE`;
+    }
+  } catch (err) {
+    wrapEl.innerHTML = `<div class="chart-loading" style="color:var(--red)">ERROR LOADING HISTORY: ${err.message}</div>`;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function render() {
+  const root = document.getElementById('appRoot');
+
+  // Show loading
+  root.innerHTML = `<div class="loading-state"><span class="spinner"></span>FETCHING LIVE OPPORTUNITIES…</div>`;
+
+  let allOpps;
+  try {
+    allOpps = await fetchOpportunities();
+  } catch (err) {
+    root.innerHTML = `<div class="error-state">⚠ FAILED TO FETCH OPPORTUNITIES<br>${err.message}<br><br>API: ${API_BASE}</div>`;
+    return;
+  }
+
+  // Normalize response shape
+  const oppsArr = Array.isArray(allOpps) ? allOpps : (allOpps.opportunities || allOpps.data || []);
+
+  // Filter: exclude drift exchange, exclude tokenized stocks
+  const filtered = oppsArr.filter(o => {
+    const longEx  = (o.longExchange  || '').toLowerCase();
+    const shortEx = (o.shortExchange || '').toLowerCase();
+    const coin    = (o.coin || '').toUpperCase();
+    if (longEx === 'drift' || shortEx === 'drift') return false;
+    if (EXCLUDED_COINS.has(coin)) return false;
+    return true;
   });
-  charts[coin] = chart;
-});
 
-// ── Tab switching ─────────────────────────────────────────────────────────────
+  // Sort by grossSpread desc, take top 10
+  filtered.sort((a, b) => (b.grossSpread || 0) - (a.grossSpread || 0));
+  const top10 = filtered.slice(0, 10);
 
-function showPair(coin) {
-  // Update tabs
-  document.querySelectorAll('.pair-tab').forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.pair === coin);
+  if (top10.length === 0) {
+    root.innerHTML = `<div class="error-state">NO OPPORTUNITIES RETURNED FROM API<br>API: ${API_BASE}</div>`;
+    return;
+  }
+
+  activePairs = top10;
+  lastFetchTime = Date.now();
+
+  // Build HTML: tabs + panels
+  const tabsHTML   = buildTabsHTML(top10);
+  const panelsHTML = top10.map((p, i) => buildPanelHTML(p, i)).join('');
+
+  root.innerHTML = `${tabsHTML}<div id="chartPanels">${panelsHTML}</div>`;
+
+  // Tab click handler
+  document.getElementById('pairTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.pair-tab');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.idx, 10);
+    showPanel(idx);
   });
-  // Update panels
-  document.querySelectorAll('.chart-panel').forEach(panel => {
-    panel.classList.toggle('visible', panel.id === `panel-${coin}`);
+
+  updateLastUpdated();
+
+  // Load chart for first pair immediately
+  await loadChartForPair(top10[0], 0);
+
+  // Load rest in background (don't await all)
+  for (let i = 1; i < top10.length; i++) {
+    loadChartForPair(top10[i], i);
+  }
+}
+
+function showPanel(idx) {
+  // Tabs
+  document.querySelectorAll('.pair-tab').forEach((tab, i) => {
+    tab.classList.toggle('active', i === idx);
+  });
+  // Panels
+  document.querySelectorAll('.chart-panel').forEach((panel, i) => {
+    panel.classList.toggle('visible', i === idx);
   });
 }
 
-document.getElementById('pairTabs').addEventListener('click', e => {
-  if (e.target.classList.contains('pair-tab')) {
-    showPair(e.target.dataset.pair);
-  }
-});
+// ─────────────────────────────────────────────────────────────────────────────
+// LAST UPDATED INDICATOR
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Show first pair on load
-showPair('BLAST');
+function updateLastUpdated() {
+  const el = document.getElementById('lastUpdated');
+  if (!el) return;
+  if (!lastFetchTime) { el.textContent = 'LOADING…'; return; }
+
+  const secs = secsAgo(lastFetchTime);
+  el.className = secs > 90 ? 'stale' : '';
+
+  if (secs < 60) {
+    el.innerHTML = `<span class="live-dot"></span>UPDATED ${secs}s AGO`;
+  } else {
+    const mins = Math.floor(secs / 60);
+    el.innerHTML = `<span class="live-dot" style="background:${secs > 90 ? 'var(--yellow)' : 'var(--green)'}"></span>UPDATED ${mins}m AGO`;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REFRESH LOOP (every 60s)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function startRefreshLoop() {
+  // Update the "X seconds ago" ticker every 5s
+  setInterval(updateLastUpdated, 5000);
+
+  // Re-fetch everything every 60s
+  setInterval(async () => {
+    // Destroy existing charts
+    Object.values(activeCharts).forEach(c => c.destroy());
+    activeCharts = {};
+    await render();
+  }, 60000);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────────────────────
+
+render().then(() => startRefreshLoop());
 </script>
 </body>
 </html>
