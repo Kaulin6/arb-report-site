@@ -1,611 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funding Arb — Paper Trade Report</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --black: #0a0a0a;
-    --white: #f5f2eb;
-    --green: #00ff87;
-    --red: #ff3b3b;
-    --yellow: #ffe135;
-    --mid: #1a1a1a;
-    --border: #2a2a2a;
-    --muted: #555;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FUNDING ARB // PAPER TRADE REPORT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+    }
 
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding: 0;
-  }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
 
-  /* HEADER */
-  header {
-    border-bottom: 3px solid var(--yellow);
-    padding: 32px 48px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
-  }
+    /* ─── HEADER ─── */
+    .header {
+      border-bottom: 1px solid var(--border);
+      padding: 32px 40px 24px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
-  .brand {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+    .header-left {}
 
-  .brand-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: var(--yellow);
-    text-transform: uppercase;
-  }
+    .header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(255, 225, 53, 0.25);
+    }
 
-  .brand-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    color: var(--white);
-  }
+    .header-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
 
-  .brand-sub {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+    .header-timestamp {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      white-space: nowrap;
+    }
 
-  .header-meta {
-    text-align: right;
-  }
+    /* ─── STATS BAR ─── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border-bottom: 1px solid var(--border);
+    }
 
-  .ts {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
+    .stat-item {
+      padding: 20px 24px;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .stat-item:last-child { border-right: none; }
 
-  /* STATS BAR */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    border-bottom: 1px solid var(--border);
-  }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
 
-  .stat {
-    padding: 28px 32px;
-    border-right: 1px solid var(--border);
-  }
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
 
-  .stat:last-child { border-right: none; }
+    .stat-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
 
-  .stat-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
+    .stat-value.yellow { color: var(--yellow); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.white { color: var(--white); }
 
-  .stat-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 42px;
-    line-height: 1;
-    color: var(--white);
-  }
+    /* ─── HEALTH BAR SECTION ─── */
+    .section {
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+    }
 
-  .stat-value.green { color: var(--green); }
-  .stat-value.yellow { color: var(--yellow); }
-  .stat-value.red { color: var(--red); }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
 
-  .stat-sub {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+    .health-bar-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-  /* MAIN GRID */
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 0;
-    min-height: calc(100vh - 280px);
-  }
+    .health-bar {
+      display: flex;
+      height: 32px;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 100%;
+    }
 
-  /* TRADES TABLE */
-  .trades-section {
-    border-right: 1px solid var(--border);
-    padding: 32px 40px;
-  }
+    .hb-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      overflow: hidden;
+    }
 
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
+    .hb-segment:hover { opacity: 0.85; }
 
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 0.05em;
-    color: var(--white);
-  }
+    .hb-segment.healthy {
+      background: rgba(0, 255, 135, 0.2);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 135, 0.3);
+    }
+    .hb-segment.compressed {
+      background: rgba(255, 225, 53, 0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(255, 225, 53, 0.25);
+      border-left: none;
+    }
+    .hb-segment.inverted {
+      background: rgba(255, 59, 59, 0.2);
+      color: var(--red);
+      border: 1px solid rgba(255, 59, 59, 0.3);
+      border-left: none;
+    }
 
-  .section-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--yellow);
-    border: 1px solid var(--yellow);
-    padding: 2px 8px;
-  }
+    .health-legend {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
 
-  thead th {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: left;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-  }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
 
-  thead th.right { text-align: right; }
+    .legend-dot.green { background: var(--green); }
+    .legend-dot.yellow { background: var(--yellow); }
+    .legend-dot.red { background: var(--red); }
 
-  tbody tr {
-    border-bottom: 1px solid #151515;
-    transition: background 0.1s;
-  }
+    .legend-count {
+      font-weight: 500;
+    }
+    .legend-count.green { color: var(--green); }
+    .legend-count.yellow { color: var(--yellow); }
+    .legend-count.red { color: var(--red); }
 
-  tbody tr:hover { background: #111; }
+    /* ─── EXIT CRITERIA BOX ─── */
+    .exit-box {
+      margin: 0 40px;
+      border: 1px solid rgba(255, 225, 53, 0.2);
+      border-left: 3px solid var(--yellow);
+      background: rgba(255, 225, 53, 0.03);
+      border-radius: 4px;
+      padding: 16px 20px;
+    }
 
-  tbody td {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    padding: 10px 12px;
-    color: var(--white);
-    vertical-align: middle;
-  }
+    .exit-box-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      margin-bottom: 8px;
+    }
 
-  tbody td.right { text-align: right; }
-  tbody td.muted { color: var(--muted); font-size: 11px; }
+    .exit-box-text {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #888;
+      line-height: 1.7;
+    }
 
-  .coin-badge {
-    display: inline-block;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--black);
-    background: var(--yellow);
-    padding: 2px 7px;
-    letter-spacing: 0.05em;
-  }
+    /* ─── TABLE SECTION ─── */
+    .table-section {
+      padding: 24px 40px 0;
+    }
 
-  .pair-text {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 2px;
-    letter-spacing: 0.03em;
-  }
+    .table-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-  .pnl-pos { color: var(--green); font-weight: 500; }
-  .pnl-neg { color: var(--red); }
+    .table-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--white);
+    }
 
-  .spread-bar-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+    .table-sort-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
 
-  .spread-bar {
-    height: 3px;
-    background: var(--border);
-    flex: 1;
-    max-width: 60px;
-    border-radius: 2px;
-    overflow: hidden;
-  }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
 
-  .spread-bar-fill {
-    height: 100%;
-    background: var(--green);
-    border-radius: 2px;
-  }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+    }
 
-  .age-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
+    thead tr {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* SIDEBAR */
-  .sidebar {
-    padding: 32px 28px;
-  }
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+      transition: color 0.15s;
+    }
 
-  /* LOSERS */
-  .losers-section {
-    margin-top: 8px;
-  }
+    th:hover { color: var(--white); }
 
-  .loser-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #151515;
-  }
+    th .sort-icon {
+      display: inline-block;
+      margin-left: 4px;
+      opacity: 0.4;
+      font-size: 8px;
+    }
 
-  .loser-coin {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--white);
-  }
+    th.sorted { color: var(--yellow); }
+    th.sorted .sort-icon { opacity: 1; color: var(--yellow); }
 
-  .loser-pair {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
 
-  .loser-pnl {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--red);
-    text-align: right;
-  }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
 
-  /* EXCHANGE TABLE */
-  .exchange-table {
-    width: 100%;
-    margin-top: 8px;
-  }
+    tbody tr.row-inverted { background: rgba(255, 59, 59, 0.04); }
+    tbody tr.row-inverted:hover { background: rgba(255, 59, 59, 0.07); }
+    tbody tr.row-healthy { background: transparent; }
+    tbody tr.row-compressed { background: rgba(255, 225, 53, 0.02); }
 
-  .exchange-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 9px 0;
-    border-bottom: 1px solid #151515;
-    gap: 8px;
-  }
+    td {
+      padding: 9px 14px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
 
-  .ex-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--white);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    flex: 1;
-  }
+    /* COIN badge */
+    .coin-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(255, 225, 53, 0.1);
+      border: 1px solid rgba(255, 225, 53, 0.25);
+      color: var(--yellow);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
 
-  .ex-count {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    min-width: 30px;
-    text-align: center;
-  }
+    /* ROUTE */
+    .route-text {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
 
-  .ex-bar {
-    height: 3px;
-    border-radius: 2px;
-    background: var(--yellow);
-    min-width: 4px;
-  }
+    .route-text span {
+      display: inline-block;
+    }
 
-  /* INSIGHT BOX */
-  .insight {
-    background: #0f0f0f;
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--yellow);
-    padding: 16px 18px;
-    margin-top: 24px;
-  }
+    .route-arrow {
+      color: #333;
+      margin: 0 2px;
+    }
 
-  .insight-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--yellow);
-    margin-bottom: 8px;
-  }
+    /* STATUS pill */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
 
-  .insight-text {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    color: #aaa;
-    line-height: 1.6;
-  }
+    .status-pill.healthy {
+      background: rgba(0, 255, 135, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(0, 255, 135, 0.2);
+    }
+    .status-pill.compressed {
+      background: rgba(255, 225, 53, 0.1);
+      color: var(--yellow);
+      border: 1px solid rgba(255, 225, 53, 0.2);
+    }
+    .status-pill.inverted {
+      background: rgba(255, 59, 59, 0.1);
+      color: var(--red);
+      border: 1px solid rgba(255, 59, 59, 0.2);
+    }
 
-  .insight-text strong {
-    color: var(--white);
-  }
+    /* Colors */
+    .c-green { color: var(--green); }
+    .c-yellow { color: var(--yellow); }
+    .c-orange { color: var(--orange); }
+    .c-red { color: var(--red); }
+    .c-muted { color: var(--muted); }
+    .c-white { color: var(--white); }
 
-  /* DIVIDER */
-  .sidebar-divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 28px 0;
-  }
+    /* EXIT check */
+    .exit-check {
+      font-size: 14px;
+      color: var(--green);
+    }
+    .exit-dash { color: var(--muted); }
 
-  /* FOOTER */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 18px 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    /* Age color */
+    .age-green { color: var(--green); }
+    .age-yellow { color: var(--yellow); }
+    .age-orange { color: var(--orange); }
 
-  footer span {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+    /* Scrollbar */
+    ::-webkit-scrollbar { height: 4px; width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #444; }
 
-  .footer-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    display: inline-block;
-    animation: pulse 2s ease-in-out infinite;
-  }
+    /* Responsive */
+    @media (max-width: 900px) {
+      .header { padding: 20px 20px 16px; }
+      .header-title { font-size: 36px; }
+      .stats-bar { grid-template-columns: repeat(3, 1fr); }
+      .stats-bar .stat-item:nth-child(3) { border-right: none; }
+      .section, .table-section { padding: 20px 20px 0; }
+      .exit-box { margin: 0 20px; }
+    }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  .fade-in {
-    opacity: 0;
-    transform: translateY(8px);
-    animation: fadeIn 0.4s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  tbody tr { animation: fadeIn 0.3s ease forwards; opacity: 0; }
-  tbody tr:nth-child(1) { animation-delay: 0.05s; }
-  tbody tr:nth-child(2) { animation-delay: 0.08s; }
-  tbody tr:nth-child(3) { animation-delay: 0.11s; }
-  tbody tr:nth-child(4) { animation-delay: 0.14s; }
-  tbody tr:nth-child(5) { animation-delay: 0.17s; }
-  tbody tr:nth-child(6) { animation-delay: 0.20s; }
-  tbody tr:nth-child(7) { animation-delay: 0.23s; }
-  tbody tr:nth-child(8) { animation-delay: 0.26s; }
-  tbody tr:nth-child(9) { animation-delay: 0.29s; }
-  tbody tr:nth-child(10) { animation-delay: 0.32s; }
-  tbody tr:nth-child(11) { animation-delay: 0.35s; }
-  tbody tr:nth-child(12) { animation-delay: 0.38s; }
-  tbody tr:nth-child(13) { animation-delay: 0.41s; }
-  tbody tr:nth-child(14) { animation-delay: 0.44s; }
-  tbody tr:nth-child(15) { animation-delay: 0.47s; }
-</style>
+    @media (max-width: 600px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .stats-bar .stat-item:nth-child(2n) { border-right: none; }
+      .stats-bar .stat-item:nth-child(3) { border-right: 1px solid var(--border); }
+    }
+  </style>
 </head>
 <body>
 
-<header class="fade-in">
-  <div class="brand">
-    <div class="brand-label">Paper Trading Report</div>
-    <div class="brand-title">Funding Arb</div>
-    <div class="brand-sub">Delta-neutral · Funding rate differential capture · No Drift · No tokenized assets</div>
-  </div>
-  <div class="header-meta">
-    <div class="ts">Generated · Mar 19, 2026 · 9:57 PM EST</div>
-    <div class="ts" style="margin-top:4px">Exchanges: Hyperliquid · Coinbase · Bitget · MEXC · WooX · Kraken · Gate.io · dYdX</div>
-  </div>
-</header>
-
-<div class="stats-bar fade-in">
-  <div class="stat">
-    <div class="stat-label">Clean Trades</div>
-    <div class="stat-value yellow">161</div>
-    <div class="stat-sub">no Drift · no tokenized</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Total P&L</div>
-    <div class="stat-value green">+$29.40</div>
-    <div class="stat-sub">accumulated funding</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Win Rate</div>
-    <div class="stat-value green">76%</div>
-    <div class="stat-sub">123 positive / 38 negative</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Top Pair APR</div>
-    <div class="stat-value yellow">1,752%</div>
-    <div class="stat-sub">AR · Bitget→Coinbase</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Exchange Stack</div>
-    <div class="stat-value white" style="font-size:28px; padding-top:6px;">5 Core</div>
-    <div class="stat-sub">HL · CB · Bitget · MEXC · WooX</div>
-  </div>
-</div>
-
-<div class="main">
-  <div class="trades-section">
-    <div class="section-header">
-      <div class="section-title">Top Performing Pairs</div>
-      <div class="section-badge">Real Signal</div>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-title">FUNDING ARB // PAPER TRADE REPORT</div>
+      <div class="header-subtitle">Delta-neutral funding rate capture</div>
     </div>
+    <div class="header-timestamp">Mar 19 2026 · 10 PM EST</div>
+  </header>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Coin</th>
-          <th>Route</th>
-          <th class="right">Entry Spread</th>
-          <th class="right">Spread Bar</th>
-          <th class="right">P&L</th>
-          <th class="right">Age</th>
-          <th class="right">Lev</th>
-        </tr>
-      </thead>
-      <tbody id="trades-body">
-        <!-- rows injected below -->
-      </tbody>
-    </table>
-  </div>
-
-  <div class="sidebar">
-    <div class="section-header">
-      <div class="section-title">Losers</div>
-      <div class="section-badge" style="color:#ff3b3b; border-color:#ff3b3b;">Watch</div>
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">Clean Trades</div>
+      <div class="stat-value white">161</div>
     </div>
-
-    <div class="losers-section" id="losers-body"></div>
-
-    <hr class="sidebar-divider">
-
-    <div class="section-header">
-      <div class="section-title">By Exchange</div>
+    <div class="stat-item">
+      <div class="stat-label">Total P&amp;L</div>
+      <div class="stat-value green">+$29.40</div>
     </div>
-
-    <div id="exchange-body"></div>
-
-    <div class="insight">
-      <div class="insight-label">Signal Assessment</div>
-      <div class="insight-text">
-        <strong>76% of trades are positive</strong> on real funding rate capture. The core cluster —
-        <strong>Hyperliquid→Coinbase</strong> and <strong>Bitget→Coinbase</strong> — shows the most persistent spreads.
-        At $200/trade across 20 clean pairs with no leverage, expect
-        <strong>$25–$50/day</strong> on real capital.
-        <br><br>
-        Accounts needed: <strong>Hyperliquid, Coinbase, Bitget, MEXC, WooX</strong>.
-      </div>
+    <div class="stat-item">
+      <div class="stat-label">Win Rate</div>
+      <div class="stat-value yellow">76%</div>
+      <div class="stat-sub">123 pos / 38 neg</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Healthy</div>
+      <div class="stat-value green">27</div>
+      <div class="stat-sub">trades</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Inverted (bleeding)</div>
+      <div class="stat-value red">10</div>
+      <div class="stat-sub">trades</div>
     </div>
   </div>
-</div>
 
-<footer>
-  <span><span class="footer-dot"></span> &nbsp;Live paper · No real capital deployed</span>
-  <span>Drift excluded · Gold tokens excluded · Tokenized stocks excluded</span>
-  <span>funding-arb-v3 · mvp-funding-arb-v3.onrender.com</span>
-</footer>
-
-<script>
-const trades = [
-  { coin: 'BLAST', long: 'coinbase', short: 'bitget', spread: 1.574, pnl: 3.73, age: 190, lev: 2 },
-  { coin: 'QNT',   long: 'kraken',   short: 'bitget', spread: 2.395, pnl: 2.77, age: 179, lev: 1 },
-  { coin: 'HUMA',  long: 'woox',     short: 'dydx',   spread: 1.644, pnl: 1.64, age: 41,  lev: 1 },
-  { coin: 'ERA',   long: 'coinbase', short: 'mexc',   spread: 1.175, pnl: 1.39, age: 127, lev: 1 },
-  { coin: 'SPK',   long: 'coinbase', short: 'htx',    spread: 1.072, pnl: 1.30, age: 35,  lev: 1 },
-  { coin: 'AI16Z', long: 'hyperliquid', short: 'coinbase', spread: 1.033, pnl: 1.23, age: 190, lev: 1 },
-  { coin: 'SCR',   long: 'coinbase', short: 'gateio', spread: 0.987, pnl: 1.17, age: 190, lev: 1 },
-  { coin: 'TRB',   long: 'kraken',   short: 'woox',   spread: 8.114, pnl: 1.13, age: 140, lev: 2 },
-  { coin: 'EDGE',  long: 'gateio',   short: 'coinbase', spread: 0.753, pnl: 1.12, age: 174, lev: 1 },
-  { coin: 'OM',    long: 'hyperliquid', short: 'coinbase', spread: 0.938, pnl: 1.11, age: 190, lev: 1 },
-  { coin: 'ANKR',  long: 'woox',     short: 'kraken', spread: 0.825, pnl: 0.98, age: 38,  lev: 1 },
-  { coin: 'OMNI',  long: 'hyperliquid', short: 'coinbase', spread: 0.782, pnl: 0.93, age: 190, lev: 1 },
-  { coin: 'BARD',  long: 'okx',      short: 'mexc',   spread: 2.495, pnl: 0.93, age: 36,  lev: 1 },
-  { coin: 'AR',    long: 'bitget',   short: 'coinbase', spread: 1.780, pnl: 0.84, age: 32,  lev: 2 },
-  { coin: 'DEGO',  long: 'gateio',   short: 'bingx',  spread: 0.670, pnl: 0.83, age: 57,  lev: 1 },
-];
-
-const losers = [
-  { coin: 'DEXE',  long: 'kraken',   short: 'bitget',   pnl: -3.29 },
-  { coin: 'MET',   long: 'woox',     short: 'coinbase', pnl: -1.31 },
-  { coin: 'BCH',   long: 'woox',     short: 'kraken',   pnl: -1.13 },
-  { coin: 'KITE',  long: 'mexc',     short: 'gateio',   pnl: -0.83 },
-  { coin: 'BABY',  long: 'woox',     short: 'coinbase', pnl: -0.66 },
-  { coin: 'AAVE',  long: 'woox',     short: 'kraken',   pnl: -0.45 },
-];
-
-const maxSpread = Math.max(...trades.map(t => t.spread));
-
-const tbody = document.getElementById('trades-body');
-trades.forEach(t => {
-  const ageH = t.age;
-  const ageDotColor = ageH > 100 ? '#00ff87' : ageH > 40 ? '#ffe135' : '#888';
-  const barW = Math.min(100, (t.spread / maxSpread) * 100);
-  tbody.innerHTML += `
-    <tr>
-      <td><span class="coin-badge">${t.coin}</span></td>
-      <td>
-        <div style="font-size:11px;">${t.long}</div>
-        <div class="pair-text">→ ${t.short}</div>
-      </td>
-      <td class="right">${t.spread.toFixed(3)}%</td>
-      <td class="right">
-        <div class="spread-bar-wrap">
-          <div class="spread-bar"><div class="spread-bar-fill" style="width:${barW}%"></div></div>
+  <!-- SPREAD HEALTH BAR -->
+  <div class="section">
+    <div class="section-label">Spread Health Distribution</div>
+    <div class="health-bar-wrap">
+      <div class="health-bar" id="healthBar"></div>
+      <div class="health-legend">
+        <div class="legend-item">
+          <div class="legend-dot green"></div>
+          <span>Healthy</span>
+          <span class="legend-count green">27</span>
         </div>
-      </td>
-      <td class="right pnl-pos">+$${t.pnl.toFixed(2)}</td>
-      <td class="right muted"><span class="age-dot" style="background:${ageDotColor}"></span>${ageH}h</td>
-      <td class="right muted">${t.lev}x</td>
-    </tr>
-  `;
-});
-
-const loserBody = document.getElementById('losers-body');
-losers.forEach(l => {
-  loserBody.innerHTML += `
-    <div class="loser-row">
-      <div>
-        <div class="loser-coin">${l.coin}</div>
-        <div class="loser-pair">${l.long} → ${l.short}</div>
+        <div class="legend-item">
+          <div class="legend-dot yellow"></div>
+          <span>Compressed</span>
+          <span class="legend-count yellow">17</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot red"></div>
+          <span>Inverted</span>
+          <span class="legend-count red">10</span>
+        </div>
       </div>
-      <div class="loser-pnl">$${l.pnl.toFixed(2)}</div>
     </div>
-  `;
-});
+  </div>
 
-// Exchange frequency
-const exCount = {};
-trades.forEach(t => {
-  exCount[t.long] = (exCount[t.long] || 0) + 1;
-  exCount[t.short] = (exCount[t.short] || 0) + 1;
-});
-const sorted = Object.entries(exCount).sort((a,b) => b[1]-a[1]);
-const maxEx = sorted[0][1];
-const exBody = document.getElementById('exchange-body');
-sorted.forEach(([ex, cnt]) => {
-  const w = Math.round((cnt / maxEx) * 80);
-  exBody.innerHTML += `
-    <div class="exchange-row">
-      <div class="ex-name">${ex}</div>
-      <div class="ex-count">${cnt}</div>
-      <div class="ex-bar" style="width:${w}px"></div>
+  <!-- EXIT CRITERIA -->
+  <div class="section">
+    <div class="exit-box">
+      <div class="exit-box-title">EXIT CRITERIA</div>
+      <div class="exit-box-text">
+        Exit triggers when |spread| &lt; 0.01% AND position held &gt; 4h. Spreads naturally compress and invert periodically — this is normal funding rate behavior. Hold through dips. Only force-exit if inverted for 24h+ with no recovery sign.
+      </div>
     </div>
-  `;
-});
-</script>
+  </div>
+
+  <!-- MAIN TABLE -->
+  <div class="table-section">
+    <div class="table-header-row">
+      <div class="table-title">ACTIVE POSITIONS</div>
+      <div class="table-sort-hint">↑↓ Click headers to sort</div>
+    </div>
+    <div class="table-wrap">
+      <table id="tradesTable">
+        <thead>
+          <tr>
+            <th data-col="coin">COIN <span class="sort-icon">↕</span></th>
+            <th data-col="route">ROUTE <span class="sort-icon">↕</span></th>
+            <th data-col="entry">ENTRY % <span class="sort-icon">↕</span></th>
+            <th data-col="current">CURRENT % <span class="sort-icon">↕</span></th>
+            <th data-col="delta">Δ SPREAD <span class="sort-icon">↕</span></th>
+            <th data-col="status">STATUS <span class="sort-icon">↕</span></th>
+            <th data-col="pnl">P&amp;L <span class="sort-icon">↕</span></th>
+            <th data-col="daily">$/DAY <span class="sort-icon">↕</span></th>
+            <th data-col="age">AGE <span class="sort-icon">↕</span></th>
+            <th data-col="lev">LEV <span class="sort-icon">↕</span></th>
+            <th data-col="exit">EXIT? <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tradesBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const trades = [
+      // HEALTHY
+      {coin:'BLAST',long:'coinbase',short:'bitget',entry:1.574,current:1.574,delta:0,pnl:3.73,daily:94.44,age:191,lev:2},
+      {coin:'QNT',long:'kraken',short:'bitget',entry:0.288,current:2.395,delta:730,pnl:2.77,daily:71.85,age:180,lev:1},
+      {coin:'ERA',long:'coinbase',short:'mexc',entry:0.245,current:1.174,delta:379,pnl:1.39,daily:35.23,age:128,lev:1},
+      {coin:'AI16Z',long:'hyperliquid',short:'coinbase',entry:1.033,current:1.033,delta:0,pnl:1.23,daily:30.98,age:191,lev:1},
+      {coin:'SCR',long:'coinbase',short:'gateio',entry:0.987,current:0.987,delta:0,pnl:1.17,daily:29.62,age:191,lev:1},
+      {coin:'OM',long:'hyperliquid',short:'coinbase',entry:0.938,current:0.938,delta:0,pnl:1.11,daily:28.13,age:191,lev:1},
+      {coin:'TRB',long:'kraken',short:'woox',entry:8.114,current:0.460,delta:-94,pnl:1.13,daily:27.61,age:141,lev:2},
+      {coin:'EDGE',long:'gateio',short:'coinbase',entry:0.298,current:0.753,delta:153,pnl:1.12,daily:22.59,age:175,lev:1},
+      {coin:'BB',long:'kraken',short:'coinbase',entry:0.320,current:0.508,delta:59,pnl:0.60,daily:15.25,age:95,lev:1},
+      {coin:'XPL',long:'backpack',short:'coinbase',entry:0.291,current:0.410,delta:41,pnl:0.48,daily:12.29,age:181,lev:1},
+      {coin:'MINA',long:'kraken',short:'coinbase',entry:0.369,current:0.400,delta:8,pnl:0.48,daily:11.99,age:86,lev:1},
+      {coin:'AXS',long:'woox',short:'dydx',entry:0.211,current:0.380,delta:80,pnl:0.45,daily:11.39,age:187,lev:1},
+      {coin:'ALCH',long:'kraken',short:'woox',entry:0.266,current:0.355,delta:34,pnl:0.42,daily:10.64,age:191,lev:1},
+      {coin:'DOGS',long:'woox',short:'coinbase',entry:0.242,current:0.354,delta:46,pnl:0.42,daily:10.61,age:88,lev:1},
+      {coin:'WCT',long:'coinbase',short:'woox',entry:0.259,current:0.340,delta:31,pnl:0.40,daily:10.21,age:191,lev:1},
+      {coin:'YB',long:'woox',short:'mexc',entry:0.163,current:0.311,delta:91,pnl:0.37,daily:9.33,age:67,lev:1},
+      {coin:'ICNT',long:'woox',short:'mexc',entry:0.239,current:0.196,delta:-18,pnl:0.23,daily:5.87,age:71,lev:1},
+      {coin:'STABLE',long:'backpack',short:'bingx',entry:0.344,current:0.256,delta:-26,pnl:0.28,daily:7.67,age:74,lev:1},
+      {coin:'VINE',long:'coinbase',short:'woox',entry:0.236,current:0.185,delta:-22,pnl:0.22,daily:5.54,age:86,lev:1},
+      {coin:'PIXEL',long:'woox',short:'dydx',entry:0.226,current:0.184,delta:-19,pnl:0.22,daily:5.52,age:82,lev:1},
+      {coin:'COMP',long:'kraken',short:'bitget',entry:0.301,current:0.176,delta:-42,pnl:0.22,daily:5.28,age:104,lev:1},
+      {coin:'ZAMA',long:'coinbase',short:'backpack',entry:0.262,current:0.176,delta:-33,pnl:0.12,daily:5.27,age:77,lev:1},
+      {coin:'LAYER',long:'woox',short:'kraken',entry:0.208,current:0.111,delta:-47,pnl:0.13,daily:3.33,age:67,lev:1},
+      {coin:'BLUR',long:'woox',short:'htx',entry:0.209,current:0.131,delta:-37,pnl:0.16,daily:3.92,age:131,lev:1},
+      {coin:'SPX',long:'woox',short:'paradex',entry:0.205,current:0.136,delta:-34,pnl:0.16,daily:4.09,age:83,lev:1},
+      {coin:'POPCAT',long:'woox',short:'paradex',entry:0.202,current:0.130,delta:-36,pnl:0.10,daily:3.89,age:69,lev:1},
+      {coin:'KAITO',long:'woox',short:'kraken',entry:0.243,current:0.137,delta:-44,pnl:0.16,daily:4.12,age:170,lev:1},
+      // COMPRESSED
+      {coin:'LPT',long:'woox',short:'kraken',entry:1.123,current:0.153,delta:-86,pnl:0.19,daily:4.58,age:148,lev:1},
+      {coin:'REZ',long:'woox',short:'dydx',entry:1.531,current:0.098,delta:-94,pnl:0.12,daily:2.95,age:98,lev:1},
+      {coin:'GMX',long:'kraken',short:'mexc',entry:0.398,current:0.087,delta:-78,pnl:0.12,daily:2.60,age:163,lev:1},
+      {coin:'DYDX',long:'coinbase',short:'aevo',entry:0.428,current:0.086,delta:-80,pnl:0.09,daily:2.57,age:182,lev:1},
+      {coin:'METIS',long:'kraken',short:'mexc',entry:0.531,current:0.139,delta:-74,pnl:0.15,daily:4.18,age:73,lev:1},
+      {coin:'ADA',long:'woox',short:'coinbase',entry:0.389,current:0.063,delta:-84,pnl:0.08,daily:1.88,age:163,lev:1},
+      {coin:'CYBER',long:'woox',short:'kraken',entry:0.371,current:0.101,delta:-73,pnl:0.12,daily:3.04,age:191,lev:1},
+      {coin:'GIGA',long:'mexc',short:'coinbase',entry:0.382,current:0.077,delta:-80,pnl:0.09,daily:2.30,age:87,lev:1},
+      {coin:'SOON',long:'gateio',short:'kraken',entry:0.240,current:0.067,delta:-72,pnl:0.08,daily:2.00,age:83,lev:1},
+      {coin:'SONIC',long:'woox',short:'gateio',entry:0.288,current:0.054,delta:-81,pnl:0.06,daily:1.62,age:71,lev:1},
+      {coin:'ZETA',long:'hyperliquid',short:'coinbase',entry:0.311,current:0.051,delta:-84,pnl:0.12,daily:1.52,age:72,lev:1},
+      {coin:'TON',long:'woox',short:'paradex',entry:0.200,current:0.056,delta:-72,pnl:0.05,daily:1.68,age:172,lev:1},
+      {coin:'USELESS',long:'dydx',short:'woox',entry:0.229,current:0.036,delta:-84,pnl:0.04,daily:1.08,age:87,lev:1},
+      {coin:'ME',long:'woox',short:'dydx',entry:0.307,current:0.034,delta:-89,pnl:0.04,daily:1.03,age:64,lev:1},
+      {coin:'HOLO',long:'woox',short:'dydx',entry:0.274,current:0.021,delta:-92,pnl:0.02,daily:0.62,age:139,lev:1},
+      {coin:'1000000MOG',long:'woox',short:'bingx',entry:0.365,current:0.069,delta:-81,pnl:0.08,daily:2.06,age:67,lev:1},
+      {coin:'SONIC',long:'woox',short:'gateio',entry:0.288,current:0.054,delta:-81,pnl:0.06,daily:1.62,age:71,lev:1},
+      // INVERTED
+      {coin:'DEXE',long:'kraken',short:'bitget',entry:0.349,current:-2.750,delta:-888,pnl:-3.29,daily:-82.49,age:96,lev:1},
+      {coin:'MET',long:'woox',short:'coinbase',entry:0.321,current:-1.101,delta:-443,pnl:-1.31,daily:-33.04,age:154,lev:1},
+      {coin:'BCH',long:'woox',short:'kraken',entry:0.645,current:-1.125,delta:-274,pnl:-1.13,daily:-33.76,age:179,lev:1},
+      {coin:'BABY',long:'woox',short:'coinbase',entry:0.239,current:-0.583,delta:-344,pnl:-0.66,daily:-17.50,age:185,lev:1},
+      {coin:'AAVE',long:'woox',short:'kraken',entry:0.202,current:-0.301,delta:-249,pnl:-0.45,daily:-9.04,age:99,lev:1},
+      {coin:'KAS',long:'coinbase',short:'htx',entry:0.270,current:-0.182,delta:-167,pnl:-0.25,daily:-5.46,age:186,lev:1},
+      {coin:'PUFFER',long:'woox',short:'mexc',entry:0.162,current:-0.163,delta:-201,pnl:-0.19,daily:-4.90,age:88,lev:1},
+      {coin:'DOT',long:'hyperliquid',short:'woox',entry:0.637,current:-0.072,delta:-111,pnl:-0.08,daily:-2.17,age:147,lev:1},
+      {coin:'BROCCOLI',long:'mexc',short:'woox',entry:0.209,current:-0.070,delta:-134,pnl:-0.08,daily:-2.11,age:119,lev:1},
+      {coin:'STBL',long:'mexc',short:'woox',entry:0.153,current:-0.017,delta:-111,pnl:-0.02,daily:-0.52,age:164,lev:1},
+    ];
+
+    function getStatus(t) {
+      if (t.current < 0) return 'INVERTED';
+      if (t.current >= 0 && t.current < t.entry * 0.3) return 'COMPRESSED';
+      return 'HEALTHY';
+    }
+
+    function isExitReady(t) {
+      return Math.abs(t.current) < 0.01 && t.age > 4;
+    }
+
+    function currentColor(t) {
+      const c = t.current;
+      if (c < 0) return 'c-red';
+      if (c >= t.entry) return 'c-green';
+      const ratio = c / t.entry;
+      if (ratio >= 0.3 && ratio <= 0.5) return 'c-yellow';
+      if (ratio > 0.5) return 'c-green';
+      if (ratio < 0.3 && c > 0) return 'c-orange';
+      return 'c-red';
+    }
+
+    function ageClass(age) {
+      if (age < 48) return 'age-green';
+      if (age <= 120) return 'age-yellow';
+      return 'age-orange';
+    }
+
+    function statusOrder(s) {
+      if (s === 'HEALTHY') return 0;
+      if (s === 'COMPRESSED') return 1;
+      return 2;
+    }
+
+    let sortCol = 'pnl';
+    let sortDir = -1; // -1 = desc, 1 = asc
+
+    function renderTable() {
+      const tbody = document.getElementById('tradesBody');
+
+      const sorted = [...trades].sort((a, b) => {
+        let av, bv;
+        if (sortCol === 'coin') { av = a.coin; bv = b.coin; }
+        else if (sortCol === 'route') { av = a.long + a.short; bv = b.long + b.short; }
+        else if (sortCol === 'status') { av = statusOrder(getStatus(a)); bv = statusOrder(getStatus(b)); }
+        else if (sortCol === 'exit') { av = isExitReady(a) ? 1 : 0; bv = isExitReady(b) ? 1 : 0; }
+        else { av = a[sortCol]; bv = b[sortCol]; }
+
+        if (typeof av === 'string') return sortDir * av.localeCompare(bv);
+        return sortDir * (av - bv);
+      });
+
+      tbody.innerHTML = sorted.map(t => {
+        const status = getStatus(t);
+        const exitReady = isExitReady(t);
+        const rowClass = `row-${status.toLowerCase()}`;
+
+        const statusPill = status === 'HEALTHY'
+          ? `<span class="status-pill healthy">🟢 HEALTHY</span>`
+          : status === 'COMPRESSED'
+          ? `<span class="status-pill compressed">🟡 COMPRESSED</span>`
+          : `<span class="status-pill inverted">🔴 INVERTED</span>`;
+
+        const pnlClass = t.pnl >= 0 ? 'c-green' : 'c-red';
+        const dailyClass = t.daily >= 0 ? 'c-green' : 'c-red';
+        const deltaClass = t.delta >= 0 ? 'c-green' : 'c-red';
+        const pnlSign = t.pnl >= 0 ? '+' : '';
+        const dailySign = t.daily >= 0 ? '+' : '';
+        const deltaSign = t.delta >= 0 ? '+' : '';
+
+        return `<tr class="${rowClass}">
+          <td><span class="coin-badge">${t.coin}</span></td>
+          <td class="route-text"><span>${t.long}</span><span class="route-arrow">→</span><span>${t.short}</span></td>
+          <td class="c-muted">${t.entry.toFixed(3)}%</td>
+          <td class="${currentColor(t)}">${t.current.toFixed(3)}%</td>
+          <td class="${deltaClass}">${deltaSign}${t.delta}%</td>
+          <td>${statusPill}</td>
+          <td class="${pnlClass}">${pnlSign}$${Math.abs(t.pnl).toFixed(2)}</td>
+          <td class="${dailyClass}">${dailySign}$${Math.abs(t.daily).toFixed(2)}</td>
+          <td class="${ageClass(t.age)}">${t.age}h</td>
+          <td class="c-muted">${t.lev}x</td>
+          <td>${exitReady ? '<span class="exit-check">✓</span>' : '<span class="exit-dash">—</span>'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function buildHealthBar() {
+      const total = 27 + 17 + 10;
+      const bar = document.getElementById('healthBar');
+      bar.innerHTML = `
+        <div class="hb-segment healthy" style="width:${(27/total*100).toFixed(1)}%">
+          HEALTHY 27
+        </div>
+        <div class="hb-segment compressed" style="width:${(17/total*100).toFixed(1)}%">
+          COMPRESSED 17
+        </div>
+        <div class="hb-segment inverted" style="width:${(10/total*100).toFixed(1)}%">
+          INVERTED 10
+        </div>
+      `;
+    }
+
+    function initSortHeaders() {
+      document.querySelectorAll('th[data-col]').forEach(th => {
+        const col = th.dataset.col;
+        if (col === sortCol) {
+          th.classList.add('sorted');
+          th.querySelector('.sort-icon').textContent = sortDir === -1 ? '↓' : '↑';
+        }
+
+        th.addEventListener('click', () => {
+          if (sortCol === col) {
+            sortDir *= -1;
+          } else {
+            sortCol = col;
+            sortDir = col === 'coin' || col === 'route' || col === 'status' ? 1 : -1;
+          }
+
+          document.querySelectorAll('th[data-col]').forEach(h => {
+            h.classList.remove('sorted');
+            h.querySelector('.sort-icon').textContent = '↕';
+          });
+          th.classList.add('sorted');
+          th.querySelector('.sort-icon').textContent = sortDir === -1 ? '↓' : '↑';
+
+          renderTable();
+        });
+      });
+    }
+
+    buildHealthBar();
+    renderTable();
+    initSortHeaders();
+  </script>
 </body>
 </html>
