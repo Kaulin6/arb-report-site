@@ -33,6 +33,34 @@
       padding: 0 0 60px;
     }
 
+    /* ─── NAV ─── */
+    .nav {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 40px;
+    }
+    .nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0 16px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid var(--border);
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav a:first-child { border-left: 1px solid var(--border); }
+    .nav a:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+    .nav a.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); margin-bottom: -1px; }
+
     /* ─── HEADER ─── */
     .header {
       border-bottom: 1px solid var(--border);
@@ -43,9 +71,6 @@
       gap: 20px;
       flex-wrap: wrap;
     }
-
-    .header-left {}
-
     .header-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 52px;
@@ -54,7 +79,6 @@
       line-height: 1;
       text-shadow: 0 0 40px rgba(255, 225, 53, 0.25);
     }
-
     .header-subtitle {
       font-family: 'DM Mono', monospace;
       font-size: 12px;
@@ -63,7 +87,6 @@
       text-transform: uppercase;
       margin-top: 6px;
     }
-
     .header-timestamp {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
@@ -81,14 +104,12 @@
       grid-template-columns: repeat(5, 1fr);
       border-bottom: 1px solid var(--border);
     }
-
     .stat-item {
       padding: 20px 24px;
       border-right: 1px solid var(--border);
       position: relative;
     }
     .stat-item:last-child { border-right: none; }
-
     .stat-label {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
@@ -97,32 +118,113 @@
       text-transform: uppercase;
       margin-bottom: 8px;
     }
-
     .stat-value {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 36px;
       letter-spacing: 1px;
       line-height: 1;
     }
-
     .stat-sub {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
       color: var(--muted);
       margin-top: 4px;
     }
-
     .stat-value.yellow { color: var(--yellow); }
     .stat-value.green { color: var(--green); }
     .stat-value.red { color: var(--red); }
     .stat-value.white { color: var(--white); }
+
+    /* ─── BLEEDER ALERT ─── */
+    .bleeder-alert {
+      margin: 20px 40px;
+      border: 1px solid rgba(255, 59, 59, 0.5);
+      border-left: 4px solid var(--red);
+      background: rgba(255, 59, 59, 0.05);
+      border-radius: 4px;
+      padding: 16px 20px;
+    }
+    .bleeder-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+    .bleeder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .bleeder-row {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .bleeder-coin {
+      display: inline-block;
+      padding: 1px 7px;
+      background: rgba(255, 59, 59, 0.15);
+      border: 1px solid rgba(255, 59, 59, 0.4);
+      color: var(--red);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      min-width: 60px;
+      text-align: center;
+    }
+    .bleeder-spread { color: var(--red); }
+    .bleeder-meta { color: var(--muted); }
+    .bleeder-bleed { color: #ff6b6b; }
+
+    /* ─── IMPROVING SECTION ─── */
+    .improving-section {
+      margin: 20px 40px;
+      border: 1px solid rgba(0, 255, 135, 0.2);
+      border-left: 4px solid var(--green);
+      background: rgba(0, 255, 135, 0.03);
+      border-radius: 4px;
+      padding: 16px 20px;
+    }
+    .improving-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+    .improving-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .improving-card {
+      background: rgba(0, 255, 135, 0.06);
+      border: 1px solid rgba(0, 255, 135, 0.2);
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+    .improving-card-coin {
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 500;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .improving-card-row { color: var(--muted); margin-top: 2px; }
+    .improving-card-row span { color: var(--white); }
+    .improving-card-gain { color: var(--green); font-size: 12px; margin-top: 4px; }
 
     /* ─── HEALTH BAR SECTION ─── */
     .section {
       padding: 24px 40px;
       border-bottom: 1px solid var(--border);
     }
-
     .section-label {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
@@ -131,13 +233,11 @@
       text-transform: uppercase;
       margin-bottom: 14px;
     }
-
     .health-bar-wrap {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-
     .health-bar {
       display: flex;
       height: 32px;
@@ -145,7 +245,6 @@
       overflow: hidden;
       width: 100%;
     }
-
     .hb-segment {
       display: flex;
       align-items: center;
@@ -158,9 +257,7 @@
       white-space: nowrap;
       overflow: hidden;
     }
-
     .hb-segment:hover { opacity: 0.85; }
-
     .hb-segment.healthy {
       background: rgba(0, 255, 135, 0.2);
       color: var(--green);
@@ -178,13 +275,11 @@
       border: 1px solid rgba(255, 59, 59, 0.3);
       border-left: none;
     }
-
     .health-legend {
       display: flex;
       gap: 24px;
       flex-wrap: wrap;
     }
-
     .legend-item {
       display: flex;
       align-items: center;
@@ -193,20 +288,11 @@
       font-size: 11px;
       color: var(--muted);
     }
-
-    .legend-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-    }
-
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
     .legend-dot.green { background: var(--green); }
     .legend-dot.yellow { background: var(--yellow); }
     .legend-dot.red { background: var(--red); }
-
-    .legend-count {
-      font-weight: 500;
-    }
+    .legend-count { font-weight: 500; }
     .legend-count.green { color: var(--green); }
     .legend-count.yellow { color: var(--yellow); }
     .legend-count.red { color: var(--red); }
@@ -220,7 +306,6 @@
       border-radius: 4px;
       padding: 16px 20px;
     }
-
     .exit-box-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 16px;
@@ -228,7 +313,6 @@
       color: var(--yellow);
       margin-bottom: 8px;
     }
-
     .exit-box-text {
       font-family: 'DM Sans', sans-serif;
       font-size: 13px;
@@ -237,10 +321,7 @@
     }
 
     /* ─── TABLE SECTION ─── */
-    .table-section {
-      padding: 24px 40px 0;
-    }
-
+    .table-section { padding: 24px 40px 0; }
     .table-header-row {
       display: flex;
       align-items: center;
@@ -249,39 +330,33 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-
     .table-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 20px;
       letter-spacing: 2px;
       color: var(--white);
     }
-
     .table-sort-hint {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
       color: var(--muted);
       letter-spacing: 1px;
     }
-
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--border);
       border-radius: 6px;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
       font-family: 'DM Mono', monospace;
       font-size: 12px;
     }
-
     thead tr {
       background: var(--surface2);
       border-bottom: 1px solid var(--border);
     }
-
     th {
       padding: 10px 14px;
       text-align: left;
@@ -294,32 +369,20 @@
       user-select: none;
       transition: color 0.15s;
     }
-
     th:hover { color: var(--white); }
-
-    th .sort-icon {
-      display: inline-block;
-      margin-left: 4px;
-      opacity: 0.4;
-      font-size: 8px;
-    }
-
+    th .sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 8px; }
     th.sorted { color: var(--yellow); }
     th.sorted .sort-icon { opacity: 1; color: var(--yellow); }
-
     tbody tr {
       border-bottom: 1px solid var(--border);
       transition: background 0.1s;
     }
-
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: rgba(255,255,255,0.02); }
-
     tbody tr.row-inverted { background: rgba(255, 59, 59, 0.04); }
     tbody tr.row-inverted:hover { background: rgba(255, 59, 59, 0.07); }
     tbody tr.row-healthy { background: transparent; }
     tbody tr.row-compressed { background: rgba(255, 225, 53, 0.02); }
-
     td {
       padding: 9px 14px;
       white-space: nowrap;
@@ -338,22 +401,12 @@
       font-weight: 500;
       letter-spacing: 1px;
     }
-
-    /* ROUTE */
     .route-text {
       font-size: 10px;
       color: var(--muted);
       line-height: 1.3;
     }
-
-    .route-text span {
-      display: inline-block;
-    }
-
-    .route-arrow {
-      color: #333;
-      margin: 0 2px;
-    }
+    .route-arrow { color: #333; margin: 0 2px; }
 
     /* STATUS pill */
     .status-pill {
@@ -367,7 +420,6 @@
       font-weight: 500;
       white-space: nowrap;
     }
-
     .status-pill.healthy {
       background: rgba(0, 255, 135, 0.1);
       color: var(--green);
@@ -384,6 +436,11 @@
       border: 1px solid rgba(255, 59, 59, 0.2);
     }
 
+    /* Spread Trend */
+    .trend-up { color: var(--green); font-size: 16px; }
+    .trend-down { color: var(--yellow); font-size: 16px; }
+    .trend-inv { color: var(--red); font-size: 16px; }
+
     /* Colors */
     .c-green { color: var(--green); }
     .c-yellow { color: var(--yellow); }
@@ -392,17 +449,38 @@
     .c-muted { color: var(--muted); }
     .c-white { color: var(--white); }
 
-    /* EXIT check */
-    .exit-check {
-      font-size: 14px;
-      color: var(--green);
-    }
+    .exit-check { font-size: 14px; color: var(--green); }
     .exit-dash { color: var(--muted); }
 
-    /* Age color */
-    .age-green { color: var(--green); }
-    .age-yellow { color: var(--yellow); }
-    .age-orange { color: var(--orange); }
+    /* Loading/error states */
+    .loading-state {
+      padding: 60px 40px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--yellow);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-msg {
+      color: var(--red);
+      padding: 20px 40px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      border: 1px solid rgba(255,59,59,0.2);
+      border-radius: 4px;
+      margin: 20px 40px;
+    }
 
     /* Scrollbar */
     ::-webkit-scrollbar { height: 4px; width: 4px; }
@@ -417,9 +495,9 @@
       .stats-bar { grid-template-columns: repeat(3, 1fr); }
       .stats-bar .stat-item:nth-child(3) { border-right: none; }
       .section, .table-section { padding: 20px 20px 0; }
-      .exit-box { margin: 0 20px; }
+      .exit-box, .bleeder-alert, .improving-section { margin: 12px 20px; }
+      .nav { padding: 0 16px; }
     }
-
     @media (max-width: 600px) {
       .stats-bar { grid-template-columns: 1fr 1fr; }
       .stats-bar .stat-item:nth-child(2n) { border-right: none; }
@@ -429,40 +507,52 @@
 </head>
 <body>
 
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/rates.html">Rate Charts</a>
+    <a href="/report.html" class="active">Trade Report</a>
+  </nav>
+
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
       <div class="header-title">FUNDING ARB // PAPER TRADE REPORT</div>
-      <div class="header-subtitle">Delta-neutral funding rate capture</div>
+      <div class="header-subtitle">Delta-neutral funding rate capture · Live data</div>
     </div>
-    <div class="header-timestamp">Mar 19 2026 · 10 PM EST</div>
+    <div class="header-timestamp" id="headerTimestamp">Loading…</div>
   </header>
 
   <!-- STATS BAR -->
-  <div class="stats-bar">
+  <div class="stats-bar" id="statsBar">
     <div class="stat-item">
-      <div class="stat-label">Clean Trades</div>
-      <div class="stat-value white">161</div>
+      <div class="stat-label">Open Trades</div>
+      <div class="stat-value white" id="statOpen">—</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">Total P&amp;L</div>
-      <div class="stat-value green">+$29.40</div>
+      <div class="stat-value green" id="statPnl">—</div>
     </div>
     <div class="stat-item">
-      <div class="stat-label">Win Rate</div>
-      <div class="stat-value yellow">76%</div>
-      <div class="stat-sub">123 pos / 38 neg</div>
+      <div class="stat-label">Est. Daily $</div>
+      <div class="stat-value yellow" id="statDaily">—</div>
+      <div class="stat-sub">at current spreads</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">Healthy</div>
-      <div class="stat-value green">27</div>
-      <div class="stat-sub">trades</div>
+      <div class="stat-value green" id="statHealthy">—</div>
+      <div class="stat-sub" id="statHealthySub"></div>
     </div>
     <div class="stat-item">
       <div class="stat-label">Inverted (bleeding)</div>
-      <div class="stat-value red">10</div>
-      <div class="stat-sub">trades</div>
+      <div class="stat-value red" id="statInverted">—</div>
+      <div class="stat-sub" id="statInvertedSub"></div>
     </div>
+  </div>
+
+  <!-- Dynamic content injected here -->
+  <div id="dynamicContent">
+    <div class="loading-state"><span class="loading-spinner"></span>Fetching live trades…</div>
   </div>
 
   <!-- SPREAD HEALTH BAR -->
@@ -470,23 +560,7 @@
     <div class="section-label">Spread Health Distribution</div>
     <div class="health-bar-wrap">
       <div class="health-bar" id="healthBar"></div>
-      <div class="health-legend">
-        <div class="legend-item">
-          <div class="legend-dot green"></div>
-          <span>Healthy</span>
-          <span class="legend-count green">27</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot yellow"></div>
-          <span>Compressed</span>
-          <span class="legend-count yellow">17</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot red"></div>
-          <span>Inverted</span>
-          <span class="legend-count red">10</span>
-        </div>
-      </div>
+      <div class="health-legend" id="healthLegend"></div>
     </div>
   </div>
 
@@ -512,138 +586,238 @@
           <tr>
             <th data-col="coin">COIN <span class="sort-icon">↕</span></th>
             <th data-col="route">ROUTE <span class="sort-icon">↕</span></th>
-            <th data-col="entry">ENTRY % <span class="sort-icon">↕</span></th>
-            <th data-col="current">CURRENT % <span class="sort-icon">↕</span></th>
-            <th data-col="delta">Δ SPREAD <span class="sort-icon">↕</span></th>
+            <th data-col="entrySpread">ENTRY % <span class="sort-icon">↕</span></th>
+            <th data-col="currentSpread">CURRENT % <span class="sort-icon">↕</span></th>
+            <th data-col="spreadTrend">TREND <span class="sort-icon">↕</span></th>
             <th data-col="status">STATUS <span class="sort-icon">↕</span></th>
-            <th data-col="pnl">P&amp;L <span class="sort-icon">↕</span></th>
-            <th data-col="daily">$/DAY <span class="sort-icon">↕</span></th>
-            <th data-col="age">AGE <span class="sort-icon">↕</span></th>
-            <th data-col="lev">LEV <span class="sort-icon">↕</span></th>
-            <th data-col="exit">EXIT? <span class="sort-icon">↕</span></th>
+            <th data-col="accumulatedPnl">P&amp;L <span class="sort-icon">↕</span></th>
+            <th data-col="estDailyDollar">EST. DAILY $ <span class="sort-icon">↕</span></th>
+            <th data-col="entryDate">ENTRY DATE <span class="sort-icon">↕</span></th>
+            <th data-col="holdDays">HOLD DAYS <span class="sort-icon">↕</span></th>
+            <th data-col="leverage">LEV <span class="sort-icon">↕</span></th>
+            <th data-col="exitReady">EXIT? <span class="sort-icon">↕</span></th>
           </tr>
         </thead>
-        <tbody id="tradesBody"></tbody>
+        <tbody id="tradesBody">
+          <tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading…</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    const trades = [
-      // HEALTHY
-      {coin:'BLAST',long:'coinbase',short:'bitget',entry:1.574,current:1.574,delta:0,pnl:3.73,daily:94.44,age:191,lev:2},
-      {coin:'QNT',long:'kraken',short:'bitget',entry:0.288,current:2.395,delta:730,pnl:2.77,daily:71.85,age:180,lev:1},
-      {coin:'ERA',long:'coinbase',short:'mexc',entry:0.245,current:1.174,delta:379,pnl:1.39,daily:35.23,age:128,lev:1},
-      {coin:'AI16Z',long:'hyperliquid',short:'coinbase',entry:1.033,current:1.033,delta:0,pnl:1.23,daily:30.98,age:191,lev:1},
-      {coin:'SCR',long:'coinbase',short:'gateio',entry:0.987,current:0.987,delta:0,pnl:1.17,daily:29.62,age:191,lev:1},
-      {coin:'OM',long:'hyperliquid',short:'coinbase',entry:0.938,current:0.938,delta:0,pnl:1.11,daily:28.13,age:191,lev:1},
-      {coin:'TRB',long:'kraken',short:'woox',entry:8.114,current:0.460,delta:-94,pnl:1.13,daily:27.61,age:141,lev:2},
-      {coin:'EDGE',long:'gateio',short:'coinbase',entry:0.298,current:0.753,delta:153,pnl:1.12,daily:22.59,age:175,lev:1},
-      {coin:'BB',long:'kraken',short:'coinbase',entry:0.320,current:0.508,delta:59,pnl:0.60,daily:15.25,age:95,lev:1},
-      {coin:'XPL',long:'backpack',short:'coinbase',entry:0.291,current:0.410,delta:41,pnl:0.48,daily:12.29,age:181,lev:1},
-      {coin:'MINA',long:'kraken',short:'coinbase',entry:0.369,current:0.400,delta:8,pnl:0.48,daily:11.99,age:86,lev:1},
-      {coin:'AXS',long:'woox',short:'dydx',entry:0.211,current:0.380,delta:80,pnl:0.45,daily:11.39,age:187,lev:1},
-      {coin:'ALCH',long:'kraken',short:'woox',entry:0.266,current:0.355,delta:34,pnl:0.42,daily:10.64,age:191,lev:1},
-      {coin:'DOGS',long:'woox',short:'coinbase',entry:0.242,current:0.354,delta:46,pnl:0.42,daily:10.61,age:88,lev:1},
-      {coin:'WCT',long:'coinbase',short:'woox',entry:0.259,current:0.340,delta:31,pnl:0.40,daily:10.21,age:191,lev:1},
-      {coin:'YB',long:'woox',short:'mexc',entry:0.163,current:0.311,delta:91,pnl:0.37,daily:9.33,age:67,lev:1},
-      {coin:'ICNT',long:'woox',short:'mexc',entry:0.239,current:0.196,delta:-18,pnl:0.23,daily:5.87,age:71,lev:1},
-      {coin:'STABLE',long:'backpack',short:'bingx',entry:0.344,current:0.256,delta:-26,pnl:0.28,daily:7.67,age:74,lev:1},
-      {coin:'VINE',long:'coinbase',short:'woox',entry:0.236,current:0.185,delta:-22,pnl:0.22,daily:5.54,age:86,lev:1},
-      {coin:'PIXEL',long:'woox',short:'dydx',entry:0.226,current:0.184,delta:-19,pnl:0.22,daily:5.52,age:82,lev:1},
-      {coin:'COMP',long:'kraken',short:'bitget',entry:0.301,current:0.176,delta:-42,pnl:0.22,daily:5.28,age:104,lev:1},
-      {coin:'ZAMA',long:'coinbase',short:'backpack',entry:0.262,current:0.176,delta:-33,pnl:0.12,daily:5.27,age:77,lev:1},
-      {coin:'LAYER',long:'woox',short:'kraken',entry:0.208,current:0.111,delta:-47,pnl:0.13,daily:3.33,age:67,lev:1},
-      {coin:'BLUR',long:'woox',short:'htx',entry:0.209,current:0.131,delta:-37,pnl:0.16,daily:3.92,age:131,lev:1},
-      {coin:'SPX',long:'woox',short:'paradex',entry:0.205,current:0.136,delta:-34,pnl:0.16,daily:4.09,age:83,lev:1},
-      {coin:'POPCAT',long:'woox',short:'paradex',entry:0.202,current:0.130,delta:-36,pnl:0.10,daily:3.89,age:69,lev:1},
-      {coin:'KAITO',long:'woox',short:'kraken',entry:0.243,current:0.137,delta:-44,pnl:0.16,daily:4.12,age:170,lev:1},
-      // COMPRESSED
-      {coin:'LPT',long:'woox',short:'kraken',entry:1.123,current:0.153,delta:-86,pnl:0.19,daily:4.58,age:148,lev:1},
-      {coin:'REZ',long:'woox',short:'dydx',entry:1.531,current:0.098,delta:-94,pnl:0.12,daily:2.95,age:98,lev:1},
-      {coin:'GMX',long:'kraken',short:'mexc',entry:0.398,current:0.087,delta:-78,pnl:0.12,daily:2.60,age:163,lev:1},
-      {coin:'DYDX',long:'coinbase',short:'aevo',entry:0.428,current:0.086,delta:-80,pnl:0.09,daily:2.57,age:182,lev:1},
-      {coin:'METIS',long:'kraken',short:'mexc',entry:0.531,current:0.139,delta:-74,pnl:0.15,daily:4.18,age:73,lev:1},
-      {coin:'ADA',long:'woox',short:'coinbase',entry:0.389,current:0.063,delta:-84,pnl:0.08,daily:1.88,age:163,lev:1},
-      {coin:'CYBER',long:'woox',short:'kraken',entry:0.371,current:0.101,delta:-73,pnl:0.12,daily:3.04,age:191,lev:1},
-      {coin:'GIGA',long:'mexc',short:'coinbase',entry:0.382,current:0.077,delta:-80,pnl:0.09,daily:2.30,age:87,lev:1},
-      {coin:'SOON',long:'gateio',short:'kraken',entry:0.240,current:0.067,delta:-72,pnl:0.08,daily:2.00,age:83,lev:1},
-      {coin:'SONIC',long:'woox',short:'gateio',entry:0.288,current:0.054,delta:-81,pnl:0.06,daily:1.62,age:71,lev:1},
-      {coin:'ZETA',long:'hyperliquid',short:'coinbase',entry:0.311,current:0.051,delta:-84,pnl:0.12,daily:1.52,age:72,lev:1},
-      {coin:'TON',long:'woox',short:'paradex',entry:0.200,current:0.056,delta:-72,pnl:0.05,daily:1.68,age:172,lev:1},
-      {coin:'USELESS',long:'dydx',short:'woox',entry:0.229,current:0.036,delta:-84,pnl:0.04,daily:1.08,age:87,lev:1},
-      {coin:'ME',long:'woox',short:'dydx',entry:0.307,current:0.034,delta:-89,pnl:0.04,daily:1.03,age:64,lev:1},
-      {coin:'HOLO',long:'woox',short:'dydx',entry:0.274,current:0.021,delta:-92,pnl:0.02,daily:0.62,age:139,lev:1},
-      {coin:'1000000MOG',long:'woox',short:'bingx',entry:0.365,current:0.069,delta:-81,pnl:0.08,daily:2.06,age:67,lev:1},
-      {coin:'SONIC',long:'woox',short:'gateio',entry:0.288,current:0.054,delta:-81,pnl:0.06,daily:1.62,age:71,lev:1},
-      // INVERTED
-      {coin:'DEXE',long:'kraken',short:'bitget',entry:0.349,current:-2.750,delta:-888,pnl:-3.29,daily:-82.49,age:96,lev:1},
-      {coin:'MET',long:'woox',short:'coinbase',entry:0.321,current:-1.101,delta:-443,pnl:-1.31,daily:-33.04,age:154,lev:1},
-      {coin:'BCH',long:'woox',short:'kraken',entry:0.645,current:-1.125,delta:-274,pnl:-1.13,daily:-33.76,age:179,lev:1},
-      {coin:'BABY',long:'woox',short:'coinbase',entry:0.239,current:-0.583,delta:-344,pnl:-0.66,daily:-17.50,age:185,lev:1},
-      {coin:'AAVE',long:'woox',short:'kraken',entry:0.202,current:-0.301,delta:-249,pnl:-0.45,daily:-9.04,age:99,lev:1},
-      {coin:'KAS',long:'coinbase',short:'htx',entry:0.270,current:-0.182,delta:-167,pnl:-0.25,daily:-5.46,age:186,lev:1},
-      {coin:'PUFFER',long:'woox',short:'mexc',entry:0.162,current:-0.163,delta:-201,pnl:-0.19,daily:-4.90,age:88,lev:1},
-      {coin:'DOT',long:'hyperliquid',short:'woox',entry:0.637,current:-0.072,delta:-111,pnl:-0.08,daily:-2.17,age:147,lev:1},
-      {coin:'BROCCOLI',long:'mexc',short:'woox',entry:0.209,current:-0.070,delta:-134,pnl:-0.08,daily:-2.11,age:119,lev:1},
-      {coin:'STBL',long:'mexc',short:'woox',entry:0.153,current:-0.017,delta:-111,pnl:-0.02,daily:-0.52,age:164,lev:1},
-    ];
+    // ─── CONFIG ───────────────────────────────────────────────────────────────
+    const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
+    const API_BASE = isLocal
+      ? 'http://localhost:3124'
+      : 'https://mvp-polymarket-alpha-bot.onrender.com';
 
+    const EXCLUDED_COINS = new Set([
+      'SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','MSTRX','QQQX','PAXG','XAUT','CRCLX'
+    ]);
+
+    function isDriftExchange(exchange) {
+      return exchange && exchange.toLowerCase().includes('drift');
+    }
+
+    // ─── STATUS HELPERS ───────────────────────────────────────────────────────
     function getStatus(t) {
-      if (t.current < 0) return 'INVERTED';
-      if (t.current >= 0 && t.current < t.entry * 0.3) return 'COMPRESSED';
+      if (t.currentSpread < 0) return 'INVERTED';
+      if (t.currentSpread < t.entrySpread * 0.3) return 'COMPRESSED';
       return 'HEALTHY';
     }
 
+    function statusOrder(s) {
+      return s === 'HEALTHY' ? 0 : s === 'COMPRESSED' ? 1 : 2;
+    }
+
+    function spreadTrendValue(t) {
+      if (t.currentSpread < 0) return -2;           // inverted
+      if (t.currentSpread > t.entrySpread) return 1; // improving
+      return -1;                                      // compressed
+    }
+
+    function spreadTrendIcon(t) {
+      if (t.currentSpread < 0) return `<span class="trend-inv" title="Inverted">⊘</span>`;
+      if (t.currentSpread > t.entrySpread) return `<span class="trend-up" title="Improving">↑</span>`;
+      return `<span class="trend-down" title="Compressed">↓</span>`;
+    }
+
+    function estDailyDollar(t) {
+      return t.currentSpread * 3 * (t.notional || 200) * (t.leverage || 1);
+    }
+
     function isExitReady(t) {
-      return Math.abs(t.current) < 0.01 && t.age > 4;
+      return Math.abs(t.currentSpread) < 0.0001 && (Date.now() - t.entryTime) > 4 * 3600000;
+    }
+
+    function holdDays(t) {
+      return (Date.now() - t.entryTime) / (3600000 * 24);
+    }
+
+    function fmtEntryDate(t) {
+      const d = new Date(t.entryTime);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function fmtPct(v) {
+      const pct = v * 100;
+      return (pct >= 0 ? '' : '') + pct.toFixed(3) + '%';
     }
 
     function currentColor(t) {
-      const c = t.current;
+      const c = t.currentSpread;
       if (c < 0) return 'c-red';
-      if (c >= t.entry) return 'c-green';
-      const ratio = c / t.entry;
-      if (ratio >= 0.3 && ratio <= 0.5) return 'c-yellow';
+      if (c >= t.entrySpread) return 'c-green';
+      const ratio = c / (t.entrySpread || 1);
       if (ratio > 0.5) return 'c-green';
-      if (ratio < 0.3 && c > 0) return 'c-orange';
-      return 'c-red';
+      if (ratio >= 0.3) return 'c-yellow';
+      return 'c-orange';
     }
 
-    function ageClass(age) {
-      if (age < 48) return 'age-green';
-      if (age <= 120) return 'age-yellow';
-      return 'age-orange';
+    // ─── RENDER HELPERS ───────────────────────────────────────────────────────
+    function fmtMoney(v, forceSign = false) {
+      const sign = forceSign && v > 0 ? '+' : '';
+      return `${sign}$${Math.abs(v).toFixed(2)}`;
     }
 
-    function statusOrder(s) {
-      if (s === 'HEALTHY') return 0;
-      if (s === 'COMPRESSED') return 1;
-      return 2;
+    // ─── MAIN RENDER ─────────────────────────────────────────────────────────
+    let allTrades = [];
+    let sortCol = 'accumulatedPnl';
+    let sortDir = -1;
+
+    function renderAll(trades) {
+      allTrades = trades;
+      updateStats(trades);
+      buildDynamic(trades);
+      buildHealthBar(trades);
+      renderTable();
     }
 
-    let sortCol = 'pnl';
-    let sortDir = -1; // -1 = desc, 1 = asc
+    function updateStats(trades) {
+      const totalPnl = trades.reduce((s, t) => s + (t.accumulatedPnl || 0), 0);
+      const totalDaily = trades.reduce((s, t) => s + estDailyDollar(t), 0);
+      const healthyCount = trades.filter(t => getStatus(t) === 'HEALTHY').length;
+      const compressedCount = trades.filter(t => getStatus(t) === 'COMPRESSED').length;
+      const invertedCount = trades.filter(t => getStatus(t) === 'INVERTED').length;
+
+      document.getElementById('statOpen').textContent = trades.length;
+      document.getElementById('statPnl').textContent = (totalPnl >= 0 ? '+' : '') + '$' + Math.abs(totalPnl).toFixed(2);
+      document.getElementById('statPnl').className = 'stat-value ' + (totalPnl >= 0 ? 'green' : 'red');
+      document.getElementById('statDaily').textContent = (totalDaily >= 0 ? '+' : '-') + '$' + Math.abs(totalDaily).toFixed(2);
+      document.getElementById('statHealthy').textContent = healthyCount;
+      document.getElementById('statHealthySub').textContent = `${compressedCount} compressed`;
+      document.getElementById('statInverted').textContent = invertedCount;
+      document.getElementById('statInvertedSub').textContent = invertedCount > 0 ? 'losing daily $' : 'all clear';
+
+      const now = new Date();
+      document.getElementById('headerTimestamp').textContent =
+        now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' +
+        now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) + ' EST';
+    }
+
+    function buildDynamic(trades) {
+      const container = document.getElementById('dynamicContent');
+      const inverted = trades.filter(t => t.currentSpread < 0);
+      const improving = trades.filter(t => t.currentSpread > t.entrySpread * 1.5 && t.currentSpread > 0);
+      let html = '';
+
+      // ── Bleeder Alert ──
+      if (inverted.length > 0) {
+        html += `<div class="bleeder-alert">
+          <div class="bleeder-title">⚠ INVERTED POSITIONS</div>
+          <div class="bleeder-list">`;
+
+        inverted.forEach(t => {
+          const days = holdDays(t).toFixed(1);
+          const bleed = estDailyDollar(t); // negative
+          const spreadPct = (t.currentSpread * 100).toFixed(3);
+          html += `<div class="bleeder-row">
+            <span class="bleeder-coin">${t.coin}</span>
+            <span class="bleeder-spread">${spreadPct}%</span>
+            <span class="bleeder-meta">held ${days}d</span>
+            <span class="bleeder-bleed">bleeding ${fmtMoney(bleed)}/day</span>
+            <span class="bleeder-meta">${t.longExchange} → ${t.shortExchange}</span>
+          </div>`;
+        });
+
+        html += `</div></div>`;
+      }
+
+      // ── Improving Section ──
+      if (improving.length > 0) {
+        const sorted = [...improving].sort((a, b) => b.currentSpread - a.currentSpread);
+        html += `<div class="improving-section">
+          <div class="improving-title">🚀 IMPROVING POSITIONS — Spread Has Grown 50%+ Since Entry</div>
+          <div class="improving-grid">`;
+
+        sorted.forEach(t => {
+          const gain = ((t.currentSpread / t.entrySpread - 1) * 100).toFixed(0);
+          const daily = estDailyDollar(t);
+          html += `<div class="improving-card">
+            <div class="improving-card-coin">${t.coin}</div>
+            <div class="improving-card-row">Entry: <span>${(t.entrySpread * 100).toFixed(3)}%</span></div>
+            <div class="improving-card-row">Now: <span style="color:var(--green)">${(t.currentSpread * 100).toFixed(3)}%</span></div>
+            <div class="improving-card-row">Route: <span>${t.longExchange} → ${t.shortExchange}</span></div>
+            <div class="improving-card-gain">▲ +${gain}% · ${fmtMoney(daily)}/day</div>
+          </div>`;
+        });
+
+        html += `</div></div>`;
+      }
+
+      container.innerHTML = html || '';
+    }
+
+    function buildHealthBar(trades) {
+      const healthy = trades.filter(t => getStatus(t) === 'HEALTHY').length;
+      const compressed = trades.filter(t => getStatus(t) === 'COMPRESSED').length;
+      const inverted = trades.filter(t => getStatus(t) === 'INVERTED').length;
+      const total = trades.length || 1;
+
+      document.getElementById('healthBar').innerHTML = `
+        <div class="hb-segment healthy" style="width:${(healthy/total*100).toFixed(1)}%">HEALTHY ${healthy}</div>
+        <div class="hb-segment compressed" style="width:${(compressed/total*100).toFixed(1)}%">COMPRESSED ${compressed}</div>
+        <div class="hb-segment inverted" style="width:${(inverted/total*100).toFixed(1)}%">INVERTED ${inverted}</div>
+      `;
+
+      document.getElementById('healthLegend').innerHTML = `
+        <div class="legend-item"><div class="legend-dot green"></div><span>Healthy</span><span class="legend-count green">${healthy}</span></div>
+        <div class="legend-item"><div class="legend-dot yellow"></div><span>Compressed</span><span class="legend-count yellow">${compressed}</span></div>
+        <div class="legend-item"><div class="legend-dot red"></div><span>Inverted</span><span class="legend-count red">${inverted}</span></div>
+      `;
+    }
 
     function renderTable() {
-      const tbody = document.getElementById('tradesBody');
-
-      const sorted = [...trades].sort((a, b) => {
+      const sorted = [...allTrades].sort((a, b) => {
         let av, bv;
-        if (sortCol === 'coin') { av = a.coin; bv = b.coin; }
-        else if (sortCol === 'route') { av = a.long + a.short; bv = b.long + b.short; }
-        else if (sortCol === 'status') { av = statusOrder(getStatus(a)); bv = statusOrder(getStatus(b)); }
-        else if (sortCol === 'exit') { av = isExitReady(a) ? 1 : 0; bv = isExitReady(b) ? 1 : 0; }
-        else { av = a[sortCol]; bv = b[sortCol]; }
-
+        switch(sortCol) {
+          case 'coin': av = a.coin; bv = b.coin; break;
+          case 'route': av = a.longExchange + a.shortExchange; bv = b.longExchange + b.shortExchange; break;
+          case 'status': av = statusOrder(getStatus(a)); bv = statusOrder(getStatus(b)); break;
+          case 'spreadTrend': av = spreadTrendValue(a); bv = spreadTrendValue(b); break;
+          case 'exitReady': av = isExitReady(a) ? 1 : 0; bv = isExitReady(b) ? 1 : 0; break;
+          case 'estDailyDollar': av = estDailyDollar(a); bv = estDailyDollar(b); break;
+          case 'holdDays': av = holdDays(a); bv = holdDays(b); break;
+          case 'entryDate': av = a.entryTime; bv = b.entryTime; break;
+          default: av = a[sortCol] || 0; bv = b[sortCol] || 0;
+        }
         if (typeof av === 'string') return sortDir * av.localeCompare(bv);
         return sortDir * (av - bv);
       });
+
+      const tbody = document.getElementById('tradesBody');
+      if (sorted.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">No open trades found.</td></tr>`;
+        return;
+      }
 
       tbody.innerHTML = sorted.map(t => {
         const status = getStatus(t);
         const exitReady = isExitReady(t);
         const rowClass = `row-${status.toLowerCase()}`;
+        const daily = estDailyDollar(t);
+        const days = holdDays(t);
 
         const statusPill = status === 'HEALTHY'
           ? `<span class="status-pill healthy">🟢 HEALTHY</span>`
@@ -651,43 +825,27 @@
           ? `<span class="status-pill compressed">🟡 COMPRESSED</span>`
           : `<span class="status-pill inverted">🔴 INVERTED</span>`;
 
-        const pnlClass = t.pnl >= 0 ? 'c-green' : 'c-red';
-        const dailyClass = t.daily >= 0 ? 'c-green' : 'c-red';
-        const deltaClass = t.delta >= 0 ? 'c-green' : 'c-red';
-        const pnlSign = t.pnl >= 0 ? '+' : '';
-        const dailySign = t.daily >= 0 ? '+' : '';
-        const deltaSign = t.delta >= 0 ? '+' : '';
+        const pnlVal = t.accumulatedPnl || 0;
+        const pnlClass = pnlVal >= 0 ? 'c-green' : 'c-red';
+        const pnlSign = pnlVal >= 0 ? '+' : '-';
+        const dailyClass = daily >= 0 ? 'c-green' : 'c-red';
+        const dailySign = daily >= 0 ? '+' : '-';
 
         return `<tr class="${rowClass}">
           <td><span class="coin-badge">${t.coin}</span></td>
-          <td class="route-text"><span>${t.long}</span><span class="route-arrow">→</span><span>${t.short}</span></td>
-          <td class="c-muted">${t.entry.toFixed(3)}%</td>
-          <td class="${currentColor(t)}">${t.current.toFixed(3)}%</td>
-          <td class="${deltaClass}">${deltaSign}${t.delta}%</td>
+          <td class="route-text"><span>${t.longExchange}</span><span class="route-arrow">→</span><span>${t.shortExchange}</span></td>
+          <td class="c-muted">${(t.entrySpread * 100).toFixed(3)}%</td>
+          <td class="${currentColor(t)}">${(t.currentSpread * 100).toFixed(3)}%</td>
+          <td style="text-align:center">${spreadTrendIcon(t)}</td>
           <td>${statusPill}</td>
-          <td class="${pnlClass}">${pnlSign}$${Math.abs(t.pnl).toFixed(2)}</td>
-          <td class="${dailyClass}">${dailySign}$${Math.abs(t.daily).toFixed(2)}</td>
-          <td class="${ageClass(t.age)}">${t.age}h</td>
-          <td class="c-muted">${t.lev}x</td>
+          <td class="${pnlClass}">${pnlSign}$${Math.abs(pnlVal).toFixed(2)}</td>
+          <td class="${dailyClass}">${dailySign}$${Math.abs(daily).toFixed(2)}</td>
+          <td class="c-muted">${fmtEntryDate(t)}</td>
+          <td class="c-muted">${days.toFixed(1)}d</td>
+          <td class="c-muted">${t.leverage || 1}x</td>
           <td>${exitReady ? '<span class="exit-check">✓</span>' : '<span class="exit-dash">—</span>'}</td>
         </tr>`;
       }).join('');
-    }
-
-    function buildHealthBar() {
-      const total = 27 + 17 + 10;
-      const bar = document.getElementById('healthBar');
-      bar.innerHTML = `
-        <div class="hb-segment healthy" style="width:${(27/total*100).toFixed(1)}%">
-          HEALTHY 27
-        </div>
-        <div class="hb-segment compressed" style="width:${(17/total*100).toFixed(1)}%">
-          COMPRESSED 17
-        </div>
-        <div class="hb-segment inverted" style="width:${(10/total*100).toFixed(1)}%">
-          INVERTED 10
-        </div>
-      `;
     }
 
     function initSortHeaders() {
@@ -697,30 +855,50 @@
           th.classList.add('sorted');
           th.querySelector('.sort-icon').textContent = sortDir === -1 ? '↓' : '↑';
         }
-
         th.addEventListener('click', () => {
           if (sortCol === col) {
             sortDir *= -1;
           } else {
             sortCol = col;
-            sortDir = col === 'coin' || col === 'route' || col === 'status' ? 1 : -1;
+            sortDir = ['coin','route','status'].includes(col) ? 1 : -1;
           }
-
           document.querySelectorAll('th[data-col]').forEach(h => {
             h.classList.remove('sorted');
             h.querySelector('.sort-icon').textContent = '↕';
           });
           th.classList.add('sorted');
           th.querySelector('.sort-icon').textContent = sortDir === -1 ? '↓' : '↑';
-
           renderTable();
         });
       });
     }
 
-    buildHealthBar();
-    renderTable();
+    // ─── FETCH ────────────────────────────────────────────────────────────────
+    async function fetchTrades() {
+      try {
+        const res = await fetch(`${API_BASE}/api/paper-trades`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const open = (data.open || []).filter(t =>
+          !EXCLUDED_COINS.has(t.coin) &&
+          !isDriftExchange(t.longExchange) &&
+          !isDriftExchange(t.shortExchange)
+        );
+        renderAll(open);
+      } catch (err) {
+        document.getElementById('dynamicContent').innerHTML = `
+          <div class="error-msg">⚠ Failed to load trades from ${API_BASE}: ${err.message}</div>
+        `;
+        document.getElementById('headerTimestamp').textContent = 'Connection error';
+        console.error('[report] fetch error:', err);
+      }
+    }
+
+    // ─── INIT ─────────────────────────────────────────────────────────────────
     initSortHeaders();
+    fetchTrades();
+    // Refresh every 2 minutes
+    setInterval(fetchTrades, 120000);
   </script>
 </body>
 </html>
