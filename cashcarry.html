@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CASH & CARRY ARB — Funding Rate Arb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --blue: #4dabf7;
+      --purple: #aa77ff;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #1e1e1e;
+      --surface: #0f0f0f;
+      --surface2: #141414;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+    }
+    .topbar-nav { display: flex; gap: 20px; }
+    .topbar-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .topbar-nav a:hover, .topbar-nav a.active { color: var(--yellow); }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .pulse {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    /* ─── LAYOUT ─── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 0 32px 80px; }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 72px 0 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 8vw, 108px);
+      letter-spacing: 4px;
+      line-height: 0.95;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+    .hero-title span { color: var(--green); }
+    .hero-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+    .hero-sub strong { color: var(--yellow); }
+    .hero-badges {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      padding: 6px 14px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .hero-badge.green { background: rgba(0,255,135,0.1); border: 1px solid rgba(0,255,135,0.3); color: var(--green); }
+    .hero-badge.yellow { background: rgba(255,225,53,0.1); border: 1px solid rgba(255,225,53,0.3); color: var(--yellow); }
+    .hero-badge.blue { background: rgba(77,171,247,0.1); border: 1px solid rgba(77,171,247,0.3); color: var(--blue); }
+
+    /* ─── SECTION HEADER ─── */
+    .section { margin-top: 64px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: var(--white);
+    }
+    .section-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ─── EXPLAINER CALLOUT ─── */
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      padding: 28px 32px;
+      border-radius: 2px;
+      margin-top: 48px;
+    }
+    .callout-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .callout p {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: #ccc;
+      line-height: 1.8;
+      margin-bottom: 8px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout strong { color: var(--yellow); }
+    .callout em { color: var(--green); font-style: normal; }
+
+    .example-box {
+      background: var(--surface2);
+      border: 1px solid #2a2a2a;
+      border-left: 3px solid var(--yellow);
+      padding: 20px 24px;
+      border-radius: 2px;
+      margin-top: 20px;
+    }
+    .example-box-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .example-box p {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: #bbb;
+      line-height: 1.9;
+      margin-bottom: 4px;
+    }
+    .example-box .highlight { color: var(--green); }
+
+    /* ─── DIFFICULTY EXPLANATION ─── */
+    .difficulty-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    @media (max-width: 640px) { .difficulty-grid { grid-template-columns: 1fr; } }
+
+    .diff-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 24px;
+    }
+    .diff-card.easy { border-left: 3px solid var(--green); }
+    .diff-card.hard { border-left: 3px solid var(--yellow); }
+
+    .diff-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .diff-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
+    .diff-badge.easy { background: rgba(0,255,135,0.1); color: var(--green); }
+    .diff-badge.hard { background: rgba(255,225,53,0.1); color: var(--yellow); }
+
+    .diff-card h3 {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .diff-card p {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .diff-card .tag {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-top: 10px;
+    }
+    .diff-card.easy .tag { background: rgba(0,255,135,0.08); color: var(--green); border: 1px solid rgba(0,255,135,0.2); }
+    .diff-card.hard .tag { background: rgba(255,225,53,0.08); color: var(--yellow); border: 1px solid rgba(255,225,53,0.2); }
+
+    /* ─── OPPORTUNITIES TABLE ─── */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 12px 16px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    td {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+
+    tr.easy-row { background: rgba(0,255,135,0.03); }
+    tr.easy-row:hover { background: rgba(0,255,135,0.07); }
+    tr.hard-row { background: rgba(255,225,53,0.03); }
+    tr.hard-row:hover { background: rgba(255,225,53,0.07); }
+
+    .coin-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .coin-icon {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--yellow);
+      flex-shrink: 0;
+    }
+    .coin-name { color: var(--white); font-weight: 500; }
+
+    .exchange-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: #aaa;
+    }
+
+    .rate-positive { color: var(--green); }
+    .rate-negative { color: var(--red); }
+    .rate-big { font-weight: 600; font-size: 13px; }
+
+    .dir-chip {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+    .dir-chip.easy { background: rgba(0,255,135,0.1); color: var(--green); border: 1px solid rgba(0,255,135,0.2); }
+    .dir-chip.hard { background: rgba(255,225,53,0.1); color: var(--yellow); border: 1px solid rgba(255,225,53,0.2); }
+
+    .analyze-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 5px 12px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .analyze-btn:hover {
+      background: var(--yellow);
+      color: #000;
+      border-color: var(--yellow);
+    }
+
+    /* ─── LOADING / EMPTY ─── */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .loading-spinner {
+      width: 32px; height: 32px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ─── COMPARISON TABLE ─── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .compare-table th {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      padding: 16px 20px;
+    }
+    .compare-table th:first-child { color: var(--muted); text-align: left; font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; }
+    .compare-table th.cc-col { color: var(--green); }
+    .compare-table th.pp-col { color: var(--yellow); }
+    .compare-table td { padding: 14px 20px; font-family: 'DM Mono', monospace; font-size: 12px; border-bottom: 1px solid var(--border); }
+    .compare-table td:first-child { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+    .compare-table td.cc-val { color: var(--green); }
+    .compare-table td.pp-val { color: var(--yellow); }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table thead tr { background: var(--surface); }
+    .compare-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.01); }
+    .compare-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+    /* ─── HOW TO EXECUTE ─── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      transition: background 0.15s;
+    }
+    .step:last-child { border-bottom: none; }
+    .step:hover { background: var(--surface2); }
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      color: var(--green);
+      opacity: 0.4;
+      line-height: 1;
+      flex-shrink: 0;
+      width: 40px;
+    }
+    .step-content h4 {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .step-content p {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .step-content strong { color: var(--yellow); }
+
+    /* ─── STATS BAR ─── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .stat-cell {
+      background: var(--surface);
+      padding: 20px 24px;
+    }
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+    }
+    .stat-value.green { color: var(--green); }
+    .stat-value.yellow { color: var(--yellow); }
+    .stat-value.blue { color: var(--blue); }
+
+    /* ─── BOTTOM NAV ─── */
+    .bottom-nav {
+      margin-top: 80px;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+    .bottom-nav-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .nav-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .nav-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-pill:hover { border-color: var(--yellow); color: var(--yellow); }
+    .nav-pill-icon { font-size: 14px; }
+    .nav-pill.active { border-color: var(--green); color: var(--green); background: rgba(0,255,135,0.05); }
+
+    /* ─── API STATUS ─── */
+    .api-banner {
+      background: rgba(255,59,59,0.1);
+      border: 1px solid rgba(255,59,59,0.3);
+      border-radius: 2px;
+      padding: 12px 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--red);
+      margin-bottom: 16px;
+      display: none;
+    }
+    .api-banner.visible { display: block; }
+
+    /* ─── REFRESH BUTTON ─── */
+    .refresh-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+
+    .last-updated {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <a href="/" class="topbar-brand">FUNDING ARB</a>
+    <nav class="topbar-nav">
+      <a href="/">Hub</a>
+      <a href="/dashboard.html">Scanner</a>
+      <a href="/rates.html">Charts</a>
+      <a href="/matrix.html">Matrix</a>
+      <a href="/cashcarry.html" class="active">Cash-Carry</a>
+      <a href="/report.html">Report</a>
+      <a href="/explainer.html">Explainer</a>
+    </nav>
+    <div class="topbar-status">
+      <div class="pulse" id="statusPulse"></div>
+      <span id="statusText">CONNECTING</span>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-eyebrow">Strategy Guide</div>
+      <h1 class="hero-title">CASH &amp;<br><span>CARRY ARB</span></h1>
+      <p class="hero-sub">
+        Long spot + Short perp. Capture the <strong>full funding rate</strong>, not just the differential.
+        Delta neutral. Collect every 8h.
+      </p>
+      <div class="hero-badges">
+        <span class="hero-badge green">🟢 Delta Neutral</span>
+        <span class="hero-badge yellow">⚡ Full Rate Capture</span>
+        <span class="hero-badge blue">🔒 Lower Liquidation Risk</span>
+      </div>
+    </section>
+
+    <!-- EXPLAINER CALLOUT -->
+    <div class="callout">
+      <div class="callout-label">How It Works</div>
+      <p>
+        Unlike <strong>perp↔perp arb</strong> where you capture the <strong>SPREAD</strong> between two rates,
+        cash-and-carry captures the <strong>FULL funding rate</strong> on one exchange.
+      </p>
+      <p>
+        <em>Long the spot asset → short the perp → collect funding every 8h.</em>
+        Delta neutral: price moves cancel out because your spot gains = your perp losses (or vice versa).
+      </p>
+      <p>
+        No second exchange rate needed. No basis risk between two perps. Just one exchange's funding rate — all yours.
+      </p>
+
+      <div class="example-box">
+        <div class="example-box-label">📐 Example</div>
+        <p>BTC perp paying <strong>-0.1%/8h</strong> on Binance (longs paying shorts)</p>
+        <p>→ Buy <strong>1 BTC spot</strong> on Coinbase ($70,000)</p>
+        <p>→ Short <strong>1 BTC perp</strong> on Binance ($70,000 notional)</p>
+        <p class="highlight">→ Collect $70/8h = $210/day on $70k deployed</p>
+        <p class="highlight">→ <strong>0.3%/day · ~109% APR</strong></p>
+        <p style="color: var(--muted); margin-top: 8px; font-size: 11px;">Price moves cancel: BTC drops $1k → spot loses $1k, short perp gains $1k → net $0</p>
+      </div>
+    </div>
+
+    <!-- DIFFICULTY EXPLANATION -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">DIFFICULTY LEVELS</div>
+        <div class="section-sub">Understanding the two directions</div>
+      </div>
+
+      <div class="difficulty-grid">
+        <div class="diff-card easy">
+          <div class="diff-card-header">
+            <span style="font-size: 20px;">🟢</span>
+            <span class="diff-badge easy">Easy</span>
+          </div>
+          <h3>Long Spot + Short Perp</h3>
+          <p>
+            The perp funding rate is <strong style="color: var(--red);">negative</strong> — longs are paying shorts.
+            You buy the spot asset (no leverage needed) and short the perp to collect the negative rate.
+            Straightforward on any exchange with both spot and perp markets.
+          </p>
+          <span class="tag easy">Most common · No borrow needed</span>
+        </div>
+        <div class="diff-card hard">
+          <div class="diff-card-header">
+            <span style="font-size: 20px;">🟡</span>
+            <span class="diff-badge hard">Hard</span>
+          </div>
+          <h3>Short Spot + Long Perp</h3>
+          <p>
+            The perp funding rate is <strong style="color: var(--green);">positive</strong> — shorts are paying longs.
+            You short the spot asset and long the perp. Shorting spot requires margin or borrowing the asset —
+            adds complexity and borrow cost.
+          </p>
+          <span class="tag hard">Requires margin · Factor in borrow rate</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE OPPORTUNITIES -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">LIVE OPPORTUNITIES</div>
+        <div class="section-sub" id="oppCount">Loading...</div>
+      </div>
+
+      <div id="apiBanner" class="api-banner">
+        ⚠ Could not reach API. Showing cached or demo data. Check your server connection.
+      </div>
+
+      <!-- Stats bar -->
+      <div class="stats-bar" id="statsBar" style="display:none;">
+        <div class="stat-cell">
+          <div class="stat-label">Opportunities</div>
+          <div class="stat-value green" id="statTotal">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Easy (Long Spot)</div>
+          <div class="stat-value green" id="statEasy">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Hard (Short Spot)</div>
+          <div class="stat-value yellow" id="statHard">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Best APR</div>
+          <div class="stat-value blue" id="statBestApr">—</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-label">Best $/Day per $1k</div>
+          <div class="stat-value yellow" id="statBestDaily">—</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <span class="last-updated" id="lastUpdated"></span>
+        <button class="refresh-btn" onclick="loadOpportunities()">↻ Refresh</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="oppTable">
+          <thead>
+            <tr>
+              <th>Coin</th>
+              <th>Exchange (Perp)</th>
+              <th>Direction</th>
+              <th>Rate / 8H</th>
+              <th>Net Rate</th>
+              <th>APR %</th>
+              <th>$/Day per $1k</th>
+              <th>Difficulty</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="oppBody">
+            <tr>
+              <td colspan="9">
+                <div class="loading-state">
+                  <div class="loading-spinner"></div>
+                  <div class="loading-label">Fetching opportunities...</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COMPARISON SECTION -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">CASH-CARRY VS PERP-PERP ARB</div>
+        <div class="section-sub">Two strategies, different trade-offs</div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Factor</th>
+              <th class="cc-col">Cash &amp; Carry</th>
+              <th class="pp-col">Perp ↔ Perp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>What you capture</td>
+              <td class="cc-val">Full funding rate on 1 exchange</td>
+              <td class="pp-val">Rate spread between 2 exchanges</td>
+            </tr>
+            <tr>
+              <td>Exchanges needed</td>
+              <td class="cc-val">1–2 (spot + perp, can be same)</td>
+              <td class="pp-val">2 (long perp on A, short perp on B)</td>
+            </tr>
+            <tr>
+              <td>Capital efficiency</td>
+              <td class="cc-val">High — spot needs no leverage</td>
+              <td class="pp-val">Higher — both legs can be leveraged</td>
+            </tr>
+            <tr>
+              <td>Liquidation risk</td>
+              <td class="cc-val">Lower — spot can't be liquidated</td>
+              <td class="pp-val">Higher — both legs are leveraged</td>
+            </tr>
+            <tr>
+              <td>Execution complexity</td>
+              <td class="cc-val">Low — straightforward hedge</td>
+              <td class="pp-val">Medium — manage 2 perp positions</td>
+            </tr>
+            <tr>
+              <td>Yield potential</td>
+              <td class="cc-val">Very high (full rate)</td>
+              <td class="pp-val">Lower (only the spread)</td>
+            </tr>
+            <tr>
+              <td>Rate requirement</td>
+              <td class="cc-val">One exchange must be elevated</td>
+              <td class="pp-val">Two exchanges must diverge</td>
+            </tr>
+            <tr>
+              <td>Risk profile</td>
+              <td class="cc-val">Rate normalization risk only</td>
+              <td class="pp-val">Rate normalization + convergence risk</td>
+            </tr>
+            <tr>
+              <td>Best for</td>
+              <td class="cc-val">High individual funding events</td>
+              <td class="pp-val">Persistent inter-exchange spreads</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- HOW TO EXECUTE -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">HOW TO EXECUTE</div>
+        <div class="section-sub">Step-by-step for the EASY direction (Long Spot + Short Perp)</div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Find an elevated negative funding rate</h4>
+            <p>
+              Use the table above to find a coin where a perp exchange is paying <strong>≥ 0.2%/8h negative rate</strong>
+              (longs paying shorts). The higher the rate, the more you collect. Filter for <strong style="color: var(--green);">EASY</strong> opportunities.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Buy the spot asset</h4>
+            <p>
+              Purchase the underlying asset on <strong>any exchange with spot markets</strong> — Coinbase, Kraken, or even the same exchange
+              as your perp. Use the same notional size you plan to short on the perp. No leverage needed for the spot leg.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Short the perp with equal notional</h4>
+            <p>
+              Open a <strong>short position on the perp</strong> with the same dollar value as your spot purchase.
+              1x leverage is sufficient — you don't need to amplify. This creates your delta-neutral hedge.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h4>Hold and collect funding every 8h</h4>
+            <p>
+              Funding payments are settled every <strong>8 hours</strong> (most exchanges). As a short, you receive funding when
+              the rate is negative. Price moves are neutralized — spot gains = perp losses. Your only P&amp;L is the funding rate.
+            </p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h4>Close both legs when rate normalizes</h4>
+            <p>
+              Monitor the funding rate. When it returns to near-zero (or the net rate after fees goes negative),
+              <strong>close the perp short first, then sell the spot</strong>. Take your accumulated funding profit and redeploy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+      <div class="bottom-nav-label">Navigate</div>
+      <div class="nav-pills">
+        <a href="/" class="nav-pill"><span class="nav-pill-icon">🏠</span>Hub</a>
+        <a href="/dashboard.html" class="nav-pill"><span class="nav-pill-icon">⚡</span>Scanner</a>
+        <a href="/rates.html" class="nav-pill"><span class="nav-pill-icon">📈</span>Rate Charts</a>
+        <a href="/matrix.html" class="nav-pill"><span class="nav-pill-icon">🟧</span>Matrix</a>
+        <a href="/cashcarry.html" class="nav-pill active"><span class="nav-pill-icon">💰</span>Cash-Carry</a>
+        <a href="/report.html" class="nav-pill"><span class="nav-pill-icon">📋</span>Report</a>
+        <a href="/pnl.html" class="nav-pill"><span class="nav-pill-icon">💹</span>P&amp;L History</a>
+        <a href="/golive.html" class="nav-pill"><span class="nav-pill-icon">🚀</span>Go Live</a>
+        <a href="/explainer.html" class="nav-pill"><span class="nav-pill-icon">📖</span>Explainer</a>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ─── API AUTO-DETECT ───
+    function getApiBase() {
+      const h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return '';
+      // GitHub Pages or other static hosts → use Render backend
+      return 'https://funding-arb-dashboard.onrender.com';
+    }
+
+    const API_BASE = getApiBase();
+
+    // ─── STATUS ───
+    async function checkStatus() {
+      try {
+        const r = await fetch(API_BASE + '/api/status', { signal: AbortSignal.timeout(5000) });
+        if (r.ok) {
+          document.getElementById('statusText').textContent = 'LIVE';
+          document.getElementById('statusPulse').style.background = 'var(--green)';
+        }
+      } catch {
+        document.getElementById('statusText').textContent = 'OFFLINE';
+        document.getElementById('statusPulse').style.background = 'var(--red)';
+        document.getElementById('statusPulse').style.boxShadow = '0 0 8px var(--red)';
+      }
+    }
+
+    // ─── EXCHANGE NAME MAP ───
+    const EXCHANGE_NAMES = {
+      binance: 'Binance', bybit: 'Bybit', okx: 'OKX', dydx: 'dYdX',
+      hyperliquid: 'Hyperliquid', gateio: 'Gate.io', bitget: 'Bitget',
+      mexc: 'MEXC', kraken: 'Kraken', bingx: 'BingX', coinbase: 'Coinbase',
+      phemex: 'Phemex', htx: 'HTX', woox: 'WOO X', paradex: 'Paradex',
+      backpack: 'Backpack', aevo: 'Aevo', xt: 'XT.com', orderly: 'Orderly', coinex: 'CoinEx'
+    };
+
+    function exchangeName(id) { return EXCHANGE_NAMES[id] || id.toUpperCase(); }
+
+    function fmt(n, dec = 4) {
+      return (n >= 0 ? '+' : '') + (n * 100).toFixed(dec) + '%';
+    }
+
+    function fmtApr(n) { return n.toFixed(1) + '%'; }
+    function fmtDaily(n) { return '$' + n.toFixed(2); }
+    function fmtPrice(p) {
+      if (!p) return '—';
+      if (p >= 1000) return '$' + p.toLocaleString('en', { maximumFractionDigits: 0 });
+      if (p >= 1) return '$' + p.toFixed(2);
+      return '$' + p.toFixed(4);
+    }
+
+    // ─── LOAD OPPORTUNITIES ───
+    async function loadOpportunities() {
+      try {
+        const r = await fetch(API_BASE + '/api/cash-carry', { signal: AbortSignal.timeout(10000) });
+        if (!r.ok) throw new Error('API error ' + r.status);
+        const opps = await r.json();
+        renderOpportunities(opps);
+        document.getElementById('apiBanner').classList.remove('visible');
+        document.getElementById('lastUpdated').textContent = '↻ Updated ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        console.error('Failed to load opportunities:', e);
+        document.getElementById('apiBanner').classList.add('visible');
+        document.getElementById('oppCount').textContent = 'API unavailable';
+        document.getElementById('oppBody').innerHTML = `
+          <tr><td colspan="9"><div class="empty-state">
+            Could not reach ${API_BASE}/api/cash-carry<br>
+            <span style="color: var(--muted); font-size: 11px;">Check your server is running</span>
+          </div></td></tr>`;
+      }
+    }
+
+    function renderOpportunities(opps) {
+      const tbody = document.getElementById('oppBody');
+      const countEl = document.getElementById('oppCount');
+
+      // Stats
+      const easy = opps.filter(o => o.difficulty === 'easy');
+      const hard = opps.filter(o => o.difficulty === 'hard');
+      const bestApr = opps.length > 0 ? Math.max(...opps.map(o => o.apr)) : 0;
+      const bestDaily = opps.length > 0 ? Math.max(...opps.map(o => o.dailyPer1k)) : 0;
+
+      document.getElementById('statTotal').textContent = opps.length;
+      document.getElementById('statEasy').textContent = easy.length;
+      document.getElementById('statHard').textContent = hard.length;
+      document.getElementById('statBestApr').textContent = bestApr > 0 ? fmtApr(bestApr) : '—';
+      document.getElementById('statBestDaily').textContent = bestDaily > 0 ? fmtDaily(bestDaily) : '—';
+      document.getElementById('statsBar').style.display = '';
+
+      if (opps.length === 0) {
+        countEl.textContent = '0 opportunities above threshold';
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">
+          No opportunities above 0.2%/8h minimum right now.<br>
+          <span style="color: var(--muted); font-size: 11px;">Rates fluctuate — check back soon.</span>
+        </div></td></tr>`;
+        return;
+      }
+
+      countEl.textContent = `${opps.length} opportunit${opps.length === 1 ? 'y' : 'ies'} · min 0.2%/8h`;
+
+      tbody.innerHTML = opps.map(opp => {
+        const isEasy = opp.difficulty === 'easy';
+        const rowClass = isEasy ? 'easy-row' : 'hard-row';
+        const rateSign = opp.rawRate < 0 ? 'rate-negative' : 'rate-positive';
+        const analyzeUrl = `pair.html?mode=cashcarry&coin=${encodeURIComponent(opp.coin)}&exchange=${encodeURIComponent(opp.exchange)}`;
+        const dirLabel = isEasy ? '↑ SPOT + ↓ PERP' : '↓ SPOT + ↑ PERP';
+
+        return `<tr class="${rowClass}">
+          <td>
+            <div class="coin-cell">
+              <div class="coin-icon">${opp.coin.slice(0, 2)}</div>
+              <span class="coin-name">${opp.coin}</span>
+              ${opp.markPrice ? `<span style="color: var(--muted); font-size: 11px;">${fmtPrice(opp.markPrice)}</span>` : ''}
+            </div>
+          </td>
+          <td><span class="exchange-tag">${exchangeName(opp.exchange)}</span></td>
+          <td><span class="dir-chip ${isEasy ? 'easy' : 'hard'}">${dirLabel}</span></td>
+          <td class="rate-big ${rateSign}">${fmt(opp.rawRate)}</td>
+          <td class="${opp.netRate > 0 ? 'rate-positive' : 'rate-negative'}">${fmt(opp.netRate)}</td>
+          <td style="color: var(--blue); font-weight: 600;">${fmtApr(opp.apr)}</td>
+          <td style="color: var(--yellow);">${fmtDaily(opp.dailyPer1k)}</td>
+          <td>
+            <span class="diff-badge ${isEasy ? 'easy' : 'hard'}" style="font-size: 10px;">
+              ${isEasy ? '🟢 EASY' : '🟡 HARD'}
+            </span>
+          </td>
+          <td>
+            <a href="${analyzeUrl}" class="analyze-btn">ANALYZE →</a>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ─── INIT ───
+    checkStatus();
+    loadOpportunities();
+    // Auto-refresh every 2 minutes
+    setInterval(loadOpportunities, 2 * 60 * 1000);
+  </script>
+</body>
+</html>
