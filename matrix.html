@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EXCHANGE MATRIX — Funding Arb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --green-deep: #00c96a;
+      --green-light: #4dff9e;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+      --surface3: #1a1a1a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── NAV ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+    .topbar-nav { display: flex; gap: 24px; flex-wrap: wrap; }
+    .topbar-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+    .topbar-nav a:hover { color: var(--white); }
+    .topbar-nav a.active { color: var(--yellow); }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--green);
+    }
+    .pulse {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ─── PAGE ─── */
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+      line-height: 1;
+    }
+    .page-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      letter-spacing: 1px;
+    }
+
+    /* ─── GRID LAYOUT ─── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+    .main-content { min-width: 0; }
+    .sidebar { min-width: 0; }
+
+    /* ─── SECTION CARD ─── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+    .card-subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── MATRIX ─── */
+    .matrix-scroll {
+      overflow-x: auto;
+    }
+    .matrix-table {
+      border-collapse: separate;
+      border-spacing: 3px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+    .matrix-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 10px;
+      white-space: nowrap;
+    }
+    .matrix-table th.col-header {
+      text-align: center;
+      background: var(--surface2);
+      border-radius: 3px;
+    }
+    .matrix-table th.row-label {
+      text-align: right;
+      color: var(--white);
+      background: transparent;
+      padding-right: 12px;
+    }
+    .matrix-table th.corner {
+      text-align: center;
+      font-size: 9px;
+      color: var(--muted);
+      padding: 6px;
+    }
+    .matrix-cell {
+      width: 96px;
+      height: 64px;
+      border-radius: 3px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      border: 2px solid transparent;
+    }
+    .matrix-cell:hover {
+      filter: brightness(1.3);
+      border-color: var(--yellow) !important;
+      z-index: 10;
+    }
+    .matrix-cell.selected {
+      border-color: var(--yellow) !important;
+      filter: brightness(1.2);
+    }
+    .matrix-cell .cell-spread {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+    }
+    .matrix-cell .cell-coins {
+      font-size: 9px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+    .cell-deep-green { background: #00552a; border-color: #00552a; }
+    .cell-light-green { background: #1a3d26; border-color: #1a3d26; }
+    .cell-yellow { background: #3d3100; border-color: #3d3100; }
+    .cell-gray { background: #1e1e1e; border-color: #1e1e1e; }
+    .cell-empty { background: #0f0f0f; cursor: default; border-color: #0f0f0f; }
+    .cell-empty:hover { filter: none; border-color: #0f0f0f !important; }
+    .cell-self { background: #0d0d0d; cursor: default; border-color: #0d0d0d; }
+    .cell-self:hover { filter: none; border-color: #0d0d0d !important; }
+
+    /* axis labels */
+    .axis-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    /* ─── TOOLTIP ─── */
+    #tooltip {
+      position: fixed;
+      background: #1a1a1a;
+      border: 1px solid var(--yellow);
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s;
+      z-index: 999;
+      max-width: 240px;
+    }
+    #tooltip.show { opacity: 1; }
+    #tooltip .tt-title {
+      color: var(--yellow);
+      font-size: 12px;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    #tooltip .tt-row {
+      color: var(--white);
+      margin: 2px 0;
+    }
+    #tooltip .tt-row span { color: var(--muted); }
+
+    /* ─── LEGEND ─── */
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .legend-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    /* ─── HEATMAP ─── */
+    .heatmap-container { margin-top: 8px; }
+    .heatmap-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .heatmap-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--white);
+      width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+    .heatmap-bar-wrap {
+      flex: 1;
+      position: relative;
+      height: 22px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: visible;
+    }
+    .heatmap-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+    .heatmap-dot {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid rgba(0,0,0,0.4);
+      z-index: 2;
+    }
+    .heatmap-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      width: 52px;
+      flex-shrink: 0;
+    }
+    .bar-green { background: linear-gradient(90deg, #004d26, #00c96a); }
+    .bar-yellow { background: linear-gradient(90deg, #3d2e00, #e6b800); }
+    .bar-red { background: linear-gradient(90deg, #4d0000, #ff3b3b); }
+
+    /* ─── TABLE ─── */
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .table-filter-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .filter-badge {
+      display: inline-block;
+      background: #1a2a1a;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .filter-badge:hover { background: #243024; }
+    .clear-filter {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 2px 6px;
+    }
+    .clear-filter:hover { color: var(--yellow); }
+
+    table.opp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+    }
+    .opp-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .opp-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #1a1a1a;
+      color: var(--white);
+    }
+    .opp-table tr:hover td { background: var(--surface2); }
+    .opp-table .td-green { color: var(--green); }
+    .opp-table .td-yellow { color: var(--yellow); }
+    .analyze-btn {
+      display: inline-block;
+      padding: 3px 10px;
+      background: transparent;
+      border: 1px solid var(--muted);
+      border-radius: 2px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .analyze-btn:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+      background: rgba(255,225,53,0.04);
+    }
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .loading-state {
+      padding: 40px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      animation: blink 1.2s infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .sidebar-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      margin-bottom: 14px;
+    }
+    .sidebar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+    .sidebar-row:last-child { border-bottom: none; }
+    .sidebar-row .sr-label { color: var(--muted); }
+    .sidebar-row .sr-value { color: var(--white); }
+    .sidebar-row .sr-green { color: var(--green); }
+    .sidebar-badge {
+      background: #1a2a1a;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .refresh-btn:hover {
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+    .refresh-btn.spinning svg { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .timestamp {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .topbar { padding: 10px 16px; }
+      .topbar-nav { gap: 12px; }
+      .page { padding: 20px 12px; }
+      .page-title { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<header class="topbar">
+  <div class="topbar-brand">FUNDING ARB</div>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="matrix.html" class="active">Matrix</a>
+    <a href="rates.html">Rate Charts</a>
+    <a href="report.html">Report</a>
+    <a href="pnl.html">P&amp;L</a>
+    <a href="golive.html">Go Live</a>
+    <a href="explainer.html">Explainer</a>
+  </nav>
+  <div class="topbar-status">
+    <div class="pulse"></div>
+    <span id="status-dot">LIVE</span>
+  </div>
+</header>
+
+<div id="tooltip">
+  <div class="tt-title" id="tt-title">—</div>
+  <div class="tt-row"><span>Coins: </span><span id="tt-coins">—</span></div>
+  <div class="tt-row"><span>Avg Spread: </span><span id="tt-spread">—</span></div>
+  <div class="tt-row"><span>Best Coin: </span><span id="tt-best">—</span></div>
+</div>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">EXCHANGE MATRIX</div>
+    <div class="page-subtitle">// which exchange combinations produce the best spreads right now?</div>
+  </div>
+
+  <div class="main-grid">
+    <div class="main-content">
+
+      <!-- MATRIX CARD -->
+      <div class="card">
+        <div class="card-title">EXCHANGE PAIR MATRIX</div>
+        <div class="card-subtitle">rows = long exchange · cols = short exchange · cell = avg gross spread across all coins</div>
+        <div class="matrix-scroll" id="matrixWrap">
+          <div class="loading-state">LOADING MATRIX DATA...</div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-box" style="background:#00552a"></div> &gt;1% spread</div>
+          <div class="legend-item"><div class="legend-box" style="background:#1a3d26"></div> 0.5–1%</div>
+          <div class="legend-item"><div class="legend-box" style="background:#3d3100"></div> 0.2–0.5%</div>
+          <div class="legend-item"><div class="legend-box" style="background:#1e1e1e"></div> &lt;0.2%</div>
+        </div>
+      </div>
+
+      <!-- HEATMAP CARD -->
+      <div class="card">
+        <div class="card-title">TOP COINS BY SPREAD</div>
+        <div class="card-subtitle">top 20 coins · bar = current gross spread · dot = current vs historical avg · green=growing / yellow=stable / red=compressing</div>
+        <div class="heatmap-container" id="heatmapWrap">
+          <div class="loading-state">LOADING HEATMAP...</div>
+        </div>
+      </div>
+
+      <!-- OPPORTUNITIES TABLE -->
+      <div class="card">
+        <div class="table-header">
+          <div>
+            <div class="card-title" style="margin-bottom:0">OPPORTUNITIES</div>
+            <div class="table-filter-label">
+              <span id="filterDesc">All pairs</span>
+              <span class="filter-badge" id="filterBadge" style="display:none"></span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="clear-filter" id="clearFilter" style="display:none" onclick="clearFilter()">✕ clear filter</span>
+          </div>
+        </div>
+        <div id="tableWrap">
+          <div class="loading-state">LOADING OPPORTUNITIES...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">MOST CONSISTENT PAIRS</div>
+        <div id="consistentPairs">
+          <div class="loading-state" style="padding:20px;font-size:11px">LOADING...</div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-title">BEST COINS — HISTORICAL</div>
+        <div id="bestCoinsHistorical">
+          <div class="loading-state" style="padding:20px;font-size:11px">LOADING...</div>
+        </div>
+      </div>
+
+      <div class="sidebar-card" style="padding:16px">
+        <div class="timestamp" id="lastUpdated">—</div>
+        <button class="refresh-btn" id="refreshBtn" onclick="loadAll()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          REFRESH DATA
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── API URL AUTO-DETECT ───────────────────────────────────────────────────
+const API_BASE = (() => {
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    return 'http://localhost:3124';
+  }
+  return 'https://mvp-polymarket-alpha-bot.onrender.com';
+})();
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+let allOpps = [];
+let statsData = {};
+let selectedLong = null;
+let selectedShort = null;
+
+// ─── FETCH HELPERS ────────────────────────────────────────────────────────
+async function fetchJSON(path) {
+  const r = await fetch(API_BASE + path);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// ─── MAIN LOAD ────────────────────────────────────────────────────────────
+async function loadAll() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  document.getElementById('lastUpdated').textContent = 'REFRESHING...';
+
+  try {
+    const [opps, stats] = await Promise.allSettled([
+      fetchJSON('/api/opportunities'),
+      fetchJSON('/api/stats')
+    ]);
+
+    if (opps.status === 'fulfilled') {
+      const raw = opps.value;
+      allOpps = Array.isArray(raw) ? raw : (raw.opportunities || raw.data || []);
+      // Filter out drift
+      allOpps = allOpps.filter(o => {
+        const l = (o.longExchange || o.long_exchange || '').toLowerCase();
+        const s = (o.shortExchange || o.short_exchange || '').toLowerCase();
+        return l !== 'drift' && s !== 'drift';
+      });
+    } else {
+      allOpps = [];
+      console.warn('Failed to load opportunities:', opps.reason);
+    }
+
+    if (stats.status === 'fulfilled') {
+      statsData = stats.value || {};
+    } else {
+      statsData = {};
+    }
+
+    renderMatrix();
+    renderHeatmap();
+    renderTable();
+    renderSidebar();
+    document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('lastUpdated').textContent = 'Error loading data';
+  }
+
+  btn.classList.remove('spinning');
+}
+
+// ─── MATRIX ───────────────────────────────────────────────────────────────
+function renderMatrix() {
+  const wrap = document.getElementById('matrixWrap');
+
+  if (!allOpps.length) {
+    wrap.innerHTML = '<div class="empty-state">No opportunities data available.</div>';
+    return;
+  }
+
+  // Collect exchanges (exclude drift)
+  const longSet = new Set();
+  const shortSet = new Set();
+  allOpps.forEach(o => {
+    const l = (o.longExchange || o.long_exchange || '').toLowerCase().trim();
+    const s = (o.shortExchange || o.short_exchange || '').toLowerCase().trim();
+    if (l && l !== 'drift') longSet.add(l);
+    if (s && s !== 'drift') shortSet.add(s);
+  });
+
+  const longExchanges = [...longSet].sort();
+  const shortExchanges = [...shortSet].sort();
+
+  // Build cell data: matrix[long][short] = { spreads: [], coins: [] }
+  const matrix = {};
+  longExchanges.forEach(l => { matrix[l] = {}; });
+
+  allOpps.forEach(o => {
+    const l = (o.longExchange || o.long_exchange || '').toLowerCase().trim();
+    const s = (o.shortExchange || o.short_exchange || '').toLowerCase().trim();
+    if (!l || !s || l === s || l === 'drift' || s === 'drift') return;
+    if (!matrix[l]) matrix[l] = {};
+    if (!matrix[l][s]) matrix[l][s] = { spreads: [], coins: [] };
+
+    const spread = parseFloat(o.grossSpread ?? o.gross_spread ?? o.spread ?? 0);
+    const coin = o.coin || o.symbol || o.asset || '?';
+    matrix[l][s].spreads.push(spread);
+    matrix[l][s].coins.push({ coin, spread });
+  });
+
+  // Build table
+  let html = '<table class="matrix-table"><thead><tr>';
+  html += '<th class="corner">LONG ↓ SHORT →</th>';
+  shortExchanges.forEach(s => {
+    html += `<th class="col-header">${s.toUpperCase()}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  longExchanges.forEach(l => {
+    html += `<tr><th class="row-label">${l.toUpperCase()}</th>`;
+    shortExchanges.forEach(s => {
+      if (l === s) {
+        html += '<td class="matrix-cell cell-self"></td>';
+        return;
+      }
+      const data = matrix[l] && matrix[l][s];
+      if (!data || !data.spreads.length) {
+        html += `<td class="matrix-cell cell-empty" data-long="${l}" data-short="${s}"></td>`;
+        return;
+      }
+
+      const avg = data.spreads.reduce((a,b) => a+b, 0) / data.spreads.length;
+      const best = data.coins.sort((a,b) => b.spread - a.spread)[0];
+      const pct = (avg * 100).toFixed(3);
+      const colorClass = avg >= 0.01 ? 'cell-deep-green' : avg >= 0.005 ? 'cell-light-green' : avg >= 0.002 ? 'cell-yellow' : 'cell-gray';
+
+      html += `<td class="matrix-cell ${colorClass}" 
+        data-long="${l}" data-short="${s}"
+        data-coins="${data.coins.length}" 
+        data-spread="${pct}"
+        data-best="${best.coin}"
+        onclick="selectCell(this)"
+        onmouseenter="showTooltip(event, this)"
+        onmouseleave="hideTooltip()">
+        <div class="cell-spread">${pct}%</div>
+        <div class="cell-coins">${data.coins.length} coin${data.coins.length !== 1 ? 's' : ''}</div>
+      </td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  // Re-apply selection
+  if (selectedLong && selectedShort) {
+    const sel = wrap.querySelector(`[data-long="${selectedLong}"][data-short="${selectedShort}"]`);
+    if (sel) sel.classList.add('selected');
+  }
+}
+
+// ─── TOOLTIP ──────────────────────────────────────────────────────────────
+function showTooltip(event, cell) {
+  const tt = document.getElementById('tooltip');
+  const l = cell.dataset.long;
+  const s = cell.dataset.short;
+  if (!l || !s || !cell.dataset.spread) return;
+
+  document.getElementById('tt-title').textContent = `LONG ${l.toUpperCase()} / SHORT ${s.toUpperCase()}`;
+  document.getElementById('tt-coins').textContent = cell.dataset.coins;
+  document.getElementById('tt-spread').textContent = cell.dataset.spread + '%';
+  document.getElementById('tt-best').textContent = (cell.dataset.best || '—').toUpperCase();
+  tt.classList.add('show');
+  moveTooltip(event);
+}
+
+function moveTooltip(event) {
+  const tt = document.getElementById('tooltip');
+  const x = event.clientX + 14;
+  const y = event.clientY - 10;
+  tt.style.left = Math.min(x, window.innerWidth - 260) + 'px';
+  tt.style.top = Math.max(0, y) + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('show');
+}
+
+document.addEventListener('mousemove', e => {
+  const tt = document.getElementById('tooltip');
+  if (tt.classList.contains('show')) moveTooltip(e);
+});
+
+// ─── CELL SELECT ──────────────────────────────────────────────────────────
+function selectCell(cell) {
+  const l = cell.dataset.long;
+  const s = cell.dataset.short;
+  if (!l || !s || !cell.dataset.spread) return;
+
+  // Deselect all
+  document.querySelectorAll('.matrix-cell.selected').forEach(c => c.classList.remove('selected'));
+
+  if (selectedLong === l && selectedShort === s) {
+    // Toggle off
+    selectedLong = null;
+    selectedShort = null;
+  } else {
+    selectedLong = l;
+    selectedShort = s;
+    cell.classList.add('selected');
+  }
+
+  renderTable();
+}
+
+function clearFilter() {
+  selectedLong = null;
+  selectedShort = null;
+  document.querySelectorAll('.matrix-cell.selected').forEach(c => c.classList.remove('selected'));
+  renderTable();
+}
+
+// ─── HEATMAP ──────────────────────────────────────────────────────────────
+function renderHeatmap() {
+  const wrap = document.getElementById('heatmapWrap');
+
+  // Build coin spread map from opportunities
+  const coinMap = {};
+  allOpps.forEach(o => {
+    const coin = (o.coin || o.symbol || o.asset || '?').toUpperCase();
+    const spread = parseFloat(o.grossSpread ?? o.gross_spread ?? o.spread ?? 0);
+    if (!coinMap[coin]) coinMap[coin] = [];
+    coinMap[coin].push(spread);
+  });
+
+  // Average per coin
+  let coinList = Object.entries(coinMap).map(([coin, spreads]) => ({
+    coin,
+    spread: spreads.reduce((a,b) => a+b, 0) / spreads.length
+  })).sort((a,b) => b.spread - a.spread).slice(0, 20);
+
+  if (!coinList.length) {
+    wrap.innerHTML = '<div class="empty-state">No data available.</div>';
+    return;
+  }
+
+  // Historical context from stats
+  const historicalMap = {};
+  const topCoins = statsData.topCoinsBySpread || statsData.top_coins_by_spread || [];
+  topCoins.forEach(row => {
+    const coin = (row.coin || row.symbol || '').toUpperCase();
+    const hist = parseFloat(row.avgSpread ?? row.avg_spread ?? row.spread ?? 0);
+    if (coin) historicalMap[coin] = hist;
+  });
+
+  const maxSpread = coinList[0].spread * 100;
+  const barMax = Math.max(maxSpread * 1.1, 0.5);
+
+  let html = '';
+  coinList.forEach(({ coin, spread }) => {
+    const pct = spread * 100;
+    const barW = Math.min((pct / barMax) * 100, 100);
+
+    // Determine color vs historical
+    const hist = historicalMap[coin];
+    let barClass = 'bar-yellow';
+    let dotColor = '#e6b800';
+    if (hist !== undefined) {
+      const delta = pct - (hist * 100);
+      if (delta > 0.05) { barClass = 'bar-green'; dotColor = '#00ff87'; }
+      else if (delta < -0.05) { barClass = 'bar-red'; dotColor = '#ff3b3b'; }
+    }
+
+    const dotPos = Math.min(barW, 99);
+
+    html += `
+    <div class="heatmap-row">
+      <div class="heatmap-label">${coin}</div>
+      <div class="heatmap-bar-wrap">
+        <div class="heatmap-bar ${barClass}" style="width:${barW}%"></div>
+        <div class="heatmap-dot" style="left:${dotPos}%;background:${dotColor}"></div>
+      </div>
+      <div class="heatmap-val">${pct.toFixed(3)}%</div>
+    </div>`;
+  });
+
+  wrap.innerHTML = html;
+}
+
+// ─── TABLE ────────────────────────────────────────────────────────────────
+function renderTable() {
+  const wrap = document.getElementById('tableWrap');
+  const filterDesc = document.getElementById('filterDesc');
+  const filterBadge = document.getElementById('filterBadge');
+  const clearFilterBtn = document.getElementById('clearFilter');
+
+  let opps = allOpps;
+
+  if (selectedLong && selectedShort) {
+    opps = allOpps.filter(o => {
+      const l = (o.longExchange || o.long_exchange || '').toLowerCase().trim();
+      const s = (o.shortExchange || o.short_exchange || '').toLowerCase().trim();
+      return l === selectedLong && s === selectedShort;
+    });
+    filterDesc.textContent = 'Filtered:';
+    filterBadge.textContent = `LONG ${selectedLong.toUpperCase()} / SHORT ${selectedShort.toUpperCase()}`;
+    filterBadge.style.display = 'inline-block';
+    clearFilterBtn.style.display = 'inline-block';
+  } else {
+    filterDesc.textContent = 'Showing all pairs';
+    filterBadge.style.display = 'none';
+    clearFilterBtn.style.display = 'none';
+  }
+
+  if (!opps.length) {
+    wrap.innerHTML = '<div class="empty-state">No opportunities for this pair.</div>';
+    return;
+  }
+
+  // Sort by gross spread desc
+  const sorted = [...opps].sort((a,b) => {
+    const sa = parseFloat(a.grossSpread ?? a.gross_spread ?? a.spread ?? 0);
+    const sb = parseFloat(b.grossSpread ?? b.gross_spread ?? b.spread ?? 0);
+    return sb - sa;
+  });
+
+  let html = `
+  <table class="opp-table">
+    <thead>
+      <tr>
+        <th>Coin</th>
+        <th>Long</th>
+        <th>Short</th>
+        <th>Spread %</th>
+        <th>Net %</th>
+        <th>APR %</th>
+        <th>$/day per $1k</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  sorted.slice(0, 50).forEach(o => {
+    const coin = (o.coin || o.symbol || o.asset || '?').toUpperCase();
+    const longEx = (o.longExchange || o.long_exchange || '—').toUpperCase();
+    const shortEx = (o.shortExchange || o.short_exchange || '—').toUpperCase();
+    const gross = parseFloat(o.grossSpread ?? o.gross_spread ?? o.spread ?? 0);
+    const net = parseFloat(o.netSpread ?? o.net_spread ?? gross ?? 0);
+    const apr = parseFloat(o.annualizedReturn ?? o.annualized_return ?? o.apr ?? (net * 365 * 3) ?? 0);
+    const dayPer1k = net * 3 * 1000; // 3 funding periods/day estimate
+
+    const pairEnc = `coin=${encodeURIComponent(coin)}&long=${encodeURIComponent(longEx.toLowerCase())}&short=${encodeURIComponent(shortEx.toLowerCase())}`;
+
+    html += `<tr>
+      <td class="td-yellow">${coin}</td>
+      <td>${longEx}</td>
+      <td>${shortEx}</td>
+      <td class="td-green">${(gross * 100).toFixed(4)}%</td>
+      <td>${(net * 100).toFixed(4)}%</td>
+      <td>${(apr * 100 > 0 ? apr * 100 : net * 100 * 365 * 3).toFixed(1)}%</td>
+      <td>$${dayPer1k.toFixed(3)}</td>
+      <td><a href="pair.html?${pairEnc}" class="analyze-btn">→ ANALYZE</a></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  if (sorted.length > 50) {
+    html += `<div style="padding:10px 12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">Showing 50 of ${sorted.length} — select a matrix cell to filter</div>`;
+  }
+
+  wrap.innerHTML = html;
+}
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────
+function renderSidebar() {
+  // Consistent pairs
+  const pairsEl = document.getElementById('consistentPairs');
+  const topPairs = statsData.topPairsByFreq || statsData.top_pairs_by_freq || [];
+  if (topPairs.length) {
+    pairsEl.innerHTML = topPairs.slice(0, 8).map(p => {
+      const label = p.pair || `${(p.longExchange || p.long || '?').toUpperCase()} / ${(p.shortExchange || p.short || '?').toUpperCase()}`;
+      const freq = p.frequency || p.count || p.freq || '—';
+      return `<div class="sidebar-row">
+        <span class="sr-label">${label}</span>
+        <span class="sr-green">${freq}×</span>
+      </div>`;
+    }).join('');
+  } else {
+    // Derive from opportunities data
+    const pairCount = {};
+    allOpps.forEach(o => {
+      const l = (o.longExchange || o.long_exchange || '').toLowerCase();
+      const s = (o.shortExchange || o.short_exchange || '').toLowerCase();
+      if (!l || !s) return;
+      const k = `${l.toUpperCase()} / ${s.toUpperCase()}`;
+      pairCount[k] = (pairCount[k] || 0) + 1;
+    });
+    const sorted = Object.entries(pairCount).sort((a,b) => b[1]-a[1]).slice(0, 8);
+    if (sorted.length) {
+      pairsEl.innerHTML = sorted.map(([k, cnt]) =>
+        `<div class="sidebar-row"><span class="sr-label">${k}</span><span class="sr-green">${cnt} coins</span></div>`
+      ).join('');
+    } else {
+      pairsEl.innerHTML = '<div class="empty-state" style="padding:12px">No data</div>';
+    }
+  }
+
+  // Best coins historical
+  const coinsEl = document.getElementById('bestCoinsHistorical');
+  const topCoins = statsData.topCoinsBySpread || statsData.top_coins_by_spread || [];
+  if (topCoins.length) {
+    coinsEl.innerHTML = topCoins.slice(0, 8).map(c => {
+      const coin = (c.coin || c.symbol || '?').toUpperCase();
+      const spread = parseFloat(c.avgSpread ?? c.avg_spread ?? c.spread ?? 0);
+      return `<div class="sidebar-row">
+        <span class="sr-label">${coin}</span>
+        <span class="sr-green">${(spread * 100).toFixed(3)}%</span>
+      </div>`;
+    }).join('');
+  } else {
+    // Derive from opps
+    const coinMap = {};
+    allOpps.forEach(o => {
+      const coin = (o.coin || o.symbol || o.asset || '?').toUpperCase();
+      const spread = parseFloat(o.grossSpread ?? o.gross_spread ?? o.spread ?? 0);
+      if (!coinMap[coin]) coinMap[coin] = [];
+      coinMap[coin].push(spread);
+    });
+    const sorted = Object.entries(coinMap)
+      .map(([coin, spreads]) => [coin, spreads.reduce((a,b)=>a+b,0)/spreads.length])
+      .sort((a,b) => b[1]-a[1]).slice(0,8);
+    if (sorted.length) {
+      coinsEl.innerHTML = sorted.map(([coin, avg]) =>
+        `<div class="sidebar-row"><span class="sr-label">${coin}</span><span class="sr-green">${(avg*100).toFixed(3)}%</span></div>`
+      ).join('');
+    } else {
+      coinsEl.innerHTML = '<div class="empty-state" style="padding:12px">No data</div>';
+    }
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
