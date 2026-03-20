@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funding Arb — Paper Trade Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2eb;
+    --green: #00ff87;
+    --red: #ff3b3b;
+    --yellow: #ffe135;
+    --mid: #1a1a1a;
+    --border: #2a2a2a;
+    --muted: #555;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 3px solid var(--yellow);
+    padding: 32px 48px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .brand-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--yellow);
+    text-transform: uppercase;
+  }
+
+  .brand-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--white);
+  }
+
+  .brand-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .header-meta {
+    text-align: right;
+  }
+
+  .ts {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    padding: 28px 32px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    line-height: 1;
+    color: var(--white);
+  }
+
+  .stat-value.green { color: var(--green); }
+  .stat-value.yellow { color: var(--yellow); }
+  .stat-value.red { color: var(--red); }
+
+  .stat-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* MAIN GRID */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 0;
+    min-height: calc(100vh - 280px);
+  }
+
+  /* TRADES TABLE */
+  .trades-section {
+    border-right: 1px solid var(--border);
+    padding: 32px 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.05em;
+    color: var(--white);
+  }
+
+  .section-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    border: 1px solid var(--yellow);
+    padding: 2px 8px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th.right { text-align: right; }
+
+  tbody tr {
+    border-bottom: 1px solid #151515;
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: #111; }
+
+  tbody td {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    color: var(--white);
+    vertical-align: middle;
+  }
+
+  tbody td.right { text-align: right; }
+  tbody td.muted { color: var(--muted); font-size: 11px; }
+
+  .coin-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--black);
+    background: var(--yellow);
+    padding: 2px 7px;
+    letter-spacing: 0.05em;
+  }
+
+  .pair-text {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+
+  .pnl-pos { color: var(--green); font-weight: 500; }
+  .pnl-neg { color: var(--red); }
+
+  .spread-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .spread-bar {
+    height: 3px;
+    background: var(--border);
+    flex: 1;
+    max-width: 60px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .spread-bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  .age-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    padding: 32px 28px;
+  }
+
+  /* LOSERS */
+  .losers-section {
+    margin-top: 8px;
+  }
+
+  .loser-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #151515;
+  }
+
+  .loser-coin {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--white);
+  }
+
+  .loser-pair {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .loser-pnl {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--red);
+    text-align: right;
+  }
+
+  /* EXCHANGE TABLE */
+  .exchange-table {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .exchange-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid #151515;
+    gap: 8px;
+  }
+
+  .ex-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex: 1;
+  }
+
+  .ex-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 30px;
+    text-align: center;
+  }
+
+  .ex-bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--yellow);
+    min-width: 4px;
+  }
+
+  /* INSIGHT BOX */
+  .insight {
+    background: #0f0f0f;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    padding: 16px 18px;
+    margin-top: 24px;
+  }
+
+  .insight-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 8px;
+  }
+
+  .insight-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+
+  .insight-text strong {
+    color: var(--white);
+  }
+
+  /* DIVIDER */
+  .sidebar-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 18px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .footer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  tbody tr { animation: fadeIn 0.3s ease forwards; opacity: 0; }
+  tbody tr:nth-child(1) { animation-delay: 0.05s; }
+  tbody tr:nth-child(2) { animation-delay: 0.08s; }
+  tbody tr:nth-child(3) { animation-delay: 0.11s; }
+  tbody tr:nth-child(4) { animation-delay: 0.14s; }
+  tbody tr:nth-child(5) { animation-delay: 0.17s; }
+  tbody tr:nth-child(6) { animation-delay: 0.20s; }
+  tbody tr:nth-child(7) { animation-delay: 0.23s; }
+  tbody tr:nth-child(8) { animation-delay: 0.26s; }
+  tbody tr:nth-child(9) { animation-delay: 0.29s; }
+  tbody tr:nth-child(10) { animation-delay: 0.32s; }
+  tbody tr:nth-child(11) { animation-delay: 0.35s; }
+  tbody tr:nth-child(12) { animation-delay: 0.38s; }
+  tbody tr:nth-child(13) { animation-delay: 0.41s; }
+  tbody tr:nth-child(14) { animation-delay: 0.44s; }
+  tbody tr:nth-child(15) { animation-delay: 0.47s; }
+</style>
+</head>
+<body>
+
+<header class="fade-in">
+  <div class="brand">
+    <div class="brand-label">Paper Trading Report</div>
+    <div class="brand-title">Funding Arb</div>
+    <div class="brand-sub">Delta-neutral · Funding rate differential capture · No Drift · No tokenized assets</div>
+  </div>
+  <div class="header-meta">
+    <div class="ts">Generated · Mar 19, 2026 · 9:57 PM EST</div>
+    <div class="ts" style="margin-top:4px">Exchanges: Hyperliquid · Coinbase · Bitget · MEXC · WooX · Kraken · Gate.io · dYdX</div>
+  </div>
+</header>
+
+<div class="stats-bar fade-in">
+  <div class="stat">
+    <div class="stat-label">Clean Trades</div>
+    <div class="stat-value yellow">161</div>
+    <div class="stat-sub">no Drift · no tokenized</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total P&L</div>
+    <div class="stat-value green">+$29.40</div>
+    <div class="stat-sub">accumulated funding</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Win Rate</div>
+    <div class="stat-value green">76%</div>
+    <div class="stat-sub">123 positive / 38 negative</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Top Pair APR</div>
+    <div class="stat-value yellow">1,752%</div>
+    <div class="stat-sub">AR · Bitget→Coinbase</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Exchange Stack</div>
+    <div class="stat-value white" style="font-size:28px; padding-top:6px;">5 Core</div>
+    <div class="stat-sub">HL · CB · Bitget · MEXC · WooX</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="trades-section">
+    <div class="section-header">
+      <div class="section-title">Top Performing Pairs</div>
+      <div class="section-badge">Real Signal</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Coin</th>
+          <th>Route</th>
+          <th class="right">Entry Spread</th>
+          <th class="right">Spread Bar</th>
+          <th class="right">P&L</th>
+          <th class="right">Age</th>
+          <th class="right">Lev</th>
+        </tr>
+      </thead>
+      <tbody id="trades-body">
+        <!-- rows injected below -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sidebar">
+    <div class="section-header">
+      <div class="section-title">Losers</div>
+      <div class="section-badge" style="color:#ff3b3b; border-color:#ff3b3b;">Watch</div>
+    </div>
+
+    <div class="losers-section" id="losers-body"></div>
+
+    <hr class="sidebar-divider">
+
+    <div class="section-header">
+      <div class="section-title">By Exchange</div>
+    </div>
+
+    <div id="exchange-body"></div>
+
+    <div class="insight">
+      <div class="insight-label">Signal Assessment</div>
+      <div class="insight-text">
+        <strong>76% of trades are positive</strong> on real funding rate capture. The core cluster —
+        <strong>Hyperliquid→Coinbase</strong> and <strong>Bitget→Coinbase</strong> — shows the most persistent spreads.
+        At $200/trade across 20 clean pairs with no leverage, expect
+        <strong>$25–$50/day</strong> on real capital.
+        <br><br>
+        Accounts needed: <strong>Hyperliquid, Coinbase, Bitget, MEXC, WooX</strong>.
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span><span class="footer-dot"></span> &nbsp;Live paper · No real capital deployed</span>
+  <span>Drift excluded · Gold tokens excluded · Tokenized stocks excluded</span>
+  <span>funding-arb-v3 · mvp-funding-arb-v3.onrender.com</span>
+</footer>
+
+<script>
+const trades = [
+  { coin: 'BLAST', long: 'coinbase', short: 'bitget', spread: 1.574, pnl: 3.73, age: 190, lev: 2 },
+  { coin: 'QNT',   long: 'kraken',   short: 'bitget', spread: 2.395, pnl: 2.77, age: 179, lev: 1 },
+  { coin: 'HUMA',  long: 'woox',     short: 'dydx',   spread: 1.644, pnl: 1.64, age: 41,  lev: 1 },
+  { coin: 'ERA',   long: 'coinbase', short: 'mexc',   spread: 1.175, pnl: 1.39, age: 127, lev: 1 },
+  { coin: 'SPK',   long: 'coinbase', short: 'htx',    spread: 1.072, pnl: 1.30, age: 35,  lev: 1 },
+  { coin: 'AI16Z', long: 'hyperliquid', short: 'coinbase', spread: 1.033, pnl: 1.23, age: 190, lev: 1 },
+  { coin: 'SCR',   long: 'coinbase', short: 'gateio', spread: 0.987, pnl: 1.17, age: 190, lev: 1 },
+  { coin: 'TRB',   long: 'kraken',   short: 'woox',   spread: 8.114, pnl: 1.13, age: 140, lev: 2 },
+  { coin: 'EDGE',  long: 'gateio',   short: 'coinbase', spread: 0.753, pnl: 1.12, age: 174, lev: 1 },
+  { coin: 'OM',    long: 'hyperliquid', short: 'coinbase', spread: 0.938, pnl: 1.11, age: 190, lev: 1 },
+  { coin: 'ANKR',  long: 'woox',     short: 'kraken', spread: 0.825, pnl: 0.98, age: 38,  lev: 1 },
+  { coin: 'OMNI',  long: 'hyperliquid', short: 'coinbase', spread: 0.782, pnl: 0.93, age: 190, lev: 1 },
+  { coin: 'BARD',  long: 'okx',      short: 'mexc',   spread: 2.495, pnl: 0.93, age: 36,  lev: 1 },
+  { coin: 'AR',    long: 'bitget',   short: 'coinbase', spread: 1.780, pnl: 0.84, age: 32,  lev: 2 },
+  { coin: 'DEGO',  long: 'gateio',   short: 'bingx',  spread: 0.670, pnl: 0.83, age: 57,  lev: 1 },
+];
+
+const losers = [
+  { coin: 'DEXE',  long: 'kraken',   short: 'bitget',   pnl: -3.29 },
+  { coin: 'MET',   long: 'woox',     short: 'coinbase', pnl: -1.31 },
+  { coin: 'BCH',   long: 'woox',     short: 'kraken',   pnl: -1.13 },
+  { coin: 'KITE',  long: 'mexc',     short: 'gateio',   pnl: -0.83 },
+  { coin: 'BABY',  long: 'woox',     short: 'coinbase', pnl: -0.66 },
+  { coin: 'AAVE',  long: 'woox',     short: 'kraken',   pnl: -0.45 },
+];
+
+const maxSpread = Math.max(...trades.map(t => t.spread));
+
+const tbody = document.getElementById('trades-body');
+trades.forEach(t => {
+  const ageH = t.age;
+  const ageDotColor = ageH > 100 ? '#00ff87' : ageH > 40 ? '#ffe135' : '#888';
+  const barW = Math.min(100, (t.spread / maxSpread) * 100);
+  tbody.innerHTML += `
+    <tr>
+      <td><span class="coin-badge">${t.coin}</span></td>
+      <td>
+        <div style="font-size:11px;">${t.long}</div>
+        <div class="pair-text">→ ${t.short}</div>
+      </td>
+      <td class="right">${t.spread.toFixed(3)}%</td>
+      <td class="right">
+        <div class="spread-bar-wrap">
+          <div class="spread-bar"><div class="spread-bar-fill" style="width:${barW}%"></div></div>
+        </div>
+      </td>
+      <td class="right pnl-pos">+$${t.pnl.toFixed(2)}</td>
+      <td class="right muted"><span class="age-dot" style="background:${ageDotColor}"></span>${ageH}h</td>
+      <td class="right muted">${t.lev}x</td>
+    </tr>
+  `;
+});
+
+const loserBody = document.getElementById('losers-body');
+losers.forEach(l => {
+  loserBody.innerHTML += `
+    <div class="loser-row">
+      <div>
+        <div class="loser-coin">${l.coin}</div>
+        <div class="loser-pair">${l.long} → ${l.short}</div>
+      </div>
+      <div class="loser-pnl">$${l.pnl.toFixed(2)}</div>
+    </div>
+  `;
+});
+
+// Exchange frequency
+const exCount = {};
+trades.forEach(t => {
+  exCount[t.long] = (exCount[t.long] || 0) + 1;
+  exCount[t.short] = (exCount[t.short] || 0) + 1;
+});
+const sorted = Object.entries(exCount).sort((a,b) => b[1]-a[1]);
+const maxEx = sorted[0][1];
+const exBody = document.getElementById('exchange-body');
+sorted.forEach(([ex, cnt]) => {
+  const w = Math.round((cnt / maxEx) * 80);
+  exBody.innerHTML += `
+    <div class="exchange-row">
+      <div class="ex-name">${ex}</div>
+      <div class="ex-count">${cnt}</div>
+      <div class="ex-bar" style="width:${w}px"></div>
+    </div>
+  `;
+});
+</script>
+</body>
+</html>
