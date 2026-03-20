@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FUNDING ARB // LIVE DASHBOARD</title>
+  <title>ARB SCANNER // LIVE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
@@ -11,921 +11,1344 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0a0a;
+      --bg: #080808;
       --yellow: #ffe135;
       --green: #00ff87;
       --red: #ff3b3b;
       --orange: #ff8c00;
+      --blue: #4fc3f7;
       --white: #f5f2eb;
       --muted: #555;
-      --border: #2a2a2a;
-      --surface: #111111;
-      --surface2: #161616;
+      --muted2: #333;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --surface: #0f0f0f;
+      --surface2: #141414;
+      --surface3: #181818;
+      --score-green-bg: rgba(0,255,135,0.07);
+      --score-yellow-bg: rgba(255,225,53,0.06);
     }
 
     body {
       background: var(--bg);
       color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
-      background: #0d0d0d;
+      background: #0a0a0a;
       border-bottom: 1px solid var(--border);
-      padding: 0 24px;
+      padding: 0 20px;
       display: flex;
       align-items: center;
-      gap: 0;
-      height: 44px;
+      height: 42px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
+      gap: 0;
     }
-
     .nav-brand {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px;
+      font-size: 17px;
       color: var(--yellow);
-      letter-spacing: 2px;
-      margin-right: 32px;
+      letter-spacing: 3px;
+      margin-right: 28px;
+      white-space: nowrap;
     }
-
     nav a {
       color: var(--muted);
       text-decoration: none;
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 1px;
-      padding: 0 16px;
-      height: 44px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      padding: 0 13px;
+      height: 42px;
       display: flex;
       align-items: center;
       border-bottom: 2px solid transparent;
-      transition: color 0.2s, border-color 0.2s;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      text-transform: uppercase;
     }
-
     nav a:hover { color: var(--white); }
-    nav a.active {
-      color: var(--yellow);
-      border-bottom-color: var(--yellow);
-    }
+    nav a.active { color: var(--yellow); border-bottom-color: var(--yellow); }
 
-    /* MAIN LAYOUT */
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 20px 24px 40px;
-    }
-
-    /* PAGE HEADER */
-    .page-header {
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
       display: flex;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 20px;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      min-height: 52px;
     }
-
-    .page-title {
+    .topbar-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 36px;
-      letter-spacing: 3px;
+      font-size: 22px;
+      letter-spacing: 4px;
       color: var(--white);
+      flex-shrink: 0;
     }
-
-    /* LIVE INDICATOR */
     .live-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 10px;
       letter-spacing: 2px;
       color: var(--green);
+      flex-shrink: 0;
     }
-
     .live-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: var(--green);
       animation: livePulse 1.5s ease-in-out infinite;
     }
-
     @keyframes livePulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(0.8); }
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.3; transform:scale(0.75); }
     }
-
-    /* TOP BAR */
-    .top-bar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
     .exchange-dots {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       align-items: center;
       flex-wrap: wrap;
     }
-
-    .exchange-item {
+    .ex-item {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 10px;
       letter-spacing: 1px;
       color: var(--muted);
+      white-space: nowrap;
     }
-
-    .exchange-item.connected { color: var(--white); }
-
+    .ex-item.on { color: var(--white); }
     .ex-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: var(--red);
       flex-shrink: 0;
     }
-
     .ex-dot.on { background: var(--green); }
-
-    .top-bar-divider {
-      width: 1px;
-      height: 24px;
-      background: var(--border);
-      flex-shrink: 0;
-    }
-
-    .stat-chip {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .stat-chip-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1.5px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .stat-chip-value {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      color: var(--white);
-    }
-
-    .refresh-countdown {
+    .topbar-sep { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
+    .topbar-chip { display: flex; flex-direction: column; gap: 1px; }
+    .topbar-chip-lbl { font-size: 8px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+    .topbar-chip-val { font-size: 12px; color: var(--white); }
+    .countdown-wrap {
       margin-left: auto;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
+      font-size: 10px;
       color: var(--muted);
+      flex-shrink: 0;
     }
+    .cbar-outer { width: 70px; height: 3px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+    .cbar-inner { height: 100%; background: var(--yellow); border-radius: 2px; transition: width 1s linear; }
 
-    .countdown-bar-wrap {
-      width: 80px;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
+    /* ── LAYOUT ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 60fr 40fr;
+      gap: 0;
+      height: calc(100vh - 94px);
       overflow: hidden;
     }
 
-    .countdown-bar {
-      height: 100%;
-      background: var(--yellow);
-      border-radius: 2px;
-      transition: width 1s linear;
+    /* ── LEFT: SCANNER ── */
+    .scanner-panel {
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    /* SECTION */
-    .section {
-      margin-bottom: 24px;
+    .scanner-header {
+      padding: 12px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      flex-shrink: 0;
     }
-
-    .section-header {
+    .scanner-title-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      gap: 10px;
+      margin-bottom: 10px;
     }
-
-    .section-title {
+    .scanner-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px;
-      letter-spacing: 2px;
+      font-size: 18px;
+      letter-spacing: 3px;
       color: var(--yellow);
     }
+    .scanner-count {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
 
-    .section-count {
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .filter-input {
+      background: var(--surface3);
+      border: 1px solid var(--border2);
+      color: var(--white);
       font-family: 'DM Mono', monospace;
       font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 2px;
+      outline: none;
+      width: 120px;
+      letter-spacing: 1px;
+    }
+    .filter-input:focus { border-color: var(--yellow); }
+    .filter-input::placeholder { color: var(--muted); }
+    .filter-select {
+      background: var(--surface3);
+      border: 1px solid var(--border2);
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 2px;
+      outline: none;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+    .filter-select:focus { border-color: var(--yellow); }
+    .filter-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
       color: var(--muted);
+      letter-spacing: 1px;
+      cursor: pointer;
+      white-space: nowrap;
     }
-
-    /* TABLES */
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 4px;
+    .filter-label input[type=checkbox] {
+      accent-color: var(--yellow);
+      cursor: pointer;
     }
+    .filter-spread-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .filter-spread-wrap input[type=range] {
+      width: 70px;
+      accent-color: var(--yellow);
+      cursor: pointer;
+    }
+    .filter-clear {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      cursor: pointer;
+      padding: 5px 8px;
+      border: 1px solid var(--border2);
+      border-radius: 2px;
+      background: none;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .filter-clear:hover { color: var(--white); border-color: var(--muted); }
 
-    table {
+    /* Table area */
+    .table-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .table-area::-webkit-scrollbar { width: 4px; }
+    .table-area::-webkit-scrollbar-track { background: var(--bg); }
+    .table-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    table.scanner-table {
       width: 100%;
       border-collapse: collapse;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
     }
-
-    thead th {
+    table.scanner-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    table.scanner-table thead th {
       background: var(--surface2);
-      padding: 10px 14px;
-      text-align: left;
-      font-size: 9px;
+      padding: 7px 10px;
+      font-size: 8px;
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--muted);
-      white-space: nowrap;
+      text-align: left;
       border-bottom: 1px solid var(--border);
-    }
-
-    thead th:first-child { border-radius: 4px 0 0 0; }
-    thead th:last-child { border-radius: 0 4px 0 0; }
-
-    tbody tr {
-      border-bottom: 1px solid #1a1a1a;
-      transition: background 0.15s;
-    }
-
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.025); }
-
-    td {
-      padding: 10px 14px;
       white-space: nowrap;
-      color: var(--white);
+      cursor: pointer;
+      user-select: none;
+    }
+    table.scanner-table thead th:hover { color: var(--white); }
+    table.scanner-table thead th.sorted { color: var(--yellow); }
+
+    table.scanner-table tbody tr {
+      border-bottom: 1px solid #111;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    table.scanner-table tbody tr:hover { filter: brightness(1.3); }
+    table.scanner-table tbody tr.row-green { background: var(--score-green-bg); }
+    table.scanner-table tbody tr.row-yellow { background: var(--score-yellow-bg); }
+    table.scanner-table tbody tr.expanded { border-bottom: none; }
+
+    table.scanner-table td {
+      padding: 8px 10px;
+      white-space: nowrap;
+      vertical-align: middle;
     }
 
-    td.coin {
+    /* Score cell */
+    .score-cell {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 1px;
+      line-height: 1;
+      text-align: center;
+    }
+    .score-green { color: var(--green); }
+    .score-yellow { color: var(--yellow); }
+    .score-red { color: var(--red); }
+
+    /* Coin cell */
+    .coin-cell {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 16px;
       letter-spacing: 1px;
       color: var(--yellow);
     }
 
-    td.exchange {
-      font-size: 11px;
+    /* Exchange cell */
+    .ex-cell {
+      font-size: 10px;
       letter-spacing: 1px;
       color: var(--muted);
     }
+    .ex-cell-main { color: var(--white); font-size: 11px; }
 
-    /* Spread colors */
     .spread-green { color: var(--green); }
     .spread-yellow { color: var(--yellow); }
     .spread-white { color: var(--white); }
+    .spread-muted { color: var(--muted); }
 
-    /* Executable */
-    .exec-yes { color: var(--green); font-size: 14px; }
-    .exec-no { color: var(--muted); font-size: 14px; }
+    /* Exec cell */
+    .exec-yes { color: var(--green); font-size: 13px; }
+    .exec-null { color: var(--muted); font-size: 11px; }
+    .exec-no { color: var(--red); font-size: 13px; }
 
-    /* PnL */
+    /* Action button */
+    .action-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      padding: 4px 10px;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: filter 0.15s;
+    }
+    .action-btn:hover { filter: brightness(1.2); }
+    .btn-enter { background: rgba(0,255,135,0.18); color: var(--green); border: 1px solid rgba(0,255,135,0.4); }
+    .btn-watch { background: rgba(255,225,53,0.15); color: var(--yellow); border: 1px solid rgba(255,225,53,0.35); }
+    .btn-skip  { background: rgba(80,80,80,0.2); color: var(--muted); border: 1px solid var(--border2); }
+
+    /* Expanded row */
+    tr.expand-row td {
+      padding: 0;
+      border-bottom: 1px solid var(--border2);
+    }
+    .expand-content {
+      padding: 10px 16px 12px;
+      background: var(--surface3);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .expand-item { display: flex; flex-direction: column; gap: 3px; }
+    .expand-lbl { font-size: 8px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+    .expand-val { font-size: 13px; color: var(--white); }
+
+    /* ── RIGHT: SIDEBAR ── */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 14px 20px;
+    }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: var(--bg); }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* Best Opportunity Card */
+    .best-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 3px;
+      padding: 14px;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .best-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--yellow));
+    }
+    .best-card-lbl {
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .best-coin {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .best-spread {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--green);
+      letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .best-route {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .best-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .best-meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .best-meta-lbl { font-size: 8px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+    .best-meta-val { font-size: 13px; color: var(--white); }
+    .best-score-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    /* Sidebar sections */
+    .sb-section { margin-bottom: 14px; }
+    .sb-section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px;
+      letter-spacing: 2.5px;
+      color: var(--white);
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Mini table */
+    table.mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    table.mini-table thead th {
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-align: left;
+      padding: 4px 6px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    table.mini-table tbody tr {
+      border-bottom: 1px solid #111;
+    }
+    table.mini-table tbody tr:last-child { border-bottom: none; }
+    table.mini-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+    table.mini-table td {
+      padding: 6px 6px;
+      white-space: nowrap;
+      color: var(--white);
+    }
+    table.mini-table td.dim { color: var(--muted); font-size: 10px; }
+
+    /* Status dot */
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .status-dot.healthy { background: var(--green); }
+    .status-dot.compressed { background: var(--yellow); }
+    .status-dot.inverted { background: var(--red); }
+    .status-dot.open { background: var(--blue); }
+
+    /* PnL colors */
     .pnl-pos { color: var(--green); }
     .pnl-neg { color: var(--red); }
     .pnl-zero { color: var(--muted); }
 
-    /* Status pills */
-    .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 2px;
-      font-size: 9px;
-      letter-spacing: 1.5px;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .pill-healthy {
-      background: rgba(0,255,135,0.12);
-      color: var(--green);
-      border: 1px solid rgba(0,255,135,0.3);
-    }
-
-    .pill-compressed {
-      background: rgba(255,225,53,0.12);
-      color: var(--yellow);
-      border: 1px solid rgba(255,225,53,0.3);
-    }
-
-    .pill-inverted {
-      background: rgba(255,59,59,0.12);
-      color: var(--red);
-      border: 1px solid rgba(255,59,59,0.3);
-    }
-
-    /* STATS ROW */
-    .stats-row {
+    /* Stats row */
+    .sys-stats {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
+    .sys-stat-item { display: flex; flex-direction: column; gap: 2px; }
+    .sys-stat-lbl { font-size: 8px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+    .sys-stat-val { font-size: 14px; color: var(--white); }
+    .sys-stat-val.accent { color: var(--yellow); }
+    .sys-stat-val.pos { color: var(--green); }
+    .sys-stat-val.neg { color: var(--red); }
 
-    @media (max-width: 900px) {
-      .stats-row { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    @media (max-width: 600px) {
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 16px 18px;
-    }
-
-    .stat-card-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .stat-card-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px;
-      letter-spacing: 1px;
-      color: var(--white);
-      line-height: 1;
-    }
-
-    .stat-card-value.pos { color: var(--green); }
-    .stat-card-value.neg { color: var(--red); }
-    .stat-card-value.accent { color: var(--yellow); }
-
-    /* EMPTY / ERROR STATES */
+    /* Empty / Error */
     .empty-state {
-      padding: 32px;
-      text-align: center;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      letter-spacing: 1px;
-    }
-
-    .error-state {
       padding: 20px;
       text-align: center;
-      color: var(--red);
-      font-family: 'DM Mono', monospace;
+      color: var(--muted);
       font-size: 11px;
       letter-spacing: 1px;
-      border: 1px solid rgba(255,59,59,0.2);
-      border-radius: 4px;
-      background: rgba(255,59,59,0.05);
+    }
+    .error-state {
+      padding: 12px;
+      text-align: center;
+      color: var(--red);
+      font-size: 10px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255,59,59,0.15);
+      border-radius: 2px;
+      background: rgba(255,59,59,0.04);
     }
 
-    /* FADE ANIMATION on data refresh */
+    /* Animations */
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(3px); }
+      to   { opacity:1; transform:translateY(0); }
     }
-
-    .fade-in {
-      animation: fadeIn 0.4s ease forwards;
-    }
-
-    /* LOADING SKELETON */
-    .skeleton {
-      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 3px;
-      height: 14px;
-    }
+    .fade-in { animation: fadeIn 0.35s ease forwards; }
 
     @keyframes shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 2px;
+      height: 13px;
+    }
 
-    /* LAST UPDATE */
-    .last-update {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 16px;
-      text-align: right;
-      letter-spacing: 1px;
+    /* Responsive collapse at small screens */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; height: auto; }
+      .scanner-panel { min-height: 60vh; }
+      .sidebar { border-top: 1px solid var(--border); }
+      .sidebar-scroll { max-height: 80vh; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <span class="nav-brand">ARB//</span>
-    <a href="/">HUB</a>
-    <a href="dashboard.html" class="active">DASHBOARD</a>
-    <a href="rates.html">RATE CHARTS</a>
-    <a href="report.html">TRADE REPORT</a>
-    <a href="pnl.html">P&L HISTORY</a>
-    <a href="golive.html">GO LIVE</a>
-    <a href="explainer.html">EXPLAINER</a>
-  </nav>
+<!-- ── NAV ── -->
+<nav>
+  <span class="nav-brand">ARB//</span>
+  <a href="/">HUB</a>
+  <a href="dashboard.html" class="active">SCANNER</a>
+  <a href="rates.html">RATE CHARTS</a>
+  <a href="report.html">TRADE REPORT</a>
+  <a href="pnl.html">P&amp;L HISTORY</a>
+  <a href="golive.html">GO LIVE</a>
+  <a href="explainer.html">EXPLAINER</a>
+</nav>
 
-  <div class="container">
+<!-- ── TOP BAR ── -->
+<div class="topbar">
+  <span class="topbar-title">ARB SCANNER</span>
+  <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+  <div class="topbar-sep"></div>
+  <div class="exchange-dots" id="exchangeDots">
+    <div class="ex-item"><div class="ex-dot"></div><span>…</span></div>
+  </div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-chip" id="chipLastUpdate">
+    <span class="topbar-chip-lbl">Last Update</span>
+    <span class="topbar-chip-val">—</span>
+  </div>
+  <div class="topbar-chip" id="chipRates">
+    <span class="topbar-chip-lbl">Rates</span>
+    <span class="topbar-chip-val">—</span>
+  </div>
+  <div class="topbar-chip" id="chipUptime">
+    <span class="topbar-chip-lbl">Uptime</span>
+    <span class="topbar-chip-val">—</span>
+  </div>
+  <div class="countdown-wrap">
+    <span id="cLabel">20s</span>
+    <div class="cbar-outer"><div class="cbar-inner" id="cBar" style="width:100%"></div></div>
+  </div>
+</div>
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-      <h1 class="page-title">LIVE DASHBOARD</h1>
-      <span class="live-badge">
-        <span class="live-dot"></span>
-        LIVE
-      </span>
-    </div>
+<!-- ── LAYOUT ── -->
+<div class="layout">
 
-    <!-- TOP BAR: system health -->
-    <div class="top-bar" id="topBar">
-      <div class="exchange-dots" id="exchangeDots">
-        <div class="exchange-item"><div class="ex-dot"></div><span>LOADING…</span></div>
+  <!-- LEFT: SCANNER PANEL -->
+  <div class="scanner-panel">
+    <div class="scanner-header">
+      <div class="scanner-title-row">
+        <span class="scanner-title">OPPORTUNITY SCANNER</span>
+        <span class="scanner-count" id="scannerCount">loading…</span>
       </div>
-      <div class="top-bar-divider"></div>
-      <div class="stat-chip" id="chipRates">
-        <span class="stat-chip-label">Rates Collected</span>
-        <span class="stat-chip-value">—</span>
-      </div>
-      <div class="stat-chip" id="chipUptime">
-        <span class="stat-chip-label">Uptime</span>
-        <span class="stat-chip-value">—</span>
-      </div>
-      <div class="stat-chip" id="chipLastUpdate">
-        <span class="stat-chip-label">Last Update</span>
-        <span class="stat-chip-value">—</span>
-      </div>
-      <div class="refresh-countdown">
-        <span id="countdownLabel">30s</span>
-        <div class="countdown-bar-wrap">
-          <div class="countdown-bar" id="countdownBar" style="width:100%"></div>
+      <div class="filter-bar">
+        <input type="text" class="filter-input" id="filterCoin" placeholder="Search coin…" autocomplete="off">
+        <select class="filter-select" id="filterExchange" title="Filter by exchange">
+          <option value="">ALL EXCHANGES</option>
+        </select>
+        <div class="filter-spread-wrap">
+          <span>MIN%</span>
+          <input type="range" id="filterSpread" min="0" max="3" step="0.1" value="0">
+          <span id="filterSpreadVal" style="color:var(--white);min-width:32px;">0.0%</span>
         </div>
-      </div>
-    </div>
-
-    <!-- OPPORTUNITIES -->
-    <div class="section" id="oppsSection">
-      <div class="section-header">
-        <span class="section-title">LIVE OPPORTUNITIES</span>
-        <span class="section-count" id="oppsCount">top 20 • sorted by spread</span>
-      </div>
-      <div id="oppsContainer">
-        <div class="empty-state">Loading opportunities…</div>
-      </div>
-    </div>
-
-    <!-- OPEN PAPER TRADES -->
-    <div class="section" id="tradesSection">
-      <div class="section-header">
-        <span class="section-title">OPEN PAPER TRADES</span>
-        <span class="section-count" id="tradesCount">—</span>
-      </div>
-      <div id="tradesContainer">
-        <div class="empty-state">Loading trades…</div>
+        <label class="filter-label">
+          <input type="checkbox" id="filterExec">
+          EXEC ONLY
+        </label>
+        <button class="filter-clear" id="filterClear">RESET</button>
       </div>
     </div>
 
-    <!-- SYSTEM STATS -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-title">SYSTEM STATS</span>
-      </div>
-      <div class="stats-row" id="statsRow">
-        <div class="stat-card">
-          <div class="stat-card-label">Total P&amp;L</div>
-          <div class="stat-card-value" id="statPnl">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Win Rate</div>
-          <div class="stat-card-value accent" id="statWinRate">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Avg Spread</div>
-          <div class="stat-card-value accent" id="statAvgSpread">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Total Trades</div>
-          <div class="stat-card-value accent" id="statTrades">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">Capital Deployed</div>
-          <div class="stat-card-value accent" id="statCapital">—</div>
-        </div>
-      </div>
+    <div class="table-area">
+      <table class="scanner-table">
+        <thead>
+          <tr>
+            <th id="th-score" class="sorted" onclick="sortBy('score')">SCORE ▾</th>
+            <th id="th-coin" onclick="sortBy('coin')">COIN</th>
+            <th id="th-longEx" onclick="sortBy('longEx')">LONG EX</th>
+            <th id="th-shortEx" onclick="sortBy('shortEx')">SHORT EX</th>
+            <th id="th-gross" onclick="sortBy('gross')">GROSS %</th>
+            <th id="th-net" onclick="sortBy('net')">NET %</th>
+            <th id="th-apr" onclick="sortBy('apr')">APR %</th>
+            <th id="th-perday" onclick="sortBy('perday')">$/DAY/$1K</th>
+            <th id="th-exec" onclick="sortBy('exec')">EXEC</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody id="scannerBody">
+          <tr><td colspan="10" class="empty-state">Loading opportunities…</td></tr>
+        </tbody>
+      </table>
     </div>
-
-    <div class="last-update" id="lastUpdate">—</div>
-
   </div>
 
-  <script>
-    // ─── API BASE ───────────────────────────────────────────────────────────
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const API = isLocal
-      ? 'http://localhost:3124'
-      : 'https://mvp-polymarket-alpha-bot.onrender.com';
+  <!-- RIGHT: SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-scroll">
 
-    // ─── CONSTANTS ──────────────────────────────────────────────────────────
-    const REFRESH_SEC = 30;
-    const EXCLUDED_EXCHANGES = ['drift'];
-    const EXCLUDED_COINS = ['SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','MSTRX','QQQX','PAXG','XAUT'];
+      <!-- Best Opportunity -->
+      <div class="sb-section">
+        <div class="best-card" id="bestCard">
+          <div class="best-card-lbl">BEST OPPORTUNITY NOW</div>
+          <div class="best-coin" id="bestCoin">—</div>
+          <div class="best-spread" id="bestSpread">—</div>
+          <div class="best-route" id="bestRoute">—</div>
+          <div class="best-meta">
+            <div class="best-meta-item">
+              <span class="best-meta-lbl">APR</span>
+              <span class="best-meta-val" id="bestApr">—</span>
+            </div>
+            <div class="best-meta-item">
+              <span class="best-meta-lbl">$/Day per $1K</span>
+              <span class="best-meta-val" id="bestPerDay">—</span>
+            </div>
+          </div>
+          <div class="best-score-badge score-green" id="bestScore">—</div>
+        </div>
+      </div>
 
-    // ─── STATE ──────────────────────────────────────────────────────────────
-    let countdownSec = REFRESH_SEC;
-    let refreshTimer = null;
-    let countdownInterval = null;
+      <!-- Top Exchange Pairs -->
+      <div class="sb-section">
+        <div class="sb-section-title">TOP EXCHANGE PAIRS</div>
+        <div id="topPairsContainer">
+          <div class="empty-state">Loading…</div>
+        </div>
+      </div>
 
-    // ─── HELPERS ────────────────────────────────────────────────────────────
-    const fmt = (n, d=2) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) : '—';
-    const fmtPct = (n, d=4) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) + '%' : '—';
-    const fmtUSD = (n) => (typeof n === 'number' && isFinite(n))
-      ? (n >= 0 ? '+$' : '-$') + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
-      : '—';
-    const fmtUSDPlain = (n) => (typeof n === 'number' && isFinite(n))
-      ? '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
-      : '—';
+      <!-- Open Positions -->
+      <div class="sb-section">
+        <div class="sb-section-title">OPEN POSITIONS</div>
+        <div id="positionsContainer">
+          <div class="empty-state">Loading…</div>
+        </div>
+      </div>
 
-    function fmtAge(openedAt) {
-      if (!openedAt) return '—';
-      const ms = Date.now() - new Date(openedAt).getTime();
-      const h = Math.floor(ms / 3600000);
-      const m = Math.floor((ms % 3600000) / 60000);
-      if (h > 24) return Math.floor(h/24) + 'd ' + (h%24) + 'h';
-      if (h > 0) return h + 'h ' + m + 'm';
-      return m + 'm';
+      <!-- System Stats -->
+      <div class="sys-stats">
+        <div class="sys-stat-item">
+          <span class="sys-stat-lbl">Total P&amp;L</span>
+          <span class="sys-stat-val" id="sStat-pnl">—</span>
+        </div>
+        <div class="sys-stat-item">
+          <span class="sys-stat-lbl">Win Rate</span>
+          <span class="sys-stat-val accent" id="sStat-wr">—</span>
+        </div>
+        <div class="sys-stat-item">
+          <span class="sys-stat-lbl">Avg Spread</span>
+          <span class="sys-stat-val accent" id="sStat-avg">—</span>
+        </div>
+        <div class="sys-stat-item">
+          <span class="sys-stat-lbl">Total Trades</span>
+          <span class="sys-stat-val accent" id="sStat-trades">—</span>
+        </div>
+        <div class="sys-stat-item">
+          <span class="sys-stat-lbl">Capital</span>
+          <span class="sys-stat-val accent" id="sStat-cap">—</span>
+        </div>
+        <div class="sys-stat-item">
+          <span class="sys-stat-lbl">Opportunities</span>
+          <span class="sys-stat-val accent" id="sStat-opps">—</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end layout -->
+
+<script>
+// ── API BASE ──────────────────────────────────────────────────────────────────
+const isLocal = ['localhost','127.0.0.1'].includes(window.location.hostname);
+const API = isLocal
+  ? 'http://localhost:3124'
+  : 'https://mvp-polymarket-alpha-bot.onrender.com';
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+const REFRESH_SEC = 20;
+const TOP_N = 30;
+const EXCLUDED_EX = ['drift'];
+const EXCLUDED_COINS = ['SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','MSTRX','QQQX','PAXG','XAUT'];
+const ROUND_TRIP_FEE = 0.08; // 0.08% estimate
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let allOpps = [];
+let statsData = null;
+let countdownSec = REFRESH_SEC;
+let countdownTimer = null;
+let sortKey = 'score';
+let sortDir = -1; // -1 = desc
+let expandedRow = null;
+let allExchanges = new Set();
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+const fCoin = document.getElementById('filterCoin');
+const fExchange = document.getElementById('filterExchange');
+const fSpread = document.getElementById('filterSpread');
+const fSpreadVal = document.getElementById('filterSpreadVal');
+const fExec = document.getElementById('filterExec');
+const fClear = document.getElementById('filterClear');
+
+fCoin.addEventListener('input', renderTable);
+fExchange.addEventListener('change', renderTable);
+fSpread.addEventListener('input', () => { fSpreadVal.textContent = parseFloat(fSpread.value).toFixed(1) + '%'; renderTable(); });
+fExec.addEventListener('change', renderTable);
+fClear.addEventListener('click', () => {
+  fCoin.value = ''; fExchange.value = ''; fSpread.value = 0; fSpreadVal.textContent = '0.0%'; fExec.checked = false;
+  renderTable();
+});
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const fmt = (n, d=2) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) : '—';
+const fmtPct = (n, d=4) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) + '%' : '—';
+const fmtUSD = (n) => (typeof n === 'number' && isFinite(n))
+  ? (n >= 0 ? '+$' : '-$') + Math.abs(n).toFixed(2)
+  : '—';
+const fmtUSDPlain = (n) => (typeof n === 'number' && isFinite(n))
+  ? '$' + n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+  : '—';
+
+function cleanCoin(s) {
+  return (s ?? '').replace(/-PERP$/i,'').replace(/\/USDT$/i,'').replace(/USDT$/i,'').toUpperCase();
+}
+
+function fmtUptime(s) {
+  if (!s && s !== 0) return '—';
+  s = Math.round(s);
+  const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60);
+  if (d > 0) return d + 'd ' + h + 'h';
+  if (h > 0) return h + 'h ' + m + 'm';
+  return m + 'm';
+}
+
+function fmtAge(ts) {
+  if (!ts) return '—';
+  const ms = Date.now() - new Date(ts).getTime();
+  const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000);
+  if (h > 24) return Math.floor(h/24) + 'd';
+  if (h > 0) return h + 'h';
+  return m + 'm';
+}
+
+function spreadClass(pct) {
+  if (!pct && pct !== 0) return 'spread-muted';
+  if (pct >= 2) return 'spread-green';
+  if (pct >= 0.5) return 'spread-yellow';
+  if (pct > 0) return 'spread-white';
+  return 'spread-muted';
+}
+
+// ── OPPORTUNITY SCORE (0-100) ─────────────────────────────────────────────────
+function computeScore(opp, statsData) {
+  let score = 0;
+  const gross = opp.grossSpread ?? opp.gross_spread ?? opp.spread ?? 0;
+  const coin = cleanCoin(opp.coin ?? opp.symbol ?? '');
+  const exec = opp.executable ?? opp.isExecutable;
+
+  // --- Spread Size (40pts) ---
+  if (gross >= 3.0) score += 40;
+  else if (gross >= 2.0) score += 35;
+  else if (gross >= 1.0) score += 20;
+  else if (gross >= 0.5) score += 10;
+
+  // --- Persistence (35pts) ---
+  if (statsData) {
+    // topCoinsBySpread: [{coin, avg_spread, cnt}, ...]
+    const topCoins = statsData.topCoinsBySpread ?? statsData.top_coins_by_spread ?? [];
+    const topPairs = statsData.topPairsByFreq ?? statsData.top_pairs_by_freq ?? [];
+
+    const coinEntry = topCoins.find(c => cleanCoin(c.coin ?? c.symbol ?? '') === coin);
+    if (coinEntry) {
+      const avg = coinEntry.avg_spread ?? coinEntry.avgSpread ?? 0;
+      if (avg >= 1.5) score += 20;
+      else if (avg >= 1.0) score += 15;
+      else if (avg >= 0.5) score += 8;
+
+      const cnt = coinEntry.cnt ?? coinEntry.count ?? 0;
+      if (cnt >= 50) score += 15;
+      else if (cnt >= 20) score += 10;
+      else if (cnt >= 5) score += 5;
     }
 
-    function fmtUptime(seconds) {
-      if (!seconds && seconds !== 0) return '—';
-      const s = Math.round(seconds);
-      const d = Math.floor(s / 86400);
-      const h = Math.floor((s % 86400) / 3600);
-      const m = Math.floor((s % 3600) / 60);
-      if (d > 0) return d + 'd ' + h + 'h';
-      if (h > 0) return h + 'h ' + m + 'm';
-      return m + 'm ' + (s % 60) + 's';
+    // topPairsByFreq bonus
+    const longEx = (opp.longExchange ?? opp.long_exchange ?? '').toLowerCase();
+    const shortEx = (opp.shortExchange ?? opp.short_exchange ?? '').toLowerCase();
+    const pairEntry = topPairs.find(p => {
+      const pl = (p.longExchange ?? p.long_exchange ?? '').toLowerCase();
+      const ps = (p.shortExchange ?? p.short_exchange ?? '').toLowerCase();
+      return pl === longEx && ps === shortEx;
+    });
+    if (pairEntry) {
+      const cnt = pairEntry.cnt ?? pairEntry.count ?? 0;
+      if (cnt >= 100) score += 5;
+      else if (cnt >= 50) score += 3;
     }
+  }
 
-    function getSpreadClass(pct) {
-      if (typeof pct !== 'number') return 'spread-white';
-      if (pct > 1) return 'spread-green';
-      if (pct >= 0.5) return 'spread-yellow';
-      return 'spread-white';
+  // --- Liquidity Proxy (25pts) ---
+  if (exec === true) score += 25;
+  else if (exec === null || exec === undefined) score += 12;
+  // exec === false → 0
+
+  return Math.min(100, Math.round(score));
+}
+
+function scoreClass(s) {
+  if (s >= 70) return 'score-green';
+  if (s >= 40) return 'score-yellow';
+  return 'score-red';
+}
+
+function rowClass(s) {
+  if (s >= 70) return 'row-green';
+  if (s >= 40) return 'row-yellow';
+  return '';
+}
+
+function actionBtn(s) {
+  if (s >= 70) return `<button class="action-btn btn-enter" onclick="event.stopPropagation()">ENTER ▶</button>`;
+  if (s >= 40) return `<button class="action-btn btn-watch" onclick="event.stopPropagation()">WATCH</button>`;
+  return `<button class="action-btn btn-skip" onclick="event.stopPropagation()">SKIP</button>`;
+}
+
+// ── SORT ──────────────────────────────────────────────────────────────────────
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = -1; }
+  // Update header classes
+  document.querySelectorAll('table.scanner-table thead th').forEach(th => {
+    th.classList.remove('sorted');
+    th.textContent = th.textContent.replace(/[▾▴]/g,'').trim();
+  });
+  const thEl = document.getElementById('th-' + key);
+  if (thEl) {
+    thEl.classList.add('sorted');
+    thEl.textContent += (sortDir === -1 ? ' ▾' : ' ▴');
+  }
+  renderTable();
+}
+
+// ── FILTER & RENDER TABLE ─────────────────────────────────────────────────────
+function getFilteredSorted() {
+  const coinQ = fCoin.value.toUpperCase().trim();
+  const exQ = fExchange.value.toLowerCase();
+  const minSpread = parseFloat(fSpread.value) || 0;
+  const execOnly = fExec.checked;
+
+  let rows = allOpps.filter(o => {
+    const coin = cleanCoin(o.coin ?? o.symbol ?? '');
+    const longEx = (o.longExchange ?? o.long_exchange ?? '').toLowerCase();
+    const shortEx = (o.shortExchange ?? o.short_exchange ?? '').toLowerCase();
+    const gross = o.grossSpread ?? o.gross_spread ?? o.spread ?? 0;
+    const exec = o.executable ?? o.isExecutable;
+
+    if (coinQ && !coin.includes(coinQ)) return false;
+    if (exQ && longEx !== exQ && shortEx !== exQ) return false;
+    if (gross < minSpread) return false;
+    if (execOnly && exec !== true) return false;
+    return true;
+  });
+
+  // Sort
+  rows.sort((a, b) => {
+    let av, bv;
+    switch(sortKey) {
+      case 'score':  av = a._score ?? 0; bv = b._score ?? 0; break;
+      case 'coin':   av = cleanCoin(a.coin ?? a.symbol ?? ''); bv = cleanCoin(b.coin ?? b.symbol ?? ''); break;
+      case 'longEx': av = (a.longExchange ?? a.long_exchange ?? '').toLowerCase(); bv = (b.longExchange ?? b.long_exchange ?? '').toLowerCase(); break;
+      case 'shortEx':av = (a.shortExchange ?? a.short_exchange ?? '').toLowerCase(); bv = (b.shortExchange ?? b.short_exchange ?? '').toLowerCase(); break;
+      case 'gross':  av = a.grossSpread ?? a.gross_spread ?? a.spread ?? 0; bv = b.grossSpread ?? b.gross_spread ?? b.spread ?? 0; break;
+      case 'net':    av = a._net ?? 0; bv = b._net ?? 0; break;
+      case 'apr':    av = a._apr ?? 0; bv = b._apr ?? 0; break;
+      case 'perday': av = a._perday ?? 0; bv = b._perday ?? 0; break;
+      case 'exec':
+        const em = v => v === true ? 2 : v === null || v === undefined ? 1 : 0;
+        av = em(a.executable ?? a.isExecutable); bv = em(b.executable ?? b.isExecutable); break;
+      default: av = a._score ?? 0; bv = b._score ?? 0;
     }
+    if (av < bv) return sortDir;
+    if (av > bv) return -sortDir;
+    return 0;
+  });
 
-    function getTradeStatus(trade) {
-      // Determine status from spread comparison
-      const entry = trade.entrySpread ?? trade.entry_spread ?? 0;
-      const current = trade.currentSpread ?? trade.current_spread ?? trade.grossSpread ?? 0;
-      if (current <= 0) return 'INVERTED';
-      if (current < entry * 0.5) return 'COMPRESSED';
-      return 'HEALTHY';
+  return rows.slice(0, TOP_N);
+}
+
+function renderTable() {
+  const tbody = document.getElementById('scannerBody');
+  const countEl = document.getElementById('scannerCount');
+  const rows = getFilteredSorted();
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No opportunities match filters</td></tr>';
+    countEl.textContent = 'none';
+    return;
+  }
+
+  countEl.textContent = `top ${rows.length} • sorted by ${sortKey}`;
+
+  const html = rows.map((o, idx) => {
+    const coin = cleanCoin(o.coin ?? o.symbol ?? '—');
+    const longEx = (o.longExchange ?? o.long_exchange ?? '—').toUpperCase();
+    const shortEx = (o.shortExchange ?? o.short_exchange ?? '—').toUpperCase();
+    const gross = o.grossSpread ?? o.gross_spread ?? o.spread ?? 0;
+    const net = o._net ?? 0;
+    const apr = o._apr ?? 0;
+    const perday = o._perday ?? 0;
+    const exec = o.executable ?? o.isExecutable;
+    const score = o._score ?? 0;
+
+    const execHTML = exec === true
+      ? '<span class="exec-yes">✓</span>'
+      : exec === false
+        ? '<span class="exec-no">✗</span>'
+        : '<span class="exec-null">?</span>';
+
+    return `<tr class="${rowClass(score)} fade-in" data-idx="${idx}" onclick="toggleExpand(${idx}, this)">
+      <td><span class="score-cell ${scoreClass(score)}">${score}</span></td>
+      <td class="coin-cell">${coin}</td>
+      <td class="ex-cell ex-cell-main">${longEx}</td>
+      <td class="ex-cell ex-cell-main">${shortEx}</td>
+      <td class="${spreadClass(gross)}">${fmt(gross, 4)}%</td>
+      <td class="${spreadClass(net)}">${net > 0 ? fmt(net, 4) + '%' : '<span class="spread-muted">' + fmt(net, 4) + '%</span>'}</td>
+      <td class="${spreadClass(apr/365)}">${fmt(apr, 1)}%</td>
+      <td class="${perday > 0 ? 'spread-yellow' : 'spread-muted'}">${perday > 0 ? '$' + fmt(perday, 2) : '—'}</td>
+      <td>${execHTML}</td>
+      <td>${actionBtn(score)}</td>
+    </tr>`;
+  }).join('');
+
+  tbody.innerHTML = html;
+  expandedRow = null;
+}
+
+// Expand row on click
+function toggleExpand(idx, tr) {
+  const rows = getFilteredSorted();
+  const o = rows[idx];
+  if (!o) return;
+
+  // Remove any existing expand
+  const existing = document.querySelector('tr.expand-row');
+  if (existing) {
+    existing.remove();
+    document.querySelectorAll('tr.expanded').forEach(r => r.classList.remove('expanded'));
+  }
+
+  // If same row, collapse
+  if (expandedRow === idx) { expandedRow = null; return; }
+  expandedRow = idx;
+  tr.classList.add('expanded');
+
+  const gross = o.grossSpread ?? o.gross_spread ?? o.spread ?? 0;
+  const longRate = o.longRate ?? o.long_rate ?? o.longFundingRate ?? (gross * 0.45);
+  const shortRate = o.shortRate ?? o.short_rate ?? o.shortFundingRate ?? (gross * 0.55);
+  const net = o._net ?? (gross - ROUND_TRIP_FEE);
+  const exec = o.executable ?? o.isExecutable;
+
+  const expandTr = document.createElement('tr');
+  expandTr.className = 'expand-row';
+  expandTr.innerHTML = `<td colspan="10">
+    <div class="expand-content">
+      <div class="expand-item">
+        <span class="expand-lbl">Long Ex Rate</span>
+        <span class="expand-val ${longRate >= 0 ? 'spread-muted' : 'spread-green'}">${fmt(longRate, 4)}%</span>
+      </div>
+      <div class="expand-item">
+        <span class="expand-lbl">Short Ex Rate</span>
+        <span class="expand-val ${shortRate > 0 ? 'spread-green' : 'spread-muted'}">${fmt(shortRate, 4)}%</span>
+      </div>
+      <div class="expand-item">
+        <span class="expand-lbl">Round-Trip Fee</span>
+        <span class="expand-val spread-muted">~${ROUND_TRIP_FEE}%</span>
+      </div>
+      <div class="expand-item">
+        <span class="expand-lbl">Net After Fees</span>
+        <span class="expand-val ${spreadClass(net)}">${fmt(net, 4)}%</span>
+      </div>
+      <div class="expand-item">
+        <span class="expand-lbl">Executable</span>
+        <span class="expand-val ${exec === true ? 'spread-green' : exec === false ? 'spread-muted' : ''}">${exec === true ? 'YES' : exec === false ? 'NO' : 'UNKNOWN'}</span>
+      </div>
+      <div class="expand-item">
+        <span class="expand-lbl">Opp Score</span>
+        <span class="expand-val ${scoreClass(o._score ?? 0)}">${o._score ?? '—'} / 100</span>
+      </div>
+    </div>
+  </td>`;
+  tr.insertAdjacentElement('afterend', expandTr);
+}
+
+// ── PREPARE OPPORTUNITIES ─────────────────────────────────────────────────────
+function prepareOpps(raw, stats) {
+  let rows = Array.isArray(raw) ? raw : (raw?.opportunities ?? raw?.data ?? []);
+
+  rows = rows.filter(r => {
+    const longEx = (r.longExchange ?? r.long_exchange ?? '').toLowerCase();
+    const shortEx = (r.shortExchange ?? r.short_exchange ?? '').toLowerCase();
+    const coin = cleanCoin(r.coin ?? r.symbol ?? '');
+    if (EXCLUDED_EX.some(ex => longEx.includes(ex) || shortEx.includes(ex))) return false;
+    if (EXCLUDED_COINS.includes(coin)) return false;
+    return true;
+  });
+
+  // Precompute derived fields & score
+  rows = rows.map(r => {
+    const gross = r.grossSpread ?? r.gross_spread ?? r.spread ?? 0;
+    const net = r.netSpread ?? r.net_spread ?? (gross - ROUND_TRIP_FEE);
+    const apr = r.apr ?? r.annualizedReturn ?? (net * 365);
+    const perday = (net / 100) * 1000; // per $1K
+
+    return {
+      ...r,
+      _net: net,
+      _apr: apr,
+      _perday: perday,
+      _score: computeScore(r, stats),
+    };
+  });
+
+  // Sort by score desc
+  rows.sort((a, b) => (b._score ?? 0) - (a._score ?? 0));
+
+  return rows;
+}
+
+// ── RENDER EXCHANGE DROPDOWN ──────────────────────────────────────────────────
+function updateExchangeDropdown(rows) {
+  const sel = fExchange;
+  const current = sel.value;
+  allExchanges.clear();
+  rows.forEach(r => {
+    const l = (r.longExchange ?? r.long_exchange ?? '').toLowerCase();
+    const s = (r.shortExchange ?? r.short_exchange ?? '').toLowerCase();
+    if (l) allExchanges.add(l);
+    if (s) allExchanges.add(s);
+  });
+  // Rebuild options (keep current selection)
+  sel.innerHTML = '<option value="">ALL EXCHANGES</option>';
+  [...allExchanges].sort().forEach(ex => {
+    const opt = document.createElement('option');
+    opt.value = ex; opt.textContent = ex.toUpperCase();
+    if (ex === current) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+// ── RENDER STATUS BAR ─────────────────────────────────────────────────────────
+function renderTopBar(statusData, oppsData) {
+  const dotsEl = document.getElementById('exchangeDots');
+  const chipLU = document.getElementById('chipLastUpdate');
+  const chipR = document.getElementById('chipRates');
+  const chipU = document.getElementById('chipUptime');
+
+  if (!statusData) {
+    dotsEl.innerHTML = '<span style="color:var(--red);font-size:10px;">API unreachable</span>';
+    return;
+  }
+
+  let exchanges = {};
+  if (statusData.exchanges) exchanges = statusData.exchanges;
+  else if (Array.isArray(statusData)) statusData.forEach(e => { exchanges[e.name??e.exchange] = e; });
+  else {
+    const known = ['hyperliquid','binance','bybit','okx','gate','bitget','mexc','kucoin','bitmex','coinbase','kraken','phemex'];
+    known.forEach(k => { if (statusData[k] !== undefined) exchanges[k] = statusData[k]; });
+    if (!Object.keys(exchanges).length) Object.entries(statusData).forEach(([k,v]) => { if (typeof v==='object'&&v) exchanges[k]=v; });
+  }
+
+  let dHTML = '';
+  Object.entries(exchanges).forEach(([name, info]) => {
+    const on = info === true || info?.connected === true || info?.status === 'connected' || info?.ok === true;
+    dHTML += `<div class="ex-item ${on?'on':''}"><div class="ex-dot ${on?'on':''}"></div><span>${name.toUpperCase()}</span></div>`;
+  });
+  dotsEl.innerHTML = dHTML || '<span style="color:var(--muted);font-size:10px;">no exchange data</span>';
+
+  const totalRates = statusData.totalRates ?? statusData.total_rates ?? statusData.ratesCollected ?? (Array.isArray(oppsData) ? oppsData.length : null);
+  chipR.innerHTML = `<span class="topbar-chip-lbl">Rates</span><span class="topbar-chip-val">${totalRates != null ? totalRates.toLocaleString() : '—'}</span>`;
+
+  const uptime = statusData.uptime ?? statusData.uptimeSeconds;
+  chipU.innerHTML = `<span class="topbar-chip-lbl">Uptime</span><span class="topbar-chip-val">${fmtUptime(uptime)}</span>`;
+
+  const lu = statusData.lastUpdate ?? statusData.last_update ?? statusData.updatedAt ?? new Date().toISOString();
+  chipLU.innerHTML = `<span class="topbar-chip-lbl">Last Update</span><span class="topbar-chip-val">${new Date(lu).toLocaleTimeString()}</span>`;
+}
+
+// ── RENDER BEST OPPORTUNITY ────────────────────────────────────────────────────
+function renderBestOpp(rows) {
+  if (!rows.length) return;
+  const o = rows[0];
+  const coin = cleanCoin(o.coin ?? o.symbol ?? '—');
+  const gross = o.grossSpread ?? o.gross_spread ?? o.spread ?? 0;
+  const longEx = (o.longExchange ?? o.long_exchange ?? '—').toUpperCase();
+  const shortEx = (o.shortExchange ?? o.short_exchange ?? '—').toUpperCase();
+  const score = o._score ?? 0;
+
+  document.getElementById('bestCoin').textContent = coin;
+  document.getElementById('bestSpread').textContent = fmt(gross, 4) + '%';
+  document.getElementById('bestRoute').textContent = `LONG ${longEx}  →  SHORT ${shortEx}`;
+  document.getElementById('bestApr').textContent = fmt(o._apr, 1) + '%';
+  document.getElementById('bestPerDay').textContent = o._perday > 0 ? '$' + fmt(o._perday, 2) : '—';
+
+  const scoreEl = document.getElementById('bestScore');
+  scoreEl.textContent = score;
+  scoreEl.className = 'best-score-badge ' + scoreClass(score);
+}
+
+// ── RENDER TOP EXCHANGE PAIRS ─────────────────────────────────────────────────
+function renderTopPairs(stats) {
+  const container = document.getElementById('topPairsContainer');
+  if (!stats) { container.innerHTML = '<div class="empty-state">No stats data</div>'; return; }
+
+  const pairs = stats.topPairsByFreq ?? stats.top_pairs_by_freq ?? [];
+  if (!pairs.length) { container.innerHTML = '<div class="empty-state">No pair data</div>'; return; }
+
+  const rows = pairs.slice(0, 8).map(p => {
+    const longEx = (p.longExchange ?? p.long_exchange ?? '?').toUpperCase();
+    const shortEx = (p.shortExchange ?? p.short_exchange ?? '?').toUpperCase();
+    const cnt = p.cnt ?? p.count ?? 0;
+    const avg = p.avg_spread ?? p.avgSpread ?? 0;
+    return `<tr>
+      <td class="ex-cell-main" style="font-size:11px;">${longEx}</td>
+      <td class="ex-cell-main" style="font-size:11px;">${shortEx}</td>
+      <td class="${spreadClass(avg)}">${fmt(avg, 2)}%</td>
+      <td class="dim">${cnt}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<table class="mini-table">
+    <thead><tr><th>LONG</th><th>SHORT</th><th>AVG %</th><th>CNT</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ── RENDER POSITIONS ──────────────────────────────────────────────────────────
+function renderPositions(tradesData) {
+  const container = document.getElementById('positionsContainer');
+  if (!tradesData) { container.innerHTML = '<div class="error-state">Failed to load</div>'; return; }
+
+  let trades = Array.isArray(tradesData) ? tradesData : (tradesData.trades ?? tradesData.data ?? tradesData.paperTrades ?? []);
+  trades = trades.filter(t => {
+    const l = (t.route ?? t.longExchange ?? t.long_exchange ?? '').toLowerCase();
+    const s = (t.shortExchange ?? t.short_exchange ?? '').toLowerCase();
+    return !l.includes('drift') && !s.includes('drift');
+  });
+
+  trades.sort((a,b) => {
+    const ap = a.pnl ?? a.unrealizedPnl ?? a.unrealized_pnl ?? 0;
+    const bp = b.pnl ?? b.unrealizedPnl ?? b.unrealized_pnl ?? 0;
+    return bp - ap;
+  });
+
+  const top10 = trades.slice(0, 10);
+  if (!top10.length) { container.innerHTML = '<div class="empty-state">No open positions</div>'; return; }
+
+  function getStatus(t) {
+    const entry = t.entrySpread ?? t.entry_spread ?? 0;
+    const cur = t.currentSpread ?? t.current_spread ?? t.grossSpread ?? t.spread ?? 0;
+    if (cur <= 0) return 'inverted';
+    if (cur < entry * 0.5) return 'compressed';
+    return 'healthy';
+  }
+
+  const rows = top10.map(t => {
+    const coin = cleanCoin(t.coin ?? t.symbol ?? '—');
+    const pnl = t.pnl ?? t.unrealizedPnl ?? t.unrealized_pnl ?? 0;
+    const pnlClass = pnl > 0 ? 'pnl-pos' : pnl < 0 ? 'pnl-neg' : 'pnl-zero';
+    const status = t.status?.toLowerCase() ?? getStatus(t);
+    const age = fmtAge(t.openedAt ?? t.createdAt ?? t.opened_at);
+    return `<tr>
+      <td><span class="status-dot ${status}"></span></td>
+      <td style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--yellow);letter-spacing:1px;">${coin}</td>
+      <td class="${pnlClass}">${fmtUSD(pnl)}</td>
+      <td class="dim">${age}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<table class="mini-table">
+    <thead><tr><th></th><th>COIN</th><th>P&amp;L</th><th>AGE</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ── RENDER SYS STATS ─────────────────────────────────────────────────────────
+function renderSysStats(stats, oppsLen) {
+  document.getElementById('sStat-opps').textContent = oppsLen != null ? oppsLen : '—';
+  if (!stats) return;
+  const s = stats.stats ?? stats;
+  const pnl = s.totalPnl ?? s.total_pnl ?? s.pnl ?? null;
+  const wr = s.winRate ?? s.win_rate ?? null;
+  const avg = s.avgSpread ?? s.avg_spread ?? null;
+  const trades = s.totalTrades ?? s.total_trades ?? null;
+  const cap = s.capitalDeployed ?? s.capital_deployed ?? s.capital ?? null;
+
+  if (pnl !== null) {
+    const el = document.getElementById('sStat-pnl');
+    el.textContent = fmtUSD(pnl);
+    el.className = 'sys-stat-val ' + (pnl >= 0 ? 'pos' : 'neg');
+  }
+  document.getElementById('sStat-wr').textContent = wr !== null ? fmt(wr * (wr > 1 ? 1 : 100), 1) + '%' : '—';
+  document.getElementById('sStat-avg').textContent = avg !== null ? fmt(avg, 4) + '%' : '—';
+  document.getElementById('sStat-trades').textContent = trades !== null ? trades.toLocaleString() : '—';
+  document.getElementById('sStat-cap').textContent = cap !== null ? fmtUSDPlain(cap) : '—';
+}
+
+// ── FETCH ALL ─────────────────────────────────────────────────────────────────
+async function fetchAll() {
+  const [status, opps, trades, stats] = await Promise.allSettled([
+    fetch(`${API}/api/status`).then(r=>r.json()),
+    fetch(`${API}/api/opportunities`).then(r=>r.json()),
+    fetch(`${API}/api/paper-trades`).then(r=>r.json()),
+    fetch(`${API}/api/stats`).then(r=>r.json()),
+  ]);
+  return {
+    status: status.status==='fulfilled' ? status.value : null,
+    opps:   opps.status==='fulfilled'   ? opps.value   : null,
+    trades: trades.status==='fulfilled' ? trades.value : null,
+    stats:  stats.status==='fulfilled'  ? stats.value  : null,
+  };
+}
+
+// ── MAIN REFRESH ──────────────────────────────────────────────────────────────
+async function refresh() {
+  const { status, opps, trades, stats } = await fetchAll();
+  statsData = stats;
+
+  renderTopBar(status, opps);
+
+  if (opps) {
+    allOpps = prepareOpps(opps, stats);
+    updateExchangeDropdown(allOpps);
+    renderTable();
+    renderBestOpp(allOpps);
+  } else {
+    document.getElementById('scannerBody').innerHTML = '<tr><td colspan="10" class="error-state">Failed to load opportunities</td></tr>';
+  }
+
+  renderTopPairs(stats);
+  renderPositions(trades);
+  renderSysStats(stats, allOpps.length);
+}
+
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────────
+function startCountdown() {
+  countdownSec = REFRESH_SEC;
+  const bar = document.getElementById('cBar');
+  const label = document.getElementById('cLabel');
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    countdownSec--;
+    bar.style.width = (countdownSec / REFRESH_SEC * 100) + '%';
+    label.textContent = countdownSec + 's';
+    if (countdownSec <= 0) {
+      clearInterval(countdownTimer);
+      refresh().then(() => startCountdown());
     }
+  }, 1000);
+}
 
-    function statusPill(status) {
-      const map = {
-        HEALTHY: 'pill-healthy',
-        COMPRESSED: 'pill-compressed',
-        INVERTED: 'pill-inverted',
-      };
-      return `<span class="pill ${map[status] || 'pill-compressed'}">${status}</span>`;
-    }
-
-    // ─── FETCH ALL ───────────────────────────────────────────────────────────
-    async function fetchAll() {
-      const [status, opps, trades, stats] = await Promise.allSettled([
-        fetch(`${API}/api/status`).then(r => r.json()),
-        fetch(`${API}/api/opportunities`).then(r => r.json()),
-        fetch(`${API}/api/paper-trades`).then(r => r.json()),
-        fetch(`${API}/api/stats`).then(r => r.json()),
-      ]);
-      return {
-        status: status.status === 'fulfilled' ? status.value : null,
-        opps:   opps.status   === 'fulfilled' ? opps.value   : null,
-        trades: trades.status === 'fulfilled' ? trades.value : null,
-        stats:  stats.status  === 'fulfilled' ? stats.value  : null,
-      };
-    }
-
-    // ─── RENDER STATUS BAR ────────────────────────────────────────────────────
-    function renderStatus(statusData, oppsData) {
-      const dotsEl = document.getElementById('exchangeDots');
-      const chipRates = document.getElementById('chipRates');
-      const chipUptime = document.getElementById('chipUptime');
-      const chipLastUpdate = document.getElementById('chipLastUpdate');
-
-      if (!statusData) {
-        dotsEl.innerHTML = '<span style="color:var(--red);font-family:DM Mono,monospace;font-size:11px;">API unreachable</span>';
-        return;
-      }
-
-      // Build exchange dots
-      // statusData may be an object like { exchanges: {hyperliquid: {connected:true}, ...}, uptime: 123, totalRates: 456 }
-      // or it may be a flat object or array — handle multiple shapes
-      let exchanges = {};
-      if (statusData.exchanges) {
-        exchanges = statusData.exchanges;
-      } else if (Array.isArray(statusData)) {
-        statusData.forEach(ex => { exchanges[ex.name || ex.exchange] = ex; });
-      } else {
-        // Try to infer from keys that look like exchange names
-        const knownKeys = ['hyperliquid','binance','bybit','okx','gate','bitget','mexc','kucoin','phemex','bitmex','coinbase','kraken'];
-        knownKeys.forEach(k => { if (statusData[k] !== undefined) exchanges[k] = statusData[k]; });
-        // If still empty, show whatever keys are present
-        if (Object.keys(exchanges).length === 0) {
-          Object.entries(statusData).forEach(([k,v]) => {
-            if (typeof v === 'object' && v !== null) exchanges[k] = v;
-          });
-        }
-      }
-
-      let dotsHTML = '';
-      const exEntries = Object.entries(exchanges);
-      if (exEntries.length === 0) {
-        dotsHTML = '<span style="color:var(--muted);font-family:DM Mono,monospace;font-size:11px;">no exchange data</span>';
-      } else {
-        exEntries.forEach(([name, info]) => {
-          const connected = info === true || info?.connected === true || info?.status === 'connected' || info?.ok === true;
-          dotsHTML += `
-            <div class="exchange-item ${connected ? 'connected' : ''}">
-              <div class="ex-dot ${connected ? 'on' : ''}"></div>
-              <span>${name.toUpperCase()}</span>
-            </div>`;
-        });
-      }
-      dotsEl.innerHTML = dotsHTML;
-
-      // Chips
-      const totalRates = statusData.totalRates ?? statusData.total_rates ?? statusData.ratesCollected ?? (oppsData ? (Array.isArray(oppsData) ? oppsData.length : null) : null);
-      chipRates.innerHTML = `
-        <span class="stat-chip-label">Rates Collected</span>
-        <span class="stat-chip-value">${totalRates != null ? totalRates.toLocaleString() : '—'}</span>`;
-
-      const uptime = statusData.uptime ?? statusData.uptimeSeconds;
-      chipUptime.innerHTML = `
-        <span class="stat-chip-label">Uptime</span>
-        <span class="stat-chip-value">${fmtUptime(uptime)}</span>`;
-
-      const lastUpdate = statusData.lastUpdate ?? statusData.last_update ?? statusData.updatedAt;
-      const luStr = lastUpdate ? new Date(lastUpdate).toLocaleTimeString() : new Date().toLocaleTimeString();
-      chipLastUpdate.innerHTML = `
-        <span class="stat-chip-label">Last Update</span>
-        <span class="stat-chip-value">${luStr}</span>`;
-    }
-
-    // ─── RENDER OPPORTUNITIES ─────────────────────────────────────────────────
-    function renderOpportunities(data) {
-      const container = document.getElementById('oppsContainer');
-      const countEl = document.getElementById('oppsCount');
-
-      if (!data) {
-        container.innerHTML = '<div class="error-state">Failed to load opportunities</div>';
-        return;
-      }
-
-      let rows = Array.isArray(data) ? data : (data.opportunities ?? data.data ?? []);
-
-      // Filter: exclude Drift and tokenized stocks
-      rows = rows.filter(r => {
-        const longEx = (r.longExchange ?? r.long_exchange ?? '').toLowerCase();
-        const shortEx = (r.shortExchange ?? r.short_exchange ?? '').toLowerCase();
-        const coin = (r.coin ?? r.symbol ?? '').toUpperCase().replace('-PERP','').replace('/USDT','').replace('USDT','');
-        if (EXCLUDED_EXCHANGES.some(ex => longEx.includes(ex) || shortEx.includes(ex))) return false;
-        if (EXCLUDED_COINS.includes(coin)) return false;
-        return true;
-      });
-
-      // Sort by grossSpread desc
-      rows.sort((a, b) => {
-        const ag = a.grossSpread ?? a.gross_spread ?? a.spread ?? 0;
-        const bg = b.grossSpread ?? b.gross_spread ?? b.spread ?? 0;
-        return bg - ag;
-      });
-
-      // Top 20
-      rows = rows.slice(0, 20);
-      countEl.textContent = `${rows.length} of top 20 • sorted by gross spread`;
-
-      if (rows.length === 0) {
-        container.innerHTML = '<div class="empty-state">No opportunities found</div>';
-        return;
-      }
-
-      const rowsHTML = rows.map(r => {
-        const coin = (r.coin ?? r.symbol ?? '—').replace('-PERP','').replace('/USDT','').replace('USDT','');
-        const longEx = (r.longExchange ?? r.long_exchange ?? '—').toUpperCase();
-        const shortEx = (r.shortExchange ?? r.short_exchange ?? '—').toUpperCase();
-        const gross = r.grossSpread ?? r.gross_spread ?? r.spread ?? 0;
-        const net = r.netSpread ?? r.net_spread ?? (gross - 0.1);
-        const apr = r.apr ?? r.annualizedReturn ?? r.annualized ?? (net * 365 / 1);
-        const exec = r.executable ?? r.isExecutable ?? (gross > 0.1);
-
-        const spreadCls = getSpreadClass(gross);
-        const execHTML = exec
-          ? '<span class="exec-yes">✓</span>'
-          : '<span class="exec-no">✗</span>';
-
-        const pairUrl = `pair.html?coin=${encodeURIComponent(coin)}&long=${encodeURIComponent((r.longExchange ?? r.long_exchange ?? '').toLowerCase())}&short=${encodeURIComponent((r.shortExchange ?? r.short_exchange ?? '').toLowerCase())}`;
-        return `<tr style="cursor:pointer;" onclick="window.open('${pairUrl}','_blank')" title="Deep dive: ${coin}">
-          <td class="coin">${coin}</td>
-          <td class="exchange">${longEx}</td>
-          <td class="exchange">${shortEx}</td>
-          <td class="${spreadCls}">${fmt(gross, 4)}%</td>
-          <td class="${getSpreadClass(net)}">${fmt(net, 4)}%</td>
-          <td class="${spreadCls}">${fmt(apr, 2)}%</td>
-          <td>${execHTML}</td>
-        </tr>`;
-      }).join('');
-
-      container.innerHTML = `
-        <div class="table-wrap fade-in">
-          <table>
-            <thead>
-              <tr>
-                <th>Coin</th>
-                <th>Long Exchange</th>
-                <th>Short Exchange</th>
-                <th>Gross Spread %</th>
-                <th>Net Spread %</th>
-                <th>APR %</th>
-                <th>Executable</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHTML}</tbody>
-          </table>
-        </div>`;
-    }
-
-    // ─── RENDER PAPER TRADES ─────────────────────────────────────────────────
-    function renderTrades(data) {
-      const container = document.getElementById('tradesContainer');
-      const countEl = document.getElementById('tradesCount');
-
-      if (!data) {
-        container.innerHTML = '<div class="error-state">Failed to load paper trades</div>';
-        return;
-      }
-
-      let trades = Array.isArray(data) ? data : (data.trades ?? data.data ?? data.paperTrades ?? []);
-
-      // Exclude Drift
-      trades = trades.filter(t => {
-        const route = (t.route ?? t.longExchange ?? t.long_exchange ?? '').toLowerCase();
-        const shortEx = (t.shortExchange ?? t.short_exchange ?? '').toLowerCase();
-        if (route.includes('drift') || shortEx.includes('drift')) return false;
-        if (t.exchange && t.exchange.toLowerCase().includes('drift')) return false;
-        return true;
-      });
-
-      // Sort by P&L desc
-      trades.sort((a, b) => {
-        const ap = a.pnl ?? a.unrealizedPnl ?? a.unrealized_pnl ?? 0;
-        const bp = b.pnl ?? b.unrealizedPnl ?? b.unrealized_pnl ?? 0;
-        return bp - ap;
-      });
-
-      countEl.textContent = `${trades.length} open positions`;
-
-      if (trades.length === 0) {
-        container.innerHTML = '<div class="empty-state">No open paper trades</div>';
-        return;
-      }
-
-      const rowsHTML = trades.map(t => {
-        const coin = (t.coin ?? t.symbol ?? '—').replace('-PERP','').replace('/USDT','').replace('USDT','');
-        const route = t.route ?? `${(t.longExchange ?? t.long_exchange ?? '?').toUpperCase()} → ${(t.shortExchange ?? t.short_exchange ?? '?').toUpperCase()}`;
-        const entrySpread = t.entrySpread ?? t.entry_spread ?? t.openSpread ?? 0;
-        const currentSpread = t.currentSpread ?? t.current_spread ?? t.grossSpread ?? t.spread ?? 0;
-        const pnl = t.pnl ?? t.unrealizedPnl ?? t.unrealized_pnl ?? 0;
-        const perDay = t.dailyPnl ?? t.daily_pnl ?? t.perDay ?? (pnl / Math.max(1, (Date.now() - new Date(t.openedAt ?? t.createdAt ?? Date.now()).getTime()) / 86400000));
-        const age = fmtAge(t.openedAt ?? t.createdAt ?? t.opened_at);
-        const status = t.status ?? getTradeStatus(t);
-
-        const pnlClass = pnl > 0 ? 'pnl-pos' : pnl < 0 ? 'pnl-neg' : 'pnl-zero';
-        const perDayClass = perDay > 0 ? 'pnl-pos' : perDay < 0 ? 'pnl-neg' : 'pnl-zero';
-
-        return `<tr>
-          <td class="coin">${coin}</td>
-          <td class="exchange" style="font-size:12px;">${route}</td>
-          <td class="${getSpreadClass(entrySpread)}">${fmt(entrySpread, 4)}%</td>
-          <td class="${getSpreadClass(currentSpread)}">${fmt(currentSpread, 4)}%</td>
-          <td class="${pnlClass}">${fmtUSD(pnl)}</td>
-          <td class="${perDayClass}">${fmtUSD(perDay)}/d</td>
-          <td style="color:var(--muted)">${age}</td>
-          <td>${statusPill(status)}</td>
-        </tr>`;
-      }).join('');
-
-      container.innerHTML = `
-        <div class="table-wrap fade-in">
-          <table>
-            <thead>
-              <tr>
-                <th>Coin</th>
-                <th>Route</th>
-                <th>Entry %</th>
-                <th>Current %</th>
-                <th>P&amp;L</th>
-                <th>$/Day</th>
-                <th>Age</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>${rowsHTML}</tbody>
-          </table>
-        </div>`;
-    }
-
-    // ─── RENDER STATS ────────────────────────────────────────────────────────
-    function renderStats(data) {
-      if (!data) return;
-
-      const stats = data.stats ?? data;
-
-      const totalPnl = stats.totalPnl ?? stats.total_pnl ?? stats.pnl ?? null;
-      const winRate = stats.winRate ?? stats.win_rate ?? null;
-      const avgSpread = stats.avgSpread ?? stats.avg_spread ?? stats.averageSpread ?? null;
-      const totalTrades = stats.totalTrades ?? stats.total_trades ?? stats.tradeCount ?? null;
-      const capital = stats.capitalDeployed ?? stats.capital_deployed ?? stats.capital ?? null;
-
-      // P&L
-      const pnlEl = document.getElementById('statPnl');
-      if (totalPnl !== null) {
-        pnlEl.textContent = fmtUSD(totalPnl);
-        pnlEl.className = 'stat-card-value ' + (totalPnl >= 0 ? 'pos' : 'neg');
-      } else {
-        pnlEl.textContent = '—';
-        pnlEl.className = 'stat-card-value';
-      }
-
-      document.getElementById('statWinRate').textContent = winRate !== null ? fmt(winRate * (winRate > 1 ? 1 : 100), 1) + '%' : '—';
-      document.getElementById('statAvgSpread').textContent = avgSpread !== null ? fmt(avgSpread, 4) + '%' : '—';
-      document.getElementById('statTrades').textContent = totalTrades !== null ? totalTrades.toLocaleString() : '—';
-      document.getElementById('statCapital').textContent = capital !== null ? fmtUSDPlain(capital) : '—';
-    }
-
-    // ─── MAIN REFRESH ────────────────────────────────────────────────────────
-    async function refresh() {
-      const { status, opps, trades, stats } = await fetchAll();
-      renderStatus(status, opps);
-      renderOpportunities(opps);
-      renderTrades(trades);
-      renderStats(stats);
-
-      document.getElementById('lastUpdate').textContent =
-        'Last refreshed: ' + new Date().toLocaleTimeString();
-    }
-
-    // ─── COUNTDOWN ───────────────────────────────────────────────────────────
-    function startCountdown() {
-      countdownSec = REFRESH_SEC;
-      const bar = document.getElementById('countdownBar');
-      const label = document.getElementById('countdownLabel');
-
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(() => {
-        countdownSec--;
-        const pct = (countdownSec / REFRESH_SEC) * 100;
-        bar.style.width = pct + '%';
-        label.textContent = countdownSec + 's';
-
-        if (countdownSec <= 0) {
-          clearInterval(countdownInterval);
-          refresh().then(() => startCountdown());
-        }
-      }, 1000);
-    }
-
-    // ─── INIT ────────────────────────────────────────────────────────────────
-    refresh().then(() => startCountdown());
-  </script>
+// ── INIT ──────────────────────────────────────────────────────────────────────
+// Set initial sort header label
+document.getElementById('th-score').textContent = 'SCORE ▾';
+refresh().then(() => startCountdown());
+</script>
 
 </body>
 </html>
