@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GO LIVE — FUNDING ARB SYSTEM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+      --blue: #4da6ff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+    .topbar-nav { display: flex; gap: 24px; flex-wrap: wrap; }
+    .topbar-nav a {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .topbar-nav a:hover { color: var(--white); }
+    .topbar-nav a.active { color: var(--green); }
+
+    /* ─── LAYOUT ─── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ─── HERO ─── */
+    .hero {
+      border: 1px solid var(--green);
+      border-radius: 4px;
+      padding: 48px 40px;
+      margin-bottom: 48px;
+      background: linear-gradient(135deg, rgba(0,255,135,0.04) 0%, transparent 60%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--green), transparent);
+    }
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--green);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 96px);
+      letter-spacing: 4px;
+      line-height: 0.95;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .hero-title span { color: var(--green); }
+    .hero-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    /* ─── CHECKLIST ─── */
+    .checklist { display: flex; flex-direction: column; gap: 12px; }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .checklist-item:hover { border-color: var(--muted); }
+    .checklist-item.checked {
+      border-color: var(--green);
+      background: rgba(0,255,135,0.05);
+    }
+    .checklist-item.checked .check-box {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .checklist-item.checked .check-box::after {
+      opacity: 1;
+    }
+    .check-box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--muted);
+      border-radius: 3px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .check-box::after {
+      content: '✓';
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--bg);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .check-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--white);
+      flex: 1;
+    }
+    .checklist-item.checked .check-label {
+      color: var(--green);
+    }
+    .check-note {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .checklist-item.checked .check-note {
+      color: rgba(0,255,135,0.5);
+    }
+
+    .hero-progress {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      color: var(--green);
+      letter-spacing: 1px;
+      min-width: 60px;
+      text-align: right;
+    }
+
+    /* ─── SECTION HEADERS ─── */
+    .section { margin-bottom: 48px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+    .section-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ─── EXCHANGE STACK ─── */
+    .exchange-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .exchange-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .exchange-card:hover { border-color: var(--yellow); }
+    .exchange-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .exchange-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+    .exchange-link {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--blue);
+      background: rgba(77,166,255,0.1);
+      border: 1px solid rgba(77,166,255,0.3);
+      border-radius: 3px;
+      padding: 4px 10px;
+      transition: all 0.2s;
+    }
+    .exchange-link:hover {
+      background: rgba(77,166,255,0.2);
+      color: #fff;
+    }
+    .exchange-why {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .exchange-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      border: 1px solid;
+      align-self: flex-start;
+    }
+    .badge-nokcy { color: var(--green); border-color: var(--green); background: rgba(0,255,135,0.08); }
+    .badge-regulated { color: var(--blue); border-color: var(--blue); background: rgba(77,166,255,0.08); }
+    .badge-volume { color: var(--orange); border-color: var(--orange); background: rgba(255,140,0,0.08); }
+    .badge-altcoin { color: #c084fc; border-color: #c084fc; background: rgba(192,132,252,0.08); }
+    .badge-lowfee { color: var(--yellow); border-color: var(--yellow); background: rgba(255,225,53,0.08); }
+
+    /* ─── LIVE TABLE ─── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+    }
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(42,42,42,0.5);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    td {
+      padding: 12px 14px;
+      white-space: nowrap;
+    }
+    .td-coin {
+      font-weight: 500;
+      color: var(--white);
+      font-size: 14px;
+    }
+    .td-exchange { color: var(--muted); }
+    .td-spread { color: var(--green); font-weight: 500; }
+    .td-earn { color: var(--yellow); }
+
+    .best-bet {
+      display: inline-block;
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 2px 6px;
+      background: var(--green);
+      color: var(--bg);
+      border-radius: 2px;
+      font-weight: 700;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .live-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    .live-dot.error { background: var(--red); animation: none; }
+    .live-dot.loading { background: var(--yellow); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .live-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      border: 1px dashed var(--border);
+      border-radius: 4px;
+    }
+
+    /* ─── CALCULATOR ─── */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 640px) {
+      .calc-grid { grid-template-columns: 1fr; }
+    }
+    .calc-inputs, .calc-outputs {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+    }
+    .calc-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .field input[type="number"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 10px 14px;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input[type="number"]:focus { border-color: var(--yellow); }
+    .field input[type="range"] {
+      width: 100%;
+      accent-color: var(--yellow);
+      margin-top: 4px;
+    }
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .output-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .output-row:last-of-type { border-bottom: none; }
+    .output-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .output-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+    .output-value.green { color: var(--green); }
+    .output-value.yellow { color: var(--yellow); }
+    .output-value.white { color: var(--white); }
+
+    .leverage-warning {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: rgba(255,59,59,0.08);
+      border: 1px solid rgba(255,59,59,0.3);
+      border-radius: 3px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--red);
+      display: none;
+    }
+    .leverage-warning.visible { display: block; }
+
+    /* ─── RISK SUMMARY ─── */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .risk-card {
+      border-radius: 4px;
+      padding: 22px;
+      border: 1px solid;
+    }
+    .risk-card.danger {
+      background: rgba(255,59,59,0.05);
+      border-color: rgba(255,59,59,0.3);
+    }
+    .risk-card.caution {
+      background: rgba(255,140,0,0.05);
+      border-color: rgba(255,140,0,0.3);
+    }
+    .risk-card.info {
+      background: rgba(77,166,255,0.05);
+      border-color: rgba(77,166,255,0.3);
+    }
+    .risk-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .risk-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .risk-card.danger .risk-title { color: var(--red); }
+    .risk-card.caution .risk-title { color: var(--orange); }
+    .risk-card.info .risk-title { color: var(--blue); }
+    .risk-body {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .risk-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 1px;
+      color: var(--red);
+      display: block;
+      margin-top: 6px;
+    }
+
+    /* ─── API STATUS ─── */
+    .api-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 32px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .api-endpoint { color: var(--white); }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .topbar { padding: 12px 16px; }
+      .hero { padding: 32px 24px; }
+      .page { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<nav class="topbar">
+  <div class="topbar-brand">FUNDING ARB</div>
+  <div class="topbar-nav">
+    <a href="index.html">HUB</a>
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="rates.html">RATES</a>
+    <a href="report.html">REPORT</a>
+    <a href="explainer.html">EXPLAINER</a>
+    <a href="golive.html" class="active">GO LIVE</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- API STATUS -->
+  <div class="api-status-bar">
+    <div class="live-dot loading" id="apiDot"></div>
+    <span>API:</span>
+    <span class="api-endpoint" id="apiEndpoint">detecting...</span>
+    <span id="apiStatusText">connecting</span>
+  </div>
+
+  <!-- ═══ SECTION 1: HERO ═══ -->
+  <div class="hero">
+    <div class="hero-label">// ACTION PLAN</div>
+    <div class="hero-title">READY TO <span>GO LIVE?</span></div>
+    <div class="hero-sub">Complete this checklist before deploying real capital.</div>
+
+    <div class="checklist" id="checklist">
+      <div class="checklist-item" data-key="paper_trading" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div style="flex:1">
+          <div class="check-label">Paper trading validated</div>
+          <div class="check-note">&gt;7 days runtime · &gt;60% win rate</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="accounts_opened" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div style="flex:1">
+          <div class="check-label">Exchange accounts opened</div>
+          <div class="check-note">Hyperliquid · Coinbase · Bitget · MEXC · WooX</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="api_keys" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div style="flex:1">
+          <div class="check-label">API keys configured</div>
+          <div class="check-note">Read + trade permissions · IP whitelisted</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="capital_allocated" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div style="flex:1">
+          <div class="check-label">Starting capital allocated</div>
+          <div class="check-note">Funded accounts · Cleared to trade</div>
+        </div>
+      </div>
+      <div class="checklist-item" data-key="risk_limits" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div style="flex:1">
+          <div class="check-label">Risk limits set</div>
+          <div class="check-note">Max position size · Daily loss limit · Exchange concentration cap</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">0 / 5</div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 2: EXCHANGE STACK ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">YOUR EXCHANGE STACK</div>
+      <div class="section-tag">// 5 CORE VENUES</div>
+    </div>
+
+    <div class="exchange-grid">
+      <div class="exchange-card">
+        <div class="exchange-header">
+          <div class="exchange-name">HYPERLIQUID</div>
+          <a href="https://hyperliquid.xyz" target="_blank" class="exchange-link">SIGN UP ↗</a>
+        </div>
+        <div class="exchange-badge badge-nokcy">No KYC</div>
+        <div class="exchange-why">Highest quality perps, no KYC, most consistent funding spreads. The reference exchange for funding arb — cleanest execution, best rate data.</div>
+      </div>
+
+      <div class="exchange-card">
+        <div class="exchange-header">
+          <div class="exchange-name">COINBASE</div>
+          <a href="https://coinbase.com/advanced-trade" target="_blank" class="exchange-link">SIGN UP ↗</a>
+        </div>
+        <div class="exchange-badge badge-regulated">Regulated</div>
+        <div class="exchange-why">Most regulated, clean API, consistently pays high short rates on many assets. Best for the "short leg" when Hyperliquid longs are elevated.</div>
+      </div>
+
+      <div class="exchange-card">
+        <div class="exchange-header">
+          <div class="exchange-name">BITGET</div>
+          <a href="https://bitget.com" target="_blank" class="exchange-link">SIGN UP ↗</a>
+        </div>
+        <div class="exchange-badge badge-volume">High Volume</div>
+        <div class="exchange-why">High volume, wide asset selection, best BLAST/BLAST pairing. Strong alt coverage and consistent rate divergence from Hyperliquid.</div>
+      </div>
+
+      <div class="exchange-card">
+        <div class="exchange-header">
+          <div class="exchange-name">MEXC</div>
+          <a href="https://mexc.com" target="_blank" class="exchange-link">SIGN UP ↗</a>
+        </div>
+        <div class="exchange-badge badge-altcoin">Alt-Heavy</div>
+        <div class="exchange-why">Widest altcoin selection, consistently differs from Coinbase rates. Best source of exotic pairs and high-spread micro-cap opportunities.</div>
+      </div>
+
+      <div class="exchange-card">
+        <div class="exchange-header">
+          <div class="exchange-name">WOOX</div>
+          <a href="https://woo.org" target="_blank" class="exchange-link">SIGN UP ↗</a>
+        </div>
+        <div class="exchange-badge badge-lowfee">Low Fees</div>
+        <div class="exchange-why">Low fees, good depth on mid-cap assets. Maker rebates can flip marginal trades into profitable ones — ideal for thin-spread pairs.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 3: BEST PAIRS RIGHT NOW ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">BEST PAIRS RIGHT NOW</div>
+      <div class="section-tag">// LIVE DATA</div>
+    </div>
+
+    <div class="live-status">
+      <div class="live-dot" id="tableDot"></div>
+      <div class="live-text" id="tableStatus">Loading opportunities...</div>
+    </div>
+
+    <div class="table-wrap">
+      <div id="tableContainer">
+        <div class="empty-state">Fetching live data...</div>
+      </div>
+    </div>
+    <div style="margin-top:10px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted);">
+      Filters: spread &gt; 0.3% · no drift · no tokenized assets · showing top 10
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 4: POSITION SIZING CALCULATOR ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">POSITION SIZING</div>
+      <div class="section-tag">// CALCULATOR</div>
+    </div>
+
+    <div class="calc-grid">
+      <div class="calc-inputs">
+        <div class="calc-section-label">// INPUTS</div>
+
+        <div class="field">
+          <label>Capital to Deploy ($)</label>
+          <input type="number" id="capital" value="3000" min="100" step="100" oninput="recalc()">
+        </div>
+
+        <div class="field">
+          <label>Max Concurrent Trades</label>
+          <input type="number" id="maxTrades" value="15" min="1" max="50" step="1" oninput="recalc()">
+        </div>
+
+        <div class="field">
+          <label>Leverage — <span id="leverageDisplay">1x</span></label>
+          <input type="range" id="leverage" value="1" min="1" max="5" step="0.5" oninput="onLeverageChange()">
+          <div class="range-labels"><span>1x</span><span>2x</span><span>3x</span><span>4x</span><span>5x</span></div>
+        </div>
+
+        <div class="leverage-warning" id="leverageWarning">
+          ⚠ Higher leverage = higher risk. Spread inversion losses multiply too. A -1% inversion at 3x leverage costs you 3% of margin per 8-hour period.
+        </div>
+      </div>
+
+      <div class="calc-outputs">
+        <div class="calc-section-label">// PROJECTED RETURNS</div>
+
+        <div class="output-row">
+          <div class="output-label">Margin / Trade</div>
+          <div class="output-value white" id="outMargin">$200</div>
+        </div>
+        <div class="output-row">
+          <div class="output-label">Avg Spread</div>
+          <div class="output-value yellow" id="outSpread">—</div>
+        </div>
+        <div class="output-row">
+          <div class="output-label">Est Daily Earnings</div>
+          <div class="output-value green" id="outDaily">—</div>
+        </div>
+        <div class="output-row">
+          <div class="output-label">Est Monthly Earnings</div>
+          <div class="output-value green" id="outMonthly">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SECTION 5: RISK SUMMARY ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">RISK SUMMARY</div>
+      <div class="section-tag">// KNOW YOUR DOWNSIDE</div>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-card danger">
+        <div class="risk-icon">🔴</div>
+        <div class="risk-title">MAX LOSS SCENARIO</div>
+        <div class="risk-body">
+          If 10 trades invert simultaneously at -1% spread for 7 days:
+          <span class="risk-number" id="maxLossNumber">—</span>
+          <small style="color:var(--muted); display:block; margin-top:4px;">Based on current capital inputs. This is why we start small.</small>
+        </div>
+      </div>
+
+      <div class="risk-card caution">
+        <div class="risk-icon">⚠️</div>
+        <div class="risk-title">START CONSERVATIVE</div>
+        <div class="risk-body">
+          Start with <strong style="color:var(--orange)">1x leverage</strong> and <strong style="color:var(--orange)">$200/trade</strong> for 2 weeks before scaling.<br><br>
+          Let the system prove itself in live conditions before committing full capital. Slippage, latency, and spreads all behave differently than paper.
+        </div>
+      </div>
+
+      <div class="risk-card info">
+        <div class="risk-icon">🔵</div>
+        <div class="risk-title">EXCHANGE CONCENTRATION</div>
+        <div class="risk-body">
+          Never put more than <strong style="color:var(--blue)">20% of capital</strong> in a single exchange.<br><br>
+          Exchange risk is real — hacks, outages, and withdrawal holds have happened. Spread your margin across all 5 venues proportionally.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>FUNDING ARB SYSTEM — GO LIVE READINESS</span>
+    <span id="footerTimestamp">—</span>
+  </div>
+
+</div>
+
+<script>
+  // ─── API ENDPOINT AUTO-DETECT ───
+  const ENDPOINTS = [
+    'http://localhost:3124',
+    'https://mvp-polymarket-alpha-bot.onrender.com'
+  ];
+  let activeEndpoint = null;
+  let liveOpportunities = [];
+
+  async function detectEndpoint() {
+    for (const ep of ENDPOINTS) {
+      try {
+        const res = await fetch(`${ep}/api/opportunities`, { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          activeEndpoint = ep;
+          return ep;
+        }
+      } catch (_) { /* try next */ }
+    }
+    return null;
+  }
+
+  // ─── CHECKLIST ───
+  function loadChecks() {
+    document.querySelectorAll('.checklist-item').forEach(item => {
+      const key = `arb_check_${item.dataset.key}`;
+      if (localStorage.getItem(key) === 'true') {
+        item.classList.add('checked');
+      }
+    });
+    updateProgress();
+  }
+
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    const key = `arb_check_${el.dataset.key}`;
+    localStorage.setItem(key, el.classList.contains('checked'));
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const items = document.querySelectorAll('.checklist-item');
+    const checked = document.querySelectorAll('.checklist-item.checked').length;
+    const pct = Math.round((checked / items.length) * 100);
+    document.getElementById('progressBar').style.width = `${pct}%`;
+    document.getElementById('progressLabel').textContent = `${checked} / ${items.length}`;
+  }
+
+  // ─── LIVE TABLE ───
+  function filterAndSort(opps) {
+    return opps
+      .filter(o => {
+        const spread = o.grossSpread || o.spread || 0;
+        const isDrift = (o.tags || []).includes('drift') || o.isDrift;
+        const isTokenized = (o.tags || []).includes('tokenized') || o.isTokenized;
+        const isExecutable = o.executable === true || o.executable === null || o.executable === undefined;
+        return !isDrift && !isTokenized && spread > 0.003 && isExecutable;
+      })
+      .sort((a, b) => {
+        const sa = a.grossSpread || a.spread || 0;
+        const sb = b.grossSpread || b.spread || 0;
+        return sb - sa;
+      })
+      .slice(0, 10);
+  }
+
+  function estPerDay(spread, margin) {
+    // 3 funding periods/day × spread × margin
+    return spread * 3 * margin;
+  }
+
+  function renderTable(opps) {
+    const dot = document.getElementById('tableDot');
+    const status = document.getElementById('tableStatus');
+
+    if (!opps || opps.length === 0) {
+      dot.className = 'live-dot error';
+      status.textContent = 'No qualifying opportunities (spread > 0.3%, executable)';
+      document.getElementById('tableContainer').innerHTML = `<div class="empty-state">No qualifying pairs found. Market may be compressed right now — check back later.</div>`;
+      return;
+    }
+
+    dot.className = 'live-dot';
+    status.textContent = `${opps.length} qualifying pairs · updated ${new Date().toLocaleTimeString()}`;
+
+    const margin = 1000; // per $1000
+    let rows = '';
+    opps.forEach((o, i) => {
+      const spread = o.grossSpread || o.spread || 0;
+      const daily = estPerDay(spread, margin);
+      const monthly = daily * 30;
+      const spreadPct = (spread * 100).toFixed(3);
+      const isBest = i < 3;
+      const coin = o.coin || o.symbol || o.pair || '—';
+      const longEx = o.longExchange || o.long_exchange || o.longEx || '—';
+      const shortEx = o.shortExchange || o.short_exchange || o.shortEx || '—';
+
+      rows += `
+        <tr>
+          <td class="td-coin">${coin}${isBest ? '<span class="best-bet">BEST BET</span>' : ''}</td>
+          <td class="td-exchange" style="color:var(--green)">${longEx}</td>
+          <td class="td-exchange" style="color:var(--red)">${shortEx}</td>
+          <td class="td-spread">${spreadPct}%</td>
+          <td class="td-earn">$${daily.toFixed(2)}</td>
+          <td class="td-earn" style="color:var(--orange)">$${monthly.toFixed(0)}</td>
+        </tr>`;
+    });
+
+    document.getElementById('tableContainer').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Coin</th>
+            <th>Long (collect)</th>
+            <th>Short (pay)</th>
+            <th>Spread %</th>
+            <th>$/day per $1k</th>
+            <th>$/mo per $1k</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    liveOpportunities = opps;
+    recalc();
+  }
+
+  async function loadOpportunities() {
+    const dot = document.getElementById('tableDot');
+    const status = document.getElementById('tableStatus');
+
+    dot.className = 'live-dot loading';
+    status.textContent = 'Fetching live data...';
+
+    if (!activeEndpoint) {
+      dot.className = 'live-dot error';
+      status.textContent = 'No API connection — showing no data';
+      document.getElementById('tableContainer').innerHTML = `<div class="empty-state">Could not reach API. Is the server running?</div>`;
+      return;
+    }
+
+    try {
+      const res = await fetch(`${activeEndpoint}/api/opportunities`, { signal: AbortSignal.timeout(10000) });
+      const data = await res.json();
+      const opps = Array.isArray(data) ? data : (data.opportunities || data.data || []);
+      const filtered = filterAndSort(opps);
+      renderTable(filtered);
+    } catch (err) {
+      dot.className = 'live-dot error';
+      status.textContent = `Error: ${err.message}`;
+      document.getElementById('tableContainer').innerHTML = `<div class="empty-state">API error: ${err.message}</div>`;
+    }
+  }
+
+  // ─── CALCULATOR ───
+  function onLeverageChange() {
+    const lev = parseFloat(document.getElementById('leverage').value);
+    document.getElementById('leverageDisplay').textContent = `${lev}x`;
+    const warn = document.getElementById('leverageWarning');
+    warn.classList.toggle('visible', lev > 1);
+    recalc();
+  }
+
+  function recalc() {
+    const capital = parseFloat(document.getElementById('capital').value) || 3000;
+    const maxTrades = parseInt(document.getElementById('maxTrades').value) || 15;
+    const leverage = parseFloat(document.getElementById('leverage').value) || 1;
+
+    const marginPerTrade = (capital / maxTrades) * leverage;
+    document.getElementById('outMargin').textContent = `$${Math.round(marginPerTrade).toLocaleString()}`;
+
+    // Avg spread from live data
+    let avgSpread = 0;
+    if (liveOpportunities.length > 0) {
+      const spreads = liveOpportunities.map(o => o.grossSpread || o.spread || 0);
+      avgSpread = spreads.reduce((a, b) => a + b, 0) / spreads.length;
+    }
+
+    if (avgSpread > 0) {
+      document.getElementById('outSpread').textContent = `${(avgSpread * 100).toFixed(3)}%`;
+      const dailyPerTrade = estPerDay(avgSpread, marginPerTrade);
+      const totalDaily = dailyPerTrade * Math.min(maxTrades, liveOpportunities.length || maxTrades);
+      const monthly = totalDaily * 30;
+      document.getElementById('outDaily').textContent = `$${totalDaily.toFixed(2)}`;
+      document.getElementById('outMonthly').textContent = `$${Math.round(monthly).toLocaleString()}`;
+    } else {
+      document.getElementById('outSpread').textContent = 'no live data';
+      document.getElementById('outDaily').textContent = '—';
+      document.getElementById('outMonthly').textContent = '—';
+    }
+
+    // Max loss: 10 trades × -1% spread × 3 periods/day × 7 days × margin
+    const marginUsed = (capital / maxTrades) * leverage;
+    const maxLoss = 10 * 0.01 * 3 * 7 * marginUsed;
+    document.getElementById('maxLossNumber').textContent = `-$${Math.round(maxLoss).toLocaleString()}`;
+  }
+
+  // ─── INIT ───
+  async function init() {
+    loadChecks();
+    recalc();
+
+    // Detect API
+    const apiDot = document.getElementById('apiDot');
+    const apiEndpoint = document.getElementById('apiEndpoint');
+    const apiStatusText = document.getElementById('apiStatusText');
+
+    const ep = await detectEndpoint();
+    if (ep) {
+      activeEndpoint = ep;
+      apiDot.className = 'live-dot';
+      apiEndpoint.textContent = ep;
+      apiStatusText.textContent = '✓ connected';
+    } else {
+      apiDot.className = 'live-dot error';
+      apiEndpoint.textContent = 'none';
+      apiStatusText.textContent = '✗ offline';
+    }
+
+    await loadOpportunities();
+
+    // Timestamp
+    document.getElementById('footerTimestamp').textContent = new Date().toLocaleString();
+
+    // Refresh every 60s
+    setInterval(loadOpportunities, 60000);
+  }
+
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
