@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FUNDING ARB // PAPER TRADE REPORT</title>
+  <title>FUNDING ARB SYSTEM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
@@ -28,93 +28,113 @@
       color: var(--white);
       font-family: 'DM Sans', sans-serif;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
       min-height: 100vh;
-      padding: 0 0 60px;
     }
 
-    /* ─── NAV ─── */
-    .nav {
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-      padding: 0 40px;
-      display: flex;
-      align-items: center;
-      gap: 0;
-      height: 40px;
-    }
-    .nav a {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      padding: 0 16px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      border-right: 1px solid var(--border);
-      transition: color 0.15s, background 0.15s;
-    }
-    .nav a:first-child { border-left: 1px solid var(--border); }
-    .nav a:hover { color: var(--white); background: rgba(255,255,255,0.03); }
-    .nav a.active { color: var(--yellow); border-bottom: 2px solid var(--yellow); margin-bottom: -1px; }
+    a { color: inherit; text-decoration: none; }
 
-    /* ─── HEADER ─── */
-    .header {
-      border-bottom: 1px solid var(--border);
-      padding: 32px 40px 24px;
+    /* ─── TOP BAR ─── */
+    .topbar {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
+      padding: 12px 32px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header-title {
+    .topbar-brand {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 52px;
-      letter-spacing: 3px;
+      font-size: 22px;
+      letter-spacing: 2px;
       color: var(--yellow);
-      line-height: 1;
-      text-shadow: 0 0 40px rgba(255, 225, 53, 0.25);
     }
-    .header-subtitle {
+    .topbar-nav { display: flex; gap: 24px; }
+    .topbar-nav a {
       font-family: 'DM Mono', monospace;
       font-size: 12px;
+      letter-spacing: 1px;
       color: var(--muted);
-      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-top: 6px;
+      transition: color 0.2s;
     }
-    .header-timestamp {
+    .topbar-nav a:hover { color: var(--yellow); }
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       color: var(--muted);
-      letter-spacing: 1px;
-      padding: 6px 12px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      white-space: nowrap;
+    }
+    .pulse {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
-    /* ─── STATS BAR ─── */
+    /* ─── HERO ─── */
+    .hero {
+      padding: 72px 32px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--yellow);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 9vw, 110px);
+      line-height: 0.92;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+    .hero-title span { color: var(--yellow); }
+    .hero-subtitle {
+      font-size: 16px;
+      color: #888;
+      max-width: 520px;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    /* ─── LIVE STATS BAR ─── */
     .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 2px;
+      margin-bottom: 56px;
+      flex-wrap: wrap;
     }
-    .stat-item {
-      padding: 20px 24px;
-      border-right: 1px solid var(--border);
-      position: relative;
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px 28px;
+      flex: 1;
+      min-width: 160px;
     }
-    .stat-item:last-child { border-right: none; }
+    .stat-chip:first-child { border-radius: 4px 0 0 4px; }
+    .stat-chip:last-child  { border-radius: 0 4px 4px 0; }
     .stat-label {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
-      color: var(--muted);
       letter-spacing: 2px;
+      color: var(--muted);
       text-transform: uppercase;
       margin-bottom: 8px;
     }
@@ -122,783 +142,570 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 36px;
       letter-spacing: 1px;
-      line-height: 1;
+      color: var(--white);
     }
-    .stat-sub {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-    .stat-value.yellow { color: var(--yellow); }
     .stat-value.green { color: var(--green); }
-    .stat-value.red { color: var(--red); }
-    .stat-value.white { color: var(--white); }
+    .stat-value.red   { color: var(--red); }
+    .stat-value.yellow { color: var(--yellow); }
 
-    /* ─── BLEEDER ALERT ─── */
-    .bleeder-alert {
-      margin: 20px 40px;
-      border: 1px solid rgba(255, 59, 59, 0.5);
-      border-left: 4px solid var(--red);
-      background: rgba(255, 59, 59, 0.05);
+    /* ─── NAV CARDS ─── */
+    .nav-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 80px;
+    }
+    @media (max-width: 700px) {
+      .nav-cards { grid-template-columns: 1fr; }
+    }
+    .nav-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 4px;
-      padding: 16px 20px;
-    }
-    .bleeder-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px;
-      letter-spacing: 2px;
-      color: var(--red);
-      margin-bottom: 12px;
-    }
-    .bleeder-list {
+      padding: 32px 28px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-    .bleeder-row {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
     }
-    .bleeder-coin {
-      display: inline-block;
-      padding: 1px 7px;
-      background: rgba(255, 59, 59, 0.15);
-      border: 1px solid rgba(255, 59, 59, 0.4);
-      color: var(--red);
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 500;
-      min-width: 60px;
-      text-align: center;
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--card-accent, var(--yellow));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s;
     }
-    .bleeder-spread { color: var(--red); }
-    .bleeder-meta { color: var(--muted); }
-    .bleeder-bleed { color: #ff6b6b; }
-
-    /* ─── IMPROVING SECTION ─── */
-    .improving-section {
-      margin: 20px 40px;
-      border: 1px solid rgba(0, 255, 135, 0.2);
-      border-left: 4px solid var(--green);
-      background: rgba(0, 255, 135, 0.03);
-      border-radius: 4px;
-      padding: 16px 20px;
+    .nav-card:hover { border-color: #3a3a3a; background: #141414; transform: translateY(-2px); }
+    .nav-card:hover::before { transform: scaleX(1); }
+    .nav-card-icon {
+      font-size: 28px;
+      margin-bottom: 4px;
     }
-    .improving-title {
+    .nav-card-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px;
+      font-size: 28px;
       letter-spacing: 2px;
-      color: var(--green);
-      margin-bottom: 12px;
+      color: var(--white);
     }
-    .improving-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .nav-card-desc {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
     }
-    .improving-card {
-      background: rgba(0, 255, 135, 0.06);
-      border: 1px solid rgba(0, 255, 135, 0.2);
-      border-radius: 4px;
-      padding: 10px 14px;
+    .nav-card-arrow {
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-    }
-    .improving-card-coin {
-      font-size: 13px;
-      color: var(--green);
-      font-weight: 500;
-      margin-bottom: 4px;
+      color: var(--muted);
+      margin-top: auto;
+      padding-top: 16px;
       letter-spacing: 1px;
     }
-    .improving-card-row { color: var(--muted); margin-top: 2px; }
-    .improving-card-row span { color: var(--white); }
-    .improving-card-gain { color: var(--green); font-size: 12px; margin-top: 4px; }
+    .nav-card:hover .nav-card-arrow { color: var(--card-accent, var(--yellow)); }
 
-    /* ─── HEALTH BAR SECTION ─── */
+    /* ─── SECTION HEADER ─── */
     .section {
-      padding: 24px 40px;
-      border-bottom: 1px solid var(--border);
+      padding: 0 32px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
     .section-label {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
+      letter-spacing: 3px;
       color: var(--muted);
-      letter-spacing: 2px;
       text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .health-bar-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .health-bar {
-      display: flex;
-      height: 32px;
-      border-radius: 4px;
-      overflow: hidden;
-      width: 100%;
-    }
-    .hb-segment {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1px;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .hb-segment:hover { opacity: 0.85; }
-    .hb-segment.healthy {
-      background: rgba(0, 255, 135, 0.2);
-      color: var(--green);
-      border: 1px solid rgba(0, 255, 135, 0.3);
-    }
-    .hb-segment.compressed {
-      background: rgba(255, 225, 53, 0.15);
-      color: var(--yellow);
-      border: 1px solid rgba(255, 225, 53, 0.25);
-      border-left: none;
-    }
-    .hb-segment.inverted {
-      background: rgba(255, 59, 59, 0.2);
-      color: var(--red);
-      border: 1px solid rgba(255, 59, 59, 0.3);
-      border-left: none;
-    }
-    .health-legend {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .legend-dot.green { background: var(--green); }
-    .legend-dot.yellow { background: var(--yellow); }
-    .legend-dot.red { background: var(--red); }
-    .legend-count { font-weight: 500; }
-    .legend-count.green { color: var(--green); }
-    .legend-count.yellow { color: var(--yellow); }
-    .legend-count.red { color: var(--red); }
-
-    /* ─── EXIT CRITERIA BOX ─── */
-    .exit-box {
-      margin: 0 40px;
-      border: 1px solid rgba(255, 225, 53, 0.2);
-      border-left: 3px solid var(--yellow);
-      background: rgba(255, 225, 53, 0.03);
-      border-radius: 4px;
-      padding: 16px 20px;
-    }
-    .exit-box-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 16px;
-      letter-spacing: 2px;
-      color: var(--yellow);
       margin-bottom: 8px;
     }
-    .exit-box-text {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      color: #888;
-      line-height: 1.7;
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      letter-spacing: 2px;
+      color: var(--white);
+      margin-bottom: 40px;
     }
 
-    /* ─── TABLE SECTION ─── */
-    .table-section { padding: 24px 40px 0; }
-    .table-header-row {
+    /* ─── FLOW DIAGRAM ─── */
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .flow-step {
+      flex: 1;
+      min-width: 170px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 20px;
+      position: relative;
+    }
+    .flow-step:first-child { border-radius: 4px 0 0 4px; }
+    .flow-step:last-child  { border-radius: 0 4px 4px 0; }
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      color: var(--yellow);
+      font-size: 22px;
+      flex-shrink: 0;
+      align-self: center;
+    }
+    .step-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .step-icon {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    .step-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+      margin-bottom: 10px;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: #777;
+      line-height: 1.55;
+    }
+    .step-accent {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--yellow);
+      opacity: 0.25;
+    }
+    .flow-step:hover .step-accent { opacity: 1; }
+    .flow-step:hover .step-label  { color: var(--white); }
+
+    /* ─── OPPORTUNITIES TABLE ─── */
+    .opp-table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .opp-table-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
     }
-    .table-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px;
+    .opp-table-header-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
       letter-spacing: 2px;
-      color: var(--white);
+      color: var(--muted);
+      text-transform: uppercase;
     }
-    .table-sort-hint {
+    .opp-refresh {
       font-family: 'DM Mono', monospace;
       font-size: 10px;
       color: var(--muted);
-      letter-spacing: 1px;
-    }
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 6px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+    }
+    thead th {
       font-family: 'DM Mono', monospace;
-      font-size: 12px;
-    }
-    thead tr {
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-    }
-    th {
-      padding: 10px 14px;
-      text-align: left;
-      font-size: 9px;
-      letter-spacing: 2px;
+      font-size: 10px;
+      letter-spacing: 1px;
       text-transform: uppercase;
       color: var(--muted);
-      cursor: pointer;
-      white-space: nowrap;
-      user-select: none;
-      transition: color 0.15s;
-    }
-    th:hover { color: var(--white); }
-    th .sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; font-size: 8px; }
-    th.sorted { color: var(--yellow); }
-    th.sorted .sort-icon { opacity: 1; color: var(--yellow); }
-    tbody tr {
+      padding: 12px 24px;
+      text-align: left;
       border-bottom: 1px solid var(--border);
-      transition: background 0.1s;
+    }
+    tbody tr {
+      border-bottom: 1px solid #1a1a1a;
+      transition: background 0.15s;
     }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,0.02); }
-    tbody tr.row-inverted { background: rgba(255, 59, 59, 0.04); }
-    tbody tr.row-inverted:hover { background: rgba(255, 59, 59, 0.07); }
-    tbody tr.row-healthy { background: transparent; }
-    tbody tr.row-compressed { background: rgba(255, 225, 53, 0.02); }
-    td {
-      padding: 9px 14px;
-      white-space: nowrap;
-      vertical-align: middle;
-    }
-
-    /* COIN badge */
-    .coin-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      background: rgba(255, 225, 53, 0.1);
-      border: 1px solid rgba(255, 225, 53, 0.25);
-      color: var(--yellow);
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1px;
-    }
-    .route-text {
-      font-size: 10px;
-      color: var(--muted);
-      line-height: 1.3;
-    }
-    .route-arrow { color: #333; margin: 0 2px; }
-
-    /* STATUS pill */
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      letter-spacing: 1px;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .status-pill.healthy {
-      background: rgba(0, 255, 135, 0.1);
-      color: var(--green);
-      border: 1px solid rgba(0, 255, 135, 0.2);
-    }
-    .status-pill.compressed {
-      background: rgba(255, 225, 53, 0.1);
-      color: var(--yellow);
-      border: 1px solid rgba(255, 225, 53, 0.2);
-    }
-    .status-pill.inverted {
-      background: rgba(255, 59, 59, 0.1);
-      color: var(--red);
-      border: 1px solid rgba(255, 59, 59, 0.2);
-    }
-
-    /* Spread Trend */
-    .trend-up { color: var(--green); font-size: 16px; }
-    .trend-down { color: var(--yellow); font-size: 16px; }
-    .trend-inv { color: var(--red); font-size: 16px; }
-
-    /* Colors */
-    .c-green { color: var(--green); }
-    .c-yellow { color: var(--yellow); }
-    .c-orange { color: var(--orange); }
-    .c-red { color: var(--red); }
-    .c-muted { color: var(--muted); }
-    .c-white { color: var(--white); }
-
-    .exit-check { font-size: 14px; color: var(--green); }
-    .exit-dash { color: var(--muted); }
-
-    /* Loading/error states */
-    .loading-state {
-      padding: 60px 40px;
-      text-align: center;
+    tbody tr:hover { background: #141414; }
+    tbody td {
+      padding: 14px 24px;
       font-family: 'DM Mono', monospace;
       font-size: 13px;
-      color: var(--muted);
+      color: var(--white);
     }
-    .loading-spinner {
+    .badge {
       display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--border);
-      border-top-color: var(--yellow);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error-msg {
-      color: var(--red);
-      padding: 20px 40px;
+    .badge-green { background: rgba(0,255,135,0.12); color: var(--green); border: 1px solid rgba(0,255,135,0.2); }
+    .badge-yellow { background: rgba(255,225,53,0.12); color: var(--yellow); border: 1px solid rgba(255,225,53,0.2); }
+    .opp-loading { padding: 32px 24px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+
+    /* ─── EXPLAINER LINK ─── */
+    .explainer-cta {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--yellow);
+      border-radius: 0 4px 4px 0;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .explainer-cta-text { }
+    .explainer-cta-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .explainer-cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 1px;
+      color: var(--white);
+    }
+    .explainer-cta-desc { font-size: 13px; color: #666; margin-top: 4px; }
+    .btn-yellow {
+      display: inline-block;
+      background: var(--yellow);
+      color: #000;
       font-family: 'DM Mono', monospace;
       font-size: 12px;
-      border: 1px solid rgba(255,59,59,0.2);
-      border-radius: 4px;
-      margin: 20px 40px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 12px 24px;
+      border-radius: 2px;
+      white-space: nowrap;
+      font-weight: 500;
+      transition: opacity 0.2s;
     }
+    .btn-yellow:hover { opacity: 0.85; }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { height: 4px; width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-    ::-webkit-scrollbar-thumb:hover { background: #444; }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      .header { padding: 20px 20px 16px; }
-      .header-title { font-size: 36px; }
-      .stats-bar { grid-template-columns: repeat(3, 1fr); }
-      .stats-bar .stat-item:nth-child(3) { border-right: none; }
-      .section, .table-section { padding: 20px 20px 0; }
-      .exit-box, .bleeder-alert, .improving-section { margin: 12px 20px; }
-      .nav { padding: 0 16px; }
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    @media (max-width: 600px) {
-      .stats-bar { grid-template-columns: 1fr 1fr; }
-      .stats-bar .stat-item:nth-child(2n) { border-right: none; }
-      .stats-bar .stat-item:nth-child(3) { border-right: 1px solid var(--border); }
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--muted);
+    }
+    .footer-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.8;
+    }
+    .footer-meta span { color: var(--yellow); }
+    .footer-disclaimer {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #333;
+      text-align: right;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <a href="/dashboard.html">Dashboard</a>
+<!-- ─── TOP BAR ─── -->
+<header class="topbar">
+  <div class="topbar-brand">FUNDING ARB</div>
+  <nav class="topbar-nav">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
     <a href="/rates.html">Rate Charts</a>
-    <a href="/report.html" class="active">Trade Report</a>
+    <a href="/report.html">Trade Report</a>
+    <a href="/explainer.html">How It Works</a>
   </nav>
+  <div class="topbar-status">
+    <div class="pulse"></div>
+    LIVE
+  </div>
+</header>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <div class="header-title">FUNDING ARB // PAPER TRADE REPORT</div>
-      <div class="header-subtitle">Delta-neutral funding rate capture · Live data</div>
-    </div>
-    <div class="header-timestamp" id="headerTimestamp">Loading…</div>
-  </header>
+<!-- ─── HERO ─── -->
+<div class="hero">
+  <div class="hero-label">// autonomous trading system</div>
+  <h1 class="hero-title">FUNDING<br><span>ARB</span><br>SYSTEM</h1>
+  <p class="hero-subtitle">Delta-neutral funding rate capture across 15 exchanges. Scanner runs 24/7, collecting spread while staying market-neutral.</p>
 
-  <!-- STATS BAR -->
-  <div class="stats-bar" id="statsBar">
-    <div class="stat-item">
-      <div class="stat-label">Open Trades</div>
-      <div class="stat-value white" id="statOpen">—</div>
-    </div>
-    <div class="stat-item">
+  <!-- LIVE STATS -->
+  <div class="stats-bar">
+    <div class="stat-chip">
       <div class="stat-label">Total P&amp;L</div>
-      <div class="stat-value green" id="statPnl">—</div>
+      <div class="stat-value yellow" id="stat-pnl">—</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-label">Est. Daily $</div>
-      <div class="stat-value yellow" id="statDaily">—</div>
-      <div class="stat-sub">at current spreads</div>
+    <div class="stat-chip">
+      <div class="stat-label">Win Rate</div>
+      <div class="stat-value" id="stat-winrate">—</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-label">Healthy</div>
-      <div class="stat-value green" id="statHealthy">—</div>
-      <div class="stat-sub" id="statHealthySub"></div>
+    <div class="stat-chip">
+      <div class="stat-label">Active Trades</div>
+      <div class="stat-value" id="stat-active">—</div>
     </div>
-    <div class="stat-item">
-      <div class="stat-label">Inverted (bleeding)</div>
-      <div class="stat-value red" id="statInverted">—</div>
-      <div class="stat-sub" id="statInvertedSub"></div>
+    <div class="stat-chip">
+      <div class="stat-label">Total Trades</div>
+      <div class="stat-value" id="stat-total">—</div>
     </div>
-  </div>
-
-  <!-- Dynamic content injected here -->
-  <div id="dynamicContent">
-    <div class="loading-state"><span class="loading-spinner"></span>Fetching live trades…</div>
-  </div>
-
-  <!-- SPREAD HEALTH BAR -->
-  <div class="section">
-    <div class="section-label">Spread Health Distribution</div>
-    <div class="health-bar-wrap">
-      <div class="health-bar" id="healthBar"></div>
-      <div class="health-legend" id="healthLegend"></div>
+    <div class="stat-chip">
+      <div class="stat-label">Exchanges</div>
+      <div class="stat-value yellow">15</div>
     </div>
   </div>
 
-  <!-- EXIT CRITERIA -->
-  <div class="section">
-    <div class="exit-box">
-      <div class="exit-box-title">EXIT CRITERIA</div>
-      <div class="exit-box-text">
-        Exit triggers when |spread| &lt; 0.01% AND position held &gt; 4h. Spreads naturally compress and invert periodically — this is normal funding rate behavior. Hold through dips. Only force-exit if inverted for 24h+ with no recovery sign.
-      </div>
+  <!-- NAV CARDS -->
+  <div class="nav-cards">
+    <a href="/dashboard" class="nav-card" style="--card-accent: var(--yellow);">
+      <div class="nav-card-icon">⚡</div>
+      <div class="nav-card-title">Dashboard</div>
+      <div class="nav-card-desc">Live P&amp;L, open positions, real-time rate scanner across all 15 exchanges.</div>
+      <div class="nav-card-arrow">OPEN DASHBOARD →</div>
+    </a>
+    <a href="/rates.html" class="nav-card" style="--card-accent: var(--green);">
+      <div class="nav-card-icon">📈</div>
+      <div class="nav-card-title">Rate Charts</div>
+      <div class="nav-card-desc">Historical funding rates per exchange and symbol. Visualize rate divergence over time.</div>
+      <div class="nav-card-arrow">VIEW CHARTS →</div>
+    </a>
+    <a href="/report.html" class="nav-card" style="--card-accent: #888;">
+      <div class="nav-card-icon">📋</div>
+      <div class="nav-card-title">Trade Report</div>
+      <div class="nav-card-desc">Full paper trade log with entry/exit, collected funding, and per-trade analytics.</div>
+      <div class="nav-card-arrow">VIEW REPORT →</div>
+    </a>
+  </div>
+</div>
+
+<!-- ─── HOW IT WORKS ─── -->
+<div class="section">
+  <div class="section-label">// mechanics</div>
+  <div class="section-title">HOW IT WORKS</div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-accent"></div>
+      <div class="step-num">STEP 01</div>
+      <div class="step-icon">🔍</div>
+      <div class="step-label">DETECT</div>
+      <div class="step-desc">Scanner polls 15 exchanges every 5–15 min for perpetual futures funding rates on all active symbols.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+
+    <div class="flow-step">
+      <div class="step-accent"></div>
+      <div class="step-num">STEP 02</div>
+      <div class="step-icon">⚖️</div>
+      <div class="step-label">COMPARE</div>
+      <div class="step-desc">Find pairs where Exchange A pays −1% per 8h and Exchange B pays +0.5% per 8h on the same asset.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+
+    <div class="flow-step">
+      <div class="step-accent"></div>
+      <div class="step-num">STEP 03</div>
+      <div class="step-icon">🎯</div>
+      <div class="step-label">ENTER</div>
+      <div class="step-desc">Go LONG on Exchange A (collect −1% = receive 1%), go SHORT on Exchange B (pay 0.5%). Delta is flat.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+
+    <div class="flow-step">
+      <div class="step-accent"></div>
+      <div class="step-num">STEP 04</div>
+      <div class="step-icon">💰</div>
+      <div class="step-label">COLLECT</div>
+      <div class="step-desc">Net spread = 1.5% per 8h = 4.5%/day on notional. Delta neutral — price moves cancel out between legs.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+
+    <div class="flow-step">
+      <div class="step-accent"></div>
+      <div class="step-num">STEP 05</div>
+      <div class="step-icon">🏁</div>
+      <div class="step-label">EXIT</div>
+      <div class="step-desc">Spread compresses toward zero → close both legs → keep the accumulated funding payments as profit.</div>
     </div>
   </div>
 
-  <!-- MAIN TABLE -->
-  <div class="table-section">
-    <div class="table-header-row">
-      <div class="table-title">ACTIVE POSITIONS</div>
-      <div class="table-sort-hint">↑↓ Click headers to sort</div>
+  <a href="/explainer.html" class="explainer-cta">
+    <div class="explainer-cta-text">
+      <div class="explainer-cta-label">// deep dive</div>
+      <div class="explainer-cta-title">WANT THE FULL BREAKDOWN?</div>
+      <div class="explainer-cta-desc">Plain-English guide with real numbers, worked examples, and risk factors.</div>
     </div>
-    <div class="table-wrap">
-      <table id="tradesTable">
-        <thead>
-          <tr>
-            <th data-col="coin">COIN <span class="sort-icon">↕</span></th>
-            <th data-col="route">ROUTE <span class="sort-icon">↕</span></th>
-            <th data-col="entrySpread">ENTRY % <span class="sort-icon">↕</span></th>
-            <th data-col="currentSpread">CURRENT % <span class="sort-icon">↕</span></th>
-            <th data-col="spreadTrend">TREND <span class="sort-icon">↕</span></th>
-            <th data-col="status">STATUS <span class="sort-icon">↕</span></th>
-            <th data-col="accumulatedPnl">P&amp;L <span class="sort-icon">↕</span></th>
-            <th data-col="estDailyDollar">EST. DAILY $ <span class="sort-icon">↕</span></th>
-            <th data-col="entryDate">ENTRY DATE <span class="sort-icon">↕</span></th>
-            <th data-col="holdDays">HOLD DAYS <span class="sort-icon">↕</span></th>
-            <th data-col="leverage">LEV <span class="sort-icon">↕</span></th>
-            <th data-col="exitReady">EXIT? <span class="sort-icon">↕</span></th>
-          </tr>
-        </thead>
-        <tbody id="tradesBody">
-          <tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">Loading…</td></tr>
-        </tbody>
-      </table>
+    <div class="btn-yellow">READ THE EXPLAINER →</div>
+  </a>
+</div>
+
+<!-- ─── TOP OPPORTUNITIES ─── -->
+<div class="section">
+  <div class="section-label">// live scanner</div>
+  <div class="section-title">CURRENT TOP OPPORTUNITIES</div>
+
+  <div class="opp-table-wrap">
+    <div class="opp-table-header">
+      <span class="opp-table-header-title">Top 5 Rate Pairs · Live</span>
+      <span class="opp-refresh" id="opp-refresh-time">fetching…</span>
+    </div>
+    <div id="opp-table-body">
+      <div class="opp-loading">Loading opportunities…</div>
     </div>
   </div>
+</div>
 
-  <script>
-    // ─── CONFIG ───────────────────────────────────────────────────────────────
-    const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
-    const API_BASE = isLocal
-      ? 'http://localhost:3124'
-      : 'https://mvp-polymarket-alpha-bot.onrender.com';
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-brand">FUNDING ARB</div>
+  <div class="footer-meta">
+    <span>15</span> exchanges · <span>15M+</span> rate data points · <span>Paper trading only</span>
+  </div>
+  <div class="footer-disclaimer">Not financial advice</div>
+</footer>
 
-    const EXCLUDED_COINS = new Set([
-      'SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','MSTRX','QQQX','PAXG','XAUT','CRCLX'
-    ]);
+<script>
+  // ─── API base URL auto-detect ───
+  const API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:3124'
+    : 'https://mvp-polymarket-alpha-bot.onrender.com';
 
-    function isDriftExchange(exchange) {
-      return exchange && exchange.toLowerCase().includes('drift');
-    }
+  // ─── LOAD STATS ───
+  async function loadStats() {
+    try {
+      const [statsRes, tradesRes] = await Promise.all([
+        fetch(`${API}/api/stats`).then(r => r.json()).catch(() => null),
+        fetch(`${API}/api/paper-trades`).then(r => r.json()).catch(() => null),
+      ]);
 
-    // ─── STATUS HELPERS ───────────────────────────────────────────────────────
-    function getStatus(t) {
-      if (t.currentSpread < 0) return 'INVERTED';
-      if (t.currentSpread < t.entrySpread * 0.3) return 'COMPRESSED';
-      return 'HEALTHY';
-    }
-
-    function statusOrder(s) {
-      return s === 'HEALTHY' ? 0 : s === 'COMPRESSED' ? 1 : 2;
-    }
-
-    function spreadTrendValue(t) {
-      if (t.currentSpread < 0) return -2;           // inverted
-      if (t.currentSpread > t.entrySpread) return 1; // improving
-      return -1;                                      // compressed
-    }
-
-    function spreadTrendIcon(t) {
-      if (t.currentSpread < 0) return `<span class="trend-inv" title="Inverted">⊘</span>`;
-      if (t.currentSpread > t.entrySpread) return `<span class="trend-up" title="Improving">↑</span>`;
-      return `<span class="trend-down" title="Compressed">↓</span>`;
-    }
-
-    function estDailyDollar(t) {
-      return t.currentSpread * 3 * (t.notional || 200) * (t.leverage || 1);
-    }
-
-    function isExitReady(t) {
-      return Math.abs(t.currentSpread) < 0.0001 && (Date.now() - t.entryTime) > 4 * 3600000;
-    }
-
-    function holdDays(t) {
-      return (Date.now() - t.entryTime) / (3600000 * 24);
-    }
-
-    function fmtEntryDate(t) {
-      const d = new Date(t.entryTime);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-
-    function fmtPct(v) {
-      const pct = v * 100;
-      return (pct >= 0 ? '' : '') + pct.toFixed(3) + '%';
-    }
-
-    function currentColor(t) {
-      const c = t.currentSpread;
-      if (c < 0) return 'c-red';
-      if (c >= t.entrySpread) return 'c-green';
-      const ratio = c / (t.entrySpread || 1);
-      if (ratio > 0.5) return 'c-green';
-      if (ratio >= 0.3) return 'c-yellow';
-      return 'c-orange';
-    }
-
-    // ─── RENDER HELPERS ───────────────────────────────────────────────────────
-    function fmtMoney(v, forceSign = false) {
-      const sign = forceSign && v > 0 ? '+' : '';
-      return `${sign}$${Math.abs(v).toFixed(2)}`;
-    }
-
-    // ─── MAIN RENDER ─────────────────────────────────────────────────────────
-    let allTrades = [];
-    let sortCol = 'accumulatedPnl';
-    let sortDir = -1;
-
-    function renderAll(trades) {
-      allTrades = trades;
-      updateStats(trades);
-      buildDynamic(trades);
-      buildHealthBar(trades);
-      renderTable();
-    }
-
-    function updateStats(trades) {
-      const totalPnl = trades.reduce((s, t) => s + (t.accumulatedPnl || 0), 0);
-      const totalDaily = trades.reduce((s, t) => s + estDailyDollar(t), 0);
-      const healthyCount = trades.filter(t => getStatus(t) === 'HEALTHY').length;
-      const compressedCount = trades.filter(t => getStatus(t) === 'COMPRESSED').length;
-      const invertedCount = trades.filter(t => getStatus(t) === 'INVERTED').length;
-
-      document.getElementById('statOpen').textContent = trades.length;
-      document.getElementById('statPnl').textContent = (totalPnl >= 0 ? '+' : '') + '$' + Math.abs(totalPnl).toFixed(2);
-      document.getElementById('statPnl').className = 'stat-value ' + (totalPnl >= 0 ? 'green' : 'red');
-      document.getElementById('statDaily').textContent = (totalDaily >= 0 ? '+' : '-') + '$' + Math.abs(totalDaily).toFixed(2);
-      document.getElementById('statHealthy').textContent = healthyCount;
-      document.getElementById('statHealthySub').textContent = `${compressedCount} compressed`;
-      document.getElementById('statInverted').textContent = invertedCount;
-      document.getElementById('statInvertedSub').textContent = invertedCount > 0 ? 'losing daily $' : 'all clear';
-
-      const now = new Date();
-      document.getElementById('headerTimestamp').textContent =
-        now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' +
-        now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }) + ' EST';
-    }
-
-    function buildDynamic(trades) {
-      const container = document.getElementById('dynamicContent');
-      const inverted = trades.filter(t => t.currentSpread < 0);
-      const improving = trades.filter(t => t.currentSpread > t.entrySpread * 1.5 && t.currentSpread > 0);
-      let html = '';
-
-      // ── Bleeder Alert ──
-      if (inverted.length > 0) {
-        html += `<div class="bleeder-alert">
-          <div class="bleeder-title">⚠ INVERTED POSITIONS</div>
-          <div class="bleeder-list">`;
-
-        inverted.forEach(t => {
-          const days = holdDays(t).toFixed(1);
-          const bleed = estDailyDollar(t); // negative
-          const spreadPct = (t.currentSpread * 100).toFixed(3);
-          html += `<div class="bleeder-row">
-            <span class="bleeder-coin">${t.coin}</span>
-            <span class="bleeder-spread">${spreadPct}%</span>
-            <span class="bleeder-meta">held ${days}d</span>
-            <span class="bleeder-bleed">bleeding ${fmtMoney(bleed)}/day</span>
-            <span class="bleeder-meta">${t.longExchange} → ${t.shortExchange}</span>
-          </div>`;
-        });
-
-        html += `</div></div>`;
-      }
-
-      // ── Improving Section ──
-      if (improving.length > 0) {
-        const sorted = [...improving].sort((a, b) => b.currentSpread - a.currentSpread);
-        html += `<div class="improving-section">
-          <div class="improving-title">🚀 IMPROVING POSITIONS — Spread Has Grown 50%+ Since Entry</div>
-          <div class="improving-grid">`;
-
-        sorted.forEach(t => {
-          const gain = ((t.currentSpread / t.entrySpread - 1) * 100).toFixed(0);
-          const daily = estDailyDollar(t);
-          html += `<div class="improving-card">
-            <div class="improving-card-coin">${t.coin}</div>
-            <div class="improving-card-row">Entry: <span>${(t.entrySpread * 100).toFixed(3)}%</span></div>
-            <div class="improving-card-row">Now: <span style="color:var(--green)">${(t.currentSpread * 100).toFixed(3)}%</span></div>
-            <div class="improving-card-row">Route: <span>${t.longExchange} → ${t.shortExchange}</span></div>
-            <div class="improving-card-gain">▲ +${gain}% · ${fmtMoney(daily)}/day</div>
-          </div>`;
-        });
-
-        html += `</div></div>`;
-      }
-
-      container.innerHTML = html || '';
-    }
-
-    function buildHealthBar(trades) {
-      const healthy = trades.filter(t => getStatus(t) === 'HEALTHY').length;
-      const compressed = trades.filter(t => getStatus(t) === 'COMPRESSED').length;
-      const inverted = trades.filter(t => getStatus(t) === 'INVERTED').length;
-      const total = trades.length || 1;
-
-      document.getElementById('healthBar').innerHTML = `
-        <div class="hb-segment healthy" style="width:${(healthy/total*100).toFixed(1)}%">HEALTHY ${healthy}</div>
-        <div class="hb-segment compressed" style="width:${(compressed/total*100).toFixed(1)}%">COMPRESSED ${compressed}</div>
-        <div class="hb-segment inverted" style="width:${(inverted/total*100).toFixed(1)}%">INVERTED ${inverted}</div>
-      `;
-
-      document.getElementById('healthLegend').innerHTML = `
-        <div class="legend-item"><div class="legend-dot green"></div><span>Healthy</span><span class="legend-count green">${healthy}</span></div>
-        <div class="legend-item"><div class="legend-dot yellow"></div><span>Compressed</span><span class="legend-count yellow">${compressed}</span></div>
-        <div class="legend-item"><div class="legend-dot red"></div><span>Inverted</span><span class="legend-count red">${inverted}</span></div>
-      `;
-    }
-
-    function renderTable() {
-      const sorted = [...allTrades].sort((a, b) => {
-        let av, bv;
-        switch(sortCol) {
-          case 'coin': av = a.coin; bv = b.coin; break;
-          case 'route': av = a.longExchange + a.shortExchange; bv = b.longExchange + b.shortExchange; break;
-          case 'status': av = statusOrder(getStatus(a)); bv = statusOrder(getStatus(b)); break;
-          case 'spreadTrend': av = spreadTrendValue(a); bv = spreadTrendValue(b); break;
-          case 'exitReady': av = isExitReady(a) ? 1 : 0; bv = isExitReady(b) ? 1 : 0; break;
-          case 'estDailyDollar': av = estDailyDollar(a); bv = estDailyDollar(b); break;
-          case 'holdDays': av = holdDays(a); bv = holdDays(b); break;
-          case 'entryDate': av = a.entryTime; bv = b.entryTime; break;
-          default: av = a[sortCol] || 0; bv = b[sortCol] || 0;
+      if (statsRes) {
+        const pnl = statsRes.totalPnl ?? statsRes.total_pnl ?? statsRes.pnl ?? null;
+        const wr  = statsRes.winRate  ?? statsRes.win_rate  ?? null;
+        if (pnl !== null) {
+          const el = document.getElementById('stat-pnl');
+          el.textContent = (pnl >= 0 ? '+' : '') + '$' + Number(pnl).toFixed(2);
+          el.className   = 'stat-value ' + (pnl >= 0 ? 'green' : 'red');
         }
-        if (typeof av === 'string') return sortDir * av.localeCompare(bv);
-        return sortDir * (av - bv);
-      });
+        if (wr !== null) {
+          const wrEl = document.getElementById('stat-winrate');
+          const pct  = (wr > 1 ? wr : wr * 100).toFixed(1);
+          wrEl.textContent = pct + '%';
+          wrEl.className   = 'stat-value ' + (pct >= 50 ? 'green' : 'red');
+        }
+      }
 
-      const tbody = document.getElementById('tradesBody');
-      if (sorted.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;">No open trades found.</td></tr>`;
+      if (tradesRes) {
+        const trades  = Array.isArray(tradesRes) ? tradesRes : (tradesRes.trades ?? []);
+        const active  = trades.filter(t => t.status === 'open' || t.status === 'active').length;
+        const total   = trades.length;
+        document.getElementById('stat-active').textContent = active;
+        document.getElementById('stat-total').textContent  = total;
+      }
+    } catch (e) {
+      console.warn('stats load failed', e);
+    }
+  }
+
+  // ─── LOAD OPPORTUNITIES ───
+  async function loadOpportunities() {
+    const container = document.getElementById('opp-table-body');
+    try {
+      const res = await fetch(`${API}/api/opportunities`);
+      const data = await res.json();
+
+      const EXCLUDE = ['drift', 'tokenize', 'tokenized', 'synthetix'];
+      const rows = (Array.isArray(data) ? data : (data.opportunities ?? data.data ?? []))
+        .filter(o => {
+          const exA = (o.exchangeA || o.exchange_a || '').toLowerCase();
+          const exB = (o.exchangeB || o.exchange_b || '').toLowerCase();
+          return !EXCLUDE.some(ex => exA.includes(ex) || exB.includes(ex));
+        })
+        .slice(0, 5);
+
+      if (!rows.length) {
+        container.innerHTML = '<div class="opp-loading">No opportunities found — scanner may be catching up.</div>';
         return;
       }
 
-      tbody.innerHTML = sorted.map(t => {
-        const status = getStatus(t);
-        const exitReady = isExitReady(t);
-        const rowClass = `row-${status.toLowerCase()}`;
-        const daily = estDailyDollar(t);
-        const days = holdDays(t);
+      const html = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Symbol</th>
+              <th>Long Leg</th>
+              <th>Short Leg</th>
+              <th>Rate A</th>
+              <th>Rate B</th>
+              <th>Spread / 8h</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((o, i) => {
+              const sym   = o.symbol || o.coin || o.asset || '—';
+              const exA   = o.exchangeA || o.exchange_a || o.longExchange  || '—';
+              const exB   = o.exchangeB || o.exchange_b || o.shortExchange || '—';
+              const rateA = o.rateA || o.rate_a || o.fundingRateA || 0;
+              const rateB = o.rateB || o.rate_b || o.fundingRateB || 0;
+              const spread = o.spread || o.netSpread || o.net_spread || Math.abs(rateA - rateB);
+              const pct = (Number(spread) * 100).toFixed(4);
+              const isGood = Number(spread) >= 0.005;
+              return `<tr>
+                <td style="color:var(--muted)">${i + 1}</td>
+                <td style="color:var(--yellow);font-weight:500">${sym}</td>
+                <td>${exA}</td>
+                <td>${exB}</td>
+                <td style="color:var(--green)">${(Number(rateA)*100).toFixed(4)}%</td>
+                <td style="color:var(--red)">${(Number(rateB)*100).toFixed(4)}%</td>
+                <td style="color:var(--yellow);font-weight:600">${pct}%</td>
+                <td><span class="badge ${isGood ? 'badge-green' : 'badge-yellow'}">${isGood ? 'STRONG' : 'WEAK'}</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
 
-        const statusPill = status === 'HEALTHY'
-          ? `<span class="status-pill healthy">🟢 HEALTHY</span>`
-          : status === 'COMPRESSED'
-          ? `<span class="status-pill compressed">🟡 COMPRESSED</span>`
-          : `<span class="status-pill inverted">🔴 INVERTED</span>`;
-
-        const pnlVal = t.accumulatedPnl || 0;
-        const pnlClass = pnlVal >= 0 ? 'c-green' : 'c-red';
-        const pnlSign = pnlVal >= 0 ? '+' : '-';
-        const dailyClass = daily >= 0 ? 'c-green' : 'c-red';
-        const dailySign = daily >= 0 ? '+' : '-';
-
-        return `<tr class="${rowClass}">
-          <td><span class="coin-badge">${t.coin}</span></td>
-          <td class="route-text"><span>${t.longExchange}</span><span class="route-arrow">→</span><span>${t.shortExchange}</span></td>
-          <td class="c-muted">${(t.entrySpread * 100).toFixed(3)}%</td>
-          <td class="${currentColor(t)}">${(t.currentSpread * 100).toFixed(3)}%</td>
-          <td style="text-align:center">${spreadTrendIcon(t)}</td>
-          <td>${statusPill}</td>
-          <td class="${pnlClass}">${pnlSign}$${Math.abs(pnlVal).toFixed(2)}</td>
-          <td class="${dailyClass}">${dailySign}$${Math.abs(daily).toFixed(2)}</td>
-          <td class="c-muted">${fmtEntryDate(t)}</td>
-          <td class="c-muted">${days.toFixed(1)}d</td>
-          <td class="c-muted">${t.leverage || 1}x</td>
-          <td>${exitReady ? '<span class="exit-check">✓</span>' : '<span class="exit-dash">—</span>'}</td>
-        </tr>`;
-      }).join('');
+      container.innerHTML = html;
+      document.getElementById('opp-refresh-time').textContent =
+        'Updated ' + new Date().toLocaleTimeString();
+    } catch (e) {
+      container.innerHTML = '<div class="opp-loading">Could not reach API — showing cached data or scanner offline.</div>';
+      console.warn('opportunities load failed', e);
     }
+  }
 
-    function initSortHeaders() {
-      document.querySelectorAll('th[data-col]').forEach(th => {
-        const col = th.dataset.col;
-        if (col === sortCol) {
-          th.classList.add('sorted');
-          th.querySelector('.sort-icon').textContent = sortDir === -1 ? '↓' : '↑';
-        }
-        th.addEventListener('click', () => {
-          if (sortCol === col) {
-            sortDir *= -1;
-          } else {
-            sortCol = col;
-            sortDir = ['coin','route','status'].includes(col) ? 1 : -1;
-          }
-          document.querySelectorAll('th[data-col]').forEach(h => {
-            h.classList.remove('sorted');
-            h.querySelector('.sort-icon').textContent = '↕';
-          });
-          th.classList.add('sorted');
-          th.querySelector('.sort-icon').textContent = sortDir === -1 ? '↓' : '↑';
-          renderTable();
-        });
-      });
-    }
-
-    // ─── FETCH ────────────────────────────────────────────────────────────────
-    async function fetchTrades() {
-      try {
-        const res = await fetch(`${API_BASE}/api/paper-trades`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const open = (data.open || []).filter(t =>
-          !EXCLUDED_COINS.has(t.coin) &&
-          !isDriftExchange(t.longExchange) &&
-          !isDriftExchange(t.shortExchange)
-        );
-        renderAll(open);
-      } catch (err) {
-        document.getElementById('dynamicContent').innerHTML = `
-          <div class="error-msg">⚠ Failed to load trades from ${API_BASE}: ${err.message}</div>
-        `;
-        document.getElementById('headerTimestamp').textContent = 'Connection error';
-        console.error('[report] fetch error:', err);
-      }
-    }
-
-    // ─── INIT ─────────────────────────────────────────────────────────────────
-    initSortHeaders();
-    fetchTrades();
-    // Refresh every 2 minutes
-    setInterval(fetchTrades, 120000);
-  </script>
+  // ─── INIT ───
+  loadStats();
+  loadOpportunities();
+  setInterval(loadStats, 30000);
+  setInterval(loadOpportunities, 60000);
+</script>
 </body>
 </html>
