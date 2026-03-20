@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GO LIVE — FUNDING ARB SYSTEM</title>
+  <title>GO LIVE — DEPLOY DECISION ENGINE</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
@@ -11,17 +11,22 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0a0a;
+      --bg: #080808;
+      --bg2: #0d0d0d;
       --yellow: #ffe135;
       --green: #00ff87;
       --red: #ff3b3b;
       --orange: #ff8c00;
-      --white: #f5f2eb;
-      --muted: #555;
-      --border: #2a2a2a;
-      --surface: #111111;
-      --surface2: #161616;
       --blue: #4da6ff;
+      --purple: #c084fc;
+      --white: #f0ede6;
+      --muted: #4a4a4a;
+      --muted2: #666;
+      --border: #1e1e1e;
+      --border2: #2a2a2a;
+      --surface: #0f0f0f;
+      --surface2: #141414;
+      --surface3: #191919;
     }
 
     body {
@@ -35,6 +40,22 @@
 
     a { color: inherit; text-decoration: none; }
 
+    /* ─── SCANLINES EFFECT ─── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
     /* ─── TOP BAR ─── */
     .topbar {
       display: flex;
@@ -42,7 +63,7 @@
       justify-content: space-between;
       padding: 12px 32px;
       border-bottom: 1px solid var(--border);
-      background: rgba(10,10,10,0.95);
+      background: rgba(8,8,8,0.97);
       backdrop-filter: blur(8px);
       position: sticky;
       top: 0;
@@ -50,16 +71,16 @@
     }
     .topbar-brand {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
+      font-size: 20px;
+      letter-spacing: 3px;
       color: var(--yellow);
     }
     .topbar-nav { display: flex; gap: 24px; flex-wrap: wrap; }
     .topbar-nav a {
       font-family: 'DM Mono', monospace;
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 1px;
-      color: var(--muted);
+      color: var(--muted2);
       text-transform: uppercase;
       transition: color 0.2s;
     }
@@ -67,78 +88,383 @@
     .topbar-nav a.active { color: var(--green); }
 
     /* ─── LAYOUT ─── */
-    .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page { max-width: 1120px; margin: 0 auto; padding: 48px 24px 80px; }
 
-    /* ─── HERO ─── */
-    .hero {
-      border: 1px solid var(--green);
-      border-radius: 4px;
-      padding: 48px 40px;
-      margin-bottom: 48px;
-      background: linear-gradient(135deg, rgba(0,255,135,0.04) 0%, transparent 60%);
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--green), transparent);
-    }
-    .hero-label {
+    /* ─── API STATUS ─── */
+    .api-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      margin-bottom: 40px;
       font-family: 'DM Mono', monospace;
       font-size: 11px;
-      letter-spacing: 3px;
-      color: var(--green);
-      text-transform: uppercase;
-      margin-bottom: 12px;
+      color: var(--muted2);
     }
-    .hero-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(52px, 8vw, 96px);
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+      flex-shrink: 0;
+    }
+    .live-dot.loading { background: var(--yellow); }
+    .live-dot.error { background: var(--red); animation: none; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ─── DEPLOY DECISION HERO ─── */
+    .deploy-hero {
+      position: relative;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 56px 48px;
+      margin-bottom: 48px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .deploy-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--decision-color, var(--muted));
+      transition: background 0.5s;
+    }
+    .deploy-hero.yes { --decision-color: var(--green); }
+    .deploy-hero.maybe { --decision-color: var(--yellow); }
+    .deploy-hero.no { --decision-color: var(--red); }
+
+    .deploy-glow {
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--decision-glow, rgba(255,225,53,0.03)) 0%, transparent 70%);
+      pointer-events: none;
+      transition: background 0.5s;
+    }
+    .deploy-hero.yes .deploy-glow { --decision-glow: rgba(0,255,135,0.06); }
+    .deploy-hero.maybe .deploy-glow { --decision-glow: rgba(255,225,53,0.05); }
+    .deploy-hero.no .deploy-glow { --decision-glow: rgba(255,59,59,0.05); }
+
+    .deploy-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
       letter-spacing: 4px;
-      line-height: 0.95;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 16px;
+    }
+    .deploy-verdict {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 12vw, 140px);
+      letter-spacing: 2px;
+      line-height: 0.9;
       color: var(--white);
+      margin-bottom: 6px;
+      transition: color 0.5s;
+    }
+    .deploy-hero.yes .deploy-verdict { color: var(--green); }
+    .deploy-hero.maybe .deploy-verdict { color: var(--yellow); }
+    .deploy-hero.no .deploy-verdict { color: var(--red); }
+
+    .deploy-sub {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: 3px;
+      color: var(--muted2);
+      margin-bottom: 32px;
+    }
+
+    .deploy-stats {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .deploy-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .deploy-stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .deploy-stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 1px;
+      color: var(--white);
+    }
+    .deploy-stat-value.green { color: var(--green); }
+    .deploy-stat-value.yellow { color: var(--yellow); }
+    .deploy-stat-value.red { color: var(--red); }
+
+    .deploy-loading {
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      color: var(--muted2);
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ─── SECTION HEADERS ─── */
+    .section { margin-bottom: 56px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 30px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+    .section-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ─── READY TABLE ─── */
+    .table-status {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted2);
+    }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+    }
+    thead tr { border-bottom: 1px solid var(--border2); }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(30,30,30,0.8);
+      transition: background 0.12s;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    td { padding: 13px 14px; white-space: nowrap; }
+
+    .td-coin { font-weight: 500; color: var(--white); font-size: 14px; }
+    .td-route { color: var(--muted2); font-size: 12px; }
+    .td-spread { color: var(--green); font-weight: 500; }
+    .td-earn { color: var(--yellow); }
+    .td-score { }
+
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+    .score-pill.ready { color: var(--green); border-color: rgba(0,255,135,0.3); background: rgba(0,255,135,0.07); }
+    .score-pill.promising { color: var(--yellow); border-color: rgba(255,225,53,0.3); background: rgba(255,225,53,0.07); }
+    .score-pill.risky { color: var(--red); border-color: rgba(255,59,59,0.3); background: rgba(255,59,59,0.07); }
+
+    .exchange-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      border: 1px solid var(--border2);
+      border-radius: 2px;
+      color: var(--muted2);
+      margin: 1px;
+    }
+
+    .empty-state {
+      padding: 48px;
+      text-align: center;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      border: 1px dashed var(--border2);
+      border-radius: 4px;
+    }
+
+    /* ─── DEPLOY PLAN CALCULATOR ─── */
+    .calc-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 768px) { .calc-layout { grid-template-columns: 1fr; } }
+
+    .calc-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+    }
+    .calc-panel-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 24px;
+    }
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted2);
       margin-bottom: 8px;
     }
-    .hero-title span { color: var(--green); }
-    .hero-sub {
+    .field input[type="number"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 3px;
+      padding: 11px 14px;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+      font-size: 20px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field input[type="number"]:focus { border-color: var(--yellow); }
+
+    .alloc-output {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px;
+    }
+    .alloc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 20px;
+    }
+    .alloc-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .alloc-totals {
+      display: flex;
+      gap: 24px;
+    }
+    .alloc-total-item {
+      text-align: right;
+    }
+    .alloc-total-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .alloc-total-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+    .alloc-total-value.green { color: var(--green); }
+    .alloc-total-value.yellow { color: var(--yellow); }
+
+    .alloc-rows { display: flex; flex-direction: column; gap: 10px; }
+    .alloc-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      border-left: 3px solid var(--green);
+    }
+    .alloc-coin {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--white);
+      min-width: 80px;
+    }
+    .alloc-route {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted2);
+      flex: 1;
+    }
+    .alloc-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 1px;
+      color: var(--yellow);
+      min-width: 80px;
+      text-align: right;
+    }
+    .alloc-daily {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--green);
+      min-width: 80px;
+      text-align: right;
+    }
+    .alloc-empty {
       font-family: 'DM Mono', monospace;
       font-size: 13px;
       color: var(--muted);
-      margin-bottom: 36px;
+      padding: 24px;
+      text-align: center;
+      border: 1px dashed var(--border2);
+      border-radius: 3px;
     }
 
-    /* ─── CHECKLIST ─── */
-    .checklist { display: flex; flex-direction: column; gap: 12px; }
-    .checklist-item {
+    /* ─── EXCHANGE CHECKLIST ─── */
+    .exchange-checklist { display: flex; flex-direction: column; gap: 12px; }
+    .exchange-check-item {
       display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 4px;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
       user-select: none;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .checklist-item:hover { border-color: var(--muted); }
-    .checklist-item.checked {
-      border-color: var(--green);
-      background: rgba(0,255,135,0.05);
-    }
-    .checklist-item.checked .check-box {
-      background: var(--green);
-      border-color: var(--green);
-    }
-    .checklist-item.checked .check-box::after {
-      opacity: 1;
+    .exchange-check-item:hover { border-color: var(--border2); }
+    .exchange-check-item.checked {
+      border-color: rgba(0,255,135,0.3);
+      background: rgba(0,255,135,0.04);
     }
     .check-box {
-      width: 20px;
-      height: 20px;
+      width: 22px; height: 22px;
       border: 2px solid var(--muted);
       border-radius: 3px;
       flex-shrink: 0;
@@ -146,43 +472,75 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
-      position: relative;
+      margin-top: 2px;
+    }
+    .exchange-check-item.checked .check-box {
+      background: var(--green);
+      border-color: var(--green);
     }
     .check-box::after {
       content: '✓';
       font-size: 13px;
-      font-weight: 700;
       color: var(--bg);
+      font-weight: 700;
       opacity: 0;
       transition: opacity 0.2s;
     }
-    .check-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      color: var(--white);
-      flex: 1;
-    }
-    .checklist-item.checked .check-label {
-      color: var(--green);
-    }
-    .check-note {
-      font-size: 11px;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-    .checklist-item.checked .check-note {
-      color: rgba(0,255,135,0.5);
-    }
+    .exchange-check-item.checked .check-box::after { opacity: 1; }
 
-    .hero-progress {
-      margin-top: 24px;
+    .exchange-check-body { flex: 1; }
+    .exchange-check-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .exchange-check-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--white);
+      transition: color 0.2s;
+    }
+    .exchange-check-item.checked .exchange-check-name { color: var(--green); }
+
+    .exchange-check-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .exchange-signup {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--blue);
+      background: rgba(77,166,255,0.08);
+      border: 1px solid rgba(77,166,255,0.25);
+      border-radius: 2px;
+      padding: 3px 10px;
+      transition: all 0.2s;
+    }
+    .exchange-signup:hover { background: rgba(77,166,255,0.15); }
+    .exchange-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted2);
+    }
+    .exchange-why {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted2);
+      line-height: 1.6;
+    }
+    .exchange-check-item.checked .exchange-why { color: rgba(0,255,135,0.5); }
+
+    .checklist-progress {
       display: flex;
       align-items: center;
       gap: 16px;
+      margin-bottom: 20px;
     }
     .progress-bar-wrap {
-      flex: 1;
-      height: 6px;
+      flex: 1; height: 5px;
       background: var(--border);
       border-radius: 3px;
       overflow: hidden;
@@ -198,282 +556,11 @@
       font-size: 20px;
       color: var(--green);
       letter-spacing: 1px;
-      min-width: 60px;
+      min-width: 48px;
       text-align: right;
     }
 
-    /* ─── SECTION HEADERS ─── */
-    .section { margin-bottom: 48px; }
-    .section-header {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 24px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 32px;
-      letter-spacing: 2px;
-      color: var(--yellow);
-    }
-    .section-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    /* ─── EXCHANGE STACK ─── */
-    .exchange-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-    }
-    .exchange-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: border-color 0.2s;
-    }
-    .exchange-card:hover { border-color: var(--yellow); }
-    .exchange-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .exchange-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
-      color: var(--yellow);
-    }
-    .exchange-link {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--blue);
-      background: rgba(77,166,255,0.1);
-      border: 1px solid rgba(77,166,255,0.3);
-      border-radius: 3px;
-      padding: 4px 10px;
-      transition: all 0.2s;
-    }
-    .exchange-link:hover {
-      background: rgba(77,166,255,0.2);
-      color: #fff;
-    }
-    .exchange-why {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-    .exchange-badge {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 2px;
-      border: 1px solid;
-      align-self: flex-start;
-    }
-    .badge-nokcy { color: var(--green); border-color: var(--green); background: rgba(0,255,135,0.08); }
-    .badge-regulated { color: var(--blue); border-color: var(--blue); background: rgba(77,166,255,0.08); }
-    .badge-volume { color: var(--orange); border-color: var(--orange); background: rgba(255,140,0,0.08); }
-    .badge-altcoin { color: #c084fc; border-color: #c084fc; background: rgba(192,132,252,0.08); }
-    .badge-lowfee { color: var(--yellow); border-color: var(--yellow); background: rgba(255,225,53,0.08); }
-
-    /* ─── LIVE TABLE ─── */
-    .table-wrap { overflow-x: auto; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-    }
-    thead tr {
-      border-bottom: 1px solid var(--border);
-    }
-    th {
-      text-align: left;
-      padding: 10px 14px;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    tbody tr {
-      border-bottom: 1px solid rgba(42,42,42,0.5);
-      transition: background 0.15s;
-    }
-    tbody tr:hover { background: rgba(255,255,255,0.02); }
-    td {
-      padding: 12px 14px;
-      white-space: nowrap;
-    }
-    .td-coin {
-      font-weight: 500;
-      color: var(--white);
-      font-size: 14px;
-    }
-    .td-exchange { color: var(--muted); }
-    .td-spread { color: var(--green); font-weight: 500; }
-    .td-earn { color: var(--yellow); }
-
-    .best-bet {
-      display: inline-block;
-      font-size: 9px;
-      letter-spacing: 1px;
-      padding: 2px 6px;
-      background: var(--green);
-      color: var(--bg);
-      border-radius: 2px;
-      font-weight: 700;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-
-    .live-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2s infinite;
-    }
-    .live-dot.error { background: var(--red); animation: none; }
-    .live-dot.loading { background: var(--yellow); }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    .live-text {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .empty-state {
-      padding: 40px;
-      text-align: center;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      border: 1px dashed var(--border);
-      border-radius: 4px;
-    }
-
-    /* ─── CALCULATOR ─── */
-    .calc-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-    @media (max-width: 640px) {
-      .calc-grid { grid-template-columns: 1fr; }
-    }
-    .calc-inputs, .calc-outputs {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 24px;
-    }
-    .calc-section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-    .field { margin-bottom: 18px; }
-    .field label {
-      display: block;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .field input[type="number"] {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 10px 14px;
-      color: var(--white);
-      font-family: 'DM Mono', monospace;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .field input[type="number"]:focus { border-color: var(--yellow); }
-    .field input[type="range"] {
-      width: 100%;
-      accent-color: var(--yellow);
-      margin-top: 4px;
-    }
-    .range-labels {
-      display: flex;
-      justify-content: space-between;
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .output-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .output-row:last-of-type { border-bottom: none; }
-    .output-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .output-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px;
-      letter-spacing: 1px;
-    }
-    .output-value.green { color: var(--green); }
-    .output-value.yellow { color: var(--yellow); }
-    .output-value.white { color: var(--white); }
-
-    .leverage-warning {
-      margin-top: 16px;
-      padding: 12px 16px;
-      background: rgba(255,59,59,0.08);
-      border: 1px solid rgba(255,59,59,0.3);
-      border-radius: 3px;
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--red);
-      display: none;
-    }
-    .leverage-warning.visible { display: block; }
-
-    /* ─── RISK SUMMARY ─── */
+    /* ─── RISK SECTION ─── */
     .risk-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -481,30 +568,18 @@
     }
     .risk-card {
       border-radius: 4px;
-      padding: 22px;
+      padding: 24px;
       border: 1px solid;
     }
-    .risk-card.danger {
-      background: rgba(255,59,59,0.05);
-      border-color: rgba(255,59,59,0.3);
-    }
-    .risk-card.caution {
-      background: rgba(255,140,0,0.05);
-      border-color: rgba(255,140,0,0.3);
-    }
-    .risk-card.info {
-      background: rgba(77,166,255,0.05);
-      border-color: rgba(77,166,255,0.3);
-    }
-    .risk-icon {
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
+    .risk-card.danger { background: rgba(255,59,59,0.04); border-color: rgba(255,59,59,0.2); }
+    .risk-card.caution { background: rgba(255,140,0,0.04); border-color: rgba(255,140,0,0.2); }
+    .risk-card.info { background: rgba(77,166,255,0.04); border-color: rgba(77,166,255,0.2); }
+    .risk-icon { font-size: 20px; margin-bottom: 10px; }
     .risk-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 18px;
       letter-spacing: 1px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .risk-card.danger .risk-title { color: var(--red); }
     .risk-card.caution .risk-title { color: var(--orange); }
@@ -512,33 +587,16 @@
     .risk-body {
       font-family: 'DM Mono', monospace;
       font-size: 12px;
-      color: var(--muted);
+      color: var(--muted2);
       line-height: 1.8;
     }
     .risk-number {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 36px;
-      letter-spacing: 1px;
       color: var(--red);
       display: block;
       margin-top: 6px;
     }
-
-    /* ─── API STATUS ─── */
-    .api-status-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      margin-bottom: 32px;
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .api-endpoint { color: var(--white); }
 
     /* ─── FOOTER ─── */
     .footer {
@@ -556,8 +614,9 @@
 
     @media (max-width: 768px) {
       .topbar { padding: 12px 16px; }
-      .hero { padding: 32px 24px; }
+      .deploy-hero { padding: 36px 24px; }
       .page { padding: 24px 16px 60px; }
+      .deploy-stats { gap: 24px; }
     }
   </style>
 </head>
@@ -581,194 +640,171 @@
 <div class="page">
 
   <!-- API STATUS -->
-  <div class="api-status-bar">
+  <div class="api-bar">
     <div class="live-dot loading" id="apiDot"></div>
     <span>API:</span>
-    <span class="api-endpoint" id="apiEndpoint">detecting...</span>
+    <span id="apiEndpoint" style="color:var(--white)">detecting...</span>
     <span id="apiStatusText">connecting</span>
+    <span style="margin-left:auto; color:var(--muted)" id="lastUpdated"></span>
   </div>
 
-  <!-- ═══ SECTION 1: HERO ═══ -->
-  <div class="hero">
-    <div class="hero-label">// ACTION PLAN</div>
-    <div class="hero-title">READY TO <span>GO LIVE?</span></div>
-    <div class="hero-sub">Complete this checklist before deploying real capital.</div>
-
-    <div class="checklist" id="checklist">
-      <div class="checklist-item" data-key="paper_trading" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <div style="flex:1">
-          <div class="check-label">Paper trading validated</div>
-          <div class="check-note">&gt;7 days runtime · &gt;60% win rate</div>
-        </div>
-      </div>
-      <div class="checklist-item" data-key="accounts_opened" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <div style="flex:1">
-          <div class="check-label">Exchange accounts opened</div>
-          <div class="check-note">Hyperliquid · Coinbase · Bitget · MEXC · WooX</div>
-        </div>
-      </div>
-      <div class="checklist-item" data-key="api_keys" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <div style="flex:1">
-          <div class="check-label">API keys configured</div>
-          <div class="check-note">Read + trade permissions · IP whitelisted</div>
-        </div>
-      </div>
-      <div class="checklist-item" data-key="capital_allocated" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <div style="flex:1">
-          <div class="check-label">Starting capital allocated</div>
-          <div class="check-note">Funded accounts · Cleared to trade</div>
-        </div>
-      </div>
-      <div class="checklist-item" data-key="risk_limits" onclick="toggleCheck(this)">
-        <div class="check-box"></div>
-        <div style="flex:1">
-          <div class="check-label">Risk limits set</div>
-          <div class="check-note">Max position size · Daily loss limit · Exchange concentration cap</div>
-        </div>
-      </div>
+  <!-- ═══ SECTION 1: DEPLOY DECISION HERO ═══ -->
+  <div class="deploy-hero" id="deployHero">
+    <div class="deploy-glow"></div>
+    <div class="deploy-label">// DEPLOY DECISION ENGINE</div>
+    <div class="deploy-verdict" id="deployVerdict">
+      <span class="deploy-loading">ANALYZING...</span>
     </div>
-
-    <div class="hero-progress">
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
-      </div>
-      <div class="progress-label" id="progressLabel">0 / 5</div>
-    </div>
+    <div class="deploy-sub" id="deploySub"></div>
+    <div class="deploy-stats" id="deployStats"></div>
   </div>
 
-  <!-- ═══ SECTION 2: EXCHANGE STACK ═══ -->
+  <!-- ═══ SECTION 2: READY TO ENTER NOW ═══ -->
   <div class="section">
     <div class="section-header">
-      <div class="section-title">YOUR EXCHANGE STACK</div>
-      <div class="section-tag">// 5 CORE VENUES</div>
+      <div class="section-title">READY TO ENTER NOW</div>
+      <div class="section-tag">// READINESS SCORE ≥ 75 · LIVE DATA</div>
     </div>
 
-    <div class="exchange-grid">
-      <div class="exchange-card">
-        <div class="exchange-header">
-          <div class="exchange-name">HYPERLIQUID</div>
-          <a href="https://hyperliquid.xyz" target="_blank" class="exchange-link">SIGN UP ↗</a>
-        </div>
-        <div class="exchange-badge badge-nokcy">No KYC</div>
-        <div class="exchange-why">Highest quality perps, no KYC, most consistent funding spreads. The reference exchange for funding arb — cleanest execution, best rate data.</div>
-      </div>
-
-      <div class="exchange-card">
-        <div class="exchange-header">
-          <div class="exchange-name">COINBASE</div>
-          <a href="https://coinbase.com/advanced-trade" target="_blank" class="exchange-link">SIGN UP ↗</a>
-        </div>
-        <div class="exchange-badge badge-regulated">Regulated</div>
-        <div class="exchange-why">Most regulated, clean API, consistently pays high short rates on many assets. Best for the "short leg" when Hyperliquid longs are elevated.</div>
-      </div>
-
-      <div class="exchange-card">
-        <div class="exchange-header">
-          <div class="exchange-name">BITGET</div>
-          <a href="https://bitget.com" target="_blank" class="exchange-link">SIGN UP ↗</a>
-        </div>
-        <div class="exchange-badge badge-volume">High Volume</div>
-        <div class="exchange-why">High volume, wide asset selection, best BLAST/BLAST pairing. Strong alt coverage and consistent rate divergence from Hyperliquid.</div>
-      </div>
-
-      <div class="exchange-card">
-        <div class="exchange-header">
-          <div class="exchange-name">MEXC</div>
-          <a href="https://mexc.com" target="_blank" class="exchange-link">SIGN UP ↗</a>
-        </div>
-        <div class="exchange-badge badge-altcoin">Alt-Heavy</div>
-        <div class="exchange-why">Widest altcoin selection, consistently differs from Coinbase rates. Best source of exotic pairs and high-spread micro-cap opportunities.</div>
-      </div>
-
-      <div class="exchange-card">
-        <div class="exchange-header">
-          <div class="exchange-name">WOOX</div>
-          <a href="https://woo.org" target="_blank" class="exchange-link">SIGN UP ↗</a>
-        </div>
-        <div class="exchange-badge badge-lowfee">Low Fees</div>
-        <div class="exchange-why">Low fees, good depth on mid-cap assets. Maker rebates can flip marginal trades into profitable ones — ideal for thin-spread pairs.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ SECTION 3: BEST PAIRS RIGHT NOW ═══ -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">BEST PAIRS RIGHT NOW</div>
-      <div class="section-tag">// LIVE DATA</div>
-    </div>
-
-    <div class="live-status">
-      <div class="live-dot" id="tableDot"></div>
-      <div class="live-text" id="tableStatus">Loading opportunities...</div>
+    <div class="table-status">
+      <div class="live-dot loading" id="tableDot"></div>
+      <span id="tableStatus">Loading opportunities...</span>
     </div>
 
     <div class="table-wrap">
-      <div id="tableContainer">
+      <div id="readyTableContainer">
         <div class="empty-state">Fetching live data...</div>
       </div>
     </div>
-    <div style="margin-top:10px; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted);">
-      Filters: spread &gt; 0.3% · no drift · no tokenized assets · showing top 10
+  </div>
+
+  <!-- ═══ SECTION 3: DEPLOY PLAN CALCULATOR ═══ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">YOUR DEPLOY PLAN</div>
+      <div class="section-tag">// ALLOCATION ENGINE</div>
+    </div>
+
+    <div class="calc-layout">
+      <div class="calc-panel">
+        <div class="calc-panel-label">// INPUTS</div>
+        <div class="field">
+          <label>Capital to Deploy ($)</label>
+          <input type="number" id="capital" value="3000" min="100" step="100" oninput="recalcPlan()">
+        </div>
+        <div class="field">
+          <label>Max per trade (% of capital)</label>
+          <input type="number" id="maxPct" value="20" min="5" max="50" step="5" oninput="recalcPlan()">
+        </div>
+      </div>
+
+      <div class="alloc-output">
+        <div class="alloc-header">
+          <div class="alloc-title">// ALLOCATION PLAN</div>
+          <div class="alloc-totals">
+            <div class="alloc-total-item">
+              <div class="alloc-total-label">Total $/day</div>
+              <div class="alloc-total-value green" id="totalDaily">—</div>
+            </div>
+            <div class="alloc-total-item">
+              <div class="alloc-total-label">Total $/mo</div>
+              <div class="alloc-total-value yellow" id="totalMonthly">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="alloc-rows" id="allocRows">
+          <div class="alloc-empty">Waiting for READY opportunities...</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ═══ SECTION 4: POSITION SIZING CALCULATOR ═══ -->
+  <!-- ═══ SECTION 4: EXCHANGE SETUP CHECKLIST ═══ -->
   <div class="section">
     <div class="section-header">
-      <div class="section-title">POSITION SIZING</div>
-      <div class="section-tag">// CALCULATOR</div>
+      <div class="section-title">EXCHANGE SETUP</div>
+      <div class="section-tag">// ACCOUNT CHECKLIST</div>
     </div>
 
-    <div class="calc-grid">
-      <div class="calc-inputs">
-        <div class="calc-section-label">// INPUTS</div>
+    <div class="checklist-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="exchangeProgressBar" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="exchangeProgressLabel">0 / 5</div>
+    </div>
 
-        <div class="field">
-          <label>Capital to Deploy ($)</label>
-          <input type="number" id="capital" value="3000" min="100" step="100" oninput="recalc()">
-        </div>
+    <div class="exchange-checklist">
 
-        <div class="field">
-          <label>Max Concurrent Trades</label>
-          <input type="number" id="maxTrades" value="15" min="1" max="50" step="1" oninput="recalc()">
-        </div>
-
-        <div class="field">
-          <label>Leverage — <span id="leverageDisplay">1x</span></label>
-          <input type="range" id="leverage" value="1" min="1" max="5" step="0.5" oninput="onLeverageChange()">
-          <div class="range-labels"><span>1x</span><span>2x</span><span>3x</span><span>4x</span><span>5x</span></div>
-        </div>
-
-        <div class="leverage-warning" id="leverageWarning">
-          ⚠ Higher leverage = higher risk. Spread inversion losses multiply too. A -1% inversion at 3x leverage costs you 3% of margin per 8-hour period.
+      <div class="exchange-check-item" data-key="hyperliquid" onclick="toggleExchangeCheck(this)">
+        <div class="check-box"></div>
+        <div class="exchange-check-body">
+          <div class="exchange-check-header">
+            <div class="exchange-check-name">HYPERLIQUID</div>
+            <div class="exchange-check-meta">
+              <a href="https://hyperliquid.xyz" target="_blank" class="exchange-signup" onclick="event.stopPropagation()">SIGN UP ↗</a>
+              <span class="exchange-time">~5 min setup</span>
+            </div>
+          </div>
+          <div class="exchange-why">No-KYC perps exchange with the most consistent funding rates. The anchor leg for most READY opportunities — you need this first.</div>
         </div>
       </div>
 
-      <div class="calc-outputs">
-        <div class="calc-section-label">// PROJECTED RETURNS</div>
-
-        <div class="output-row">
-          <div class="output-label">Margin / Trade</div>
-          <div class="output-value white" id="outMargin">$200</div>
-        </div>
-        <div class="output-row">
-          <div class="output-label">Avg Spread</div>
-          <div class="output-value yellow" id="outSpread">—</div>
-        </div>
-        <div class="output-row">
-          <div class="output-label">Est Daily Earnings</div>
-          <div class="output-value green" id="outDaily">—</div>
-        </div>
-        <div class="output-row">
-          <div class="output-label">Est Monthly Earnings</div>
-          <div class="output-value green" id="outMonthly">—</div>
+      <div class="exchange-check-item" data-key="coinbase" onclick="toggleExchangeCheck(this)">
+        <div class="check-box"></div>
+        <div class="exchange-check-body">
+          <div class="exchange-check-header">
+            <div class="exchange-check-name">COINBASE ADVANCED</div>
+            <div class="exchange-check-meta">
+              <a href="https://coinbase.com/advanced-trade" target="_blank" class="exchange-signup" onclick="event.stopPropagation()">SIGN UP ↗</a>
+              <span class="exchange-time">~15 min setup</span>
+            </div>
+          </div>
+          <div class="exchange-why">Regulated US exchange with consistently high short funding rates. Best counter-leg when Hyperliquid runs positive. KYC required.</div>
         </div>
       </div>
+
+      <div class="exchange-check-item" data-key="bitget" onclick="toggleExchangeCheck(this)">
+        <div class="check-box"></div>
+        <div class="exchange-check-body">
+          <div class="exchange-check-header">
+            <div class="exchange-check-name">BITGET</div>
+            <div class="exchange-check-meta">
+              <a href="https://bitget.com" target="_blank" class="exchange-signup" onclick="event.stopPropagation()">SIGN UP ↗</a>
+              <span class="exchange-time">~10 min setup</span>
+            </div>
+          </div>
+          <div class="exchange-why">High volume with wide alt coverage and the best BLAST/BGB spreads. Frequently diverges from Hyperliquid on mid-caps.</div>
+        </div>
+      </div>
+
+      <div class="exchange-check-item" data-key="mexc" onclick="toggleExchangeCheck(this)">
+        <div class="check-box"></div>
+        <div class="exchange-check-body">
+          <div class="exchange-check-header">
+            <div class="exchange-check-name">MEXC</div>
+            <div class="exchange-check-meta">
+              <a href="https://mexc.com" target="_blank" class="exchange-signup" onclick="event.stopPropagation()">SIGN UP ↗</a>
+              <span class="exchange-time">~10 min setup</span>
+            </div>
+          </div>
+          <div class="exchange-why">Largest altcoin selection — essential for exotic pairs with big funding divergences. Zero maker fees on most pairs.</div>
+        </div>
+      </div>
+
+      <div class="exchange-check-item" data-key="woox" onclick="toggleExchangeCheck(this)">
+        <div class="check-box"></div>
+        <div class="exchange-check-body">
+          <div class="exchange-check-header">
+            <div class="exchange-check-name">WOOX</div>
+            <div class="exchange-check-meta">
+              <a href="https://woo.org" target="_blank" class="exchange-signup" onclick="event.stopPropagation()">SIGN UP ↗</a>
+              <span class="exchange-time">~10 min setup</span>
+            </div>
+          </div>
+          <div class="exchange-why">Maker rebates flip thin-spread trades profitable. Best for marginal PROMISING opportunities when you want to squeeze extra yield.</div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -784,9 +820,9 @@
         <div class="risk-icon">🔴</div>
         <div class="risk-title">MAX LOSS SCENARIO</div>
         <div class="risk-body">
-          If 10 trades invert simultaneously at -1% spread for 7 days:
-          <span class="risk-number" id="maxLossNumber">—</span>
-          <small style="color:var(--muted); display:block; margin-top:4px;">Based on current capital inputs. This is why we start small.</small>
+          If 5 trades invert simultaneously at -1% spread for 7 days at 1x leverage:
+          <span class="risk-number" id="maxLossNum">—</span>
+          <small style="color:var(--muted); display:block; margin-top:4px;">Start small. Let it prove itself first.</small>
         </div>
       </div>
 
@@ -794,8 +830,8 @@
         <div class="risk-icon">⚠️</div>
         <div class="risk-title">START CONSERVATIVE</div>
         <div class="risk-body">
-          Start with <strong style="color:var(--orange)">1x leverage</strong> and <strong style="color:var(--orange)">$200/trade</strong> for 2 weeks before scaling.<br><br>
-          Let the system prove itself in live conditions before committing full capital. Slippage, latency, and spreads all behave differently than paper.
+          Run 1x leverage and $200/trade for 2 weeks before scaling.<br><br>
+          Slippage, latency, and spreads all behave differently live. Paper trading doesn't capture API failures, partial fills, or manual intervention costs.
         </div>
       </div>
 
@@ -804,244 +840,310 @@
         <div class="risk-title">EXCHANGE CONCENTRATION</div>
         <div class="risk-body">
           Never put more than <strong style="color:var(--blue)">20% of capital</strong> in a single exchange.<br><br>
-          Exchange risk is real — hacks, outages, and withdrawal holds have happened. Spread your margin across all 5 venues proportionally.
+          Hacks, outages, and withdrawal holds are real risks. Distribute margin across all 5 venues proportionally to your position count.
         </div>
       </div>
     </div>
   </div>
 
   <div class="footer">
-    <span>FUNDING ARB SYSTEM — GO LIVE READINESS</span>
+    <span>FUNDING ARB — DEPLOY DECISION ENGINE</span>
     <span id="footerTimestamp">—</span>
   </div>
 
 </div>
 
 <script>
-  // ─── API ENDPOINT AUTO-DETECT ───
+  // ─── CONFIG ───
   const ENDPOINTS = [
+    'https://funding-arb-server.onrender.com',
     'http://localhost:3124',
+    'http://localhost:3000',
     'https://mvp-polymarket-alpha-bot.onrender.com'
   ];
   let activeEndpoint = null;
-  let liveOpportunities = [];
+  let allOpportunities = [];
+  let readyOpportunities = [];
 
+  // ─── ENDPOINT DETECTION ───
   async function detectEndpoint() {
     for (const ep of ENDPOINTS) {
       try {
-        const res = await fetch(`${ep}/api/opportunities`, { signal: AbortSignal.timeout(3000) });
-        if (res.ok) {
-          activeEndpoint = ep;
-          return ep;
-        }
-      } catch (_) { /* try next */ }
+        const res = await fetch(`${ep}/api/opportunities`, { signal: AbortSignal.timeout(4000) });
+        if (res.ok) return ep;
+      } catch (_) {}
     }
     return null;
   }
 
-  // ─── CHECKLIST ───
-  function loadChecks() {
-    document.querySelectorAll('.checklist-item').forEach(item => {
-      const key = `arb_check_${item.dataset.key}`;
-      if (localStorage.getItem(key) === 'true') {
-        item.classList.add('checked');
-      }
+  // ─── EXCHANGE CHECKLIST ───
+  function loadExchangeChecks() {
+    document.querySelectorAll('.exchange-check-item').forEach(item => {
+      const key = `arb_ex_${item.dataset.key}`;
+      if (localStorage.getItem(key) === 'true') item.classList.add('checked');
     });
-    updateProgress();
+    updateExchangeProgress();
   }
 
-  function toggleCheck(el) {
+  function toggleExchangeCheck(el) {
     el.classList.toggle('checked');
-    const key = `arb_check_${el.dataset.key}`;
-    localStorage.setItem(key, el.classList.contains('checked'));
-    updateProgress();
+    localStorage.setItem(`arb_ex_${el.dataset.key}`, el.classList.contains('checked'));
+    updateExchangeProgress();
   }
 
-  function updateProgress() {
-    const items = document.querySelectorAll('.checklist-item');
-    const checked = document.querySelectorAll('.checklist-item.checked').length;
+  function updateExchangeProgress() {
+    const items = document.querySelectorAll('.exchange-check-item');
+    const checked = document.querySelectorAll('.exchange-check-item.checked').length;
     const pct = Math.round((checked / items.length) * 100);
-    document.getElementById('progressBar').style.width = `${pct}%`;
-    document.getElementById('progressLabel').textContent = `${checked} / ${items.length}`;
+    document.getElementById('exchangeProgressBar').style.width = `${pct}%`;
+    document.getElementById('exchangeProgressLabel').textContent = `${checked} / ${items.length}`;
   }
 
-  // ─── LIVE TABLE ───
-  function filterAndSort(opps) {
+  // ─── DEPLOY DECISION HERO ───
+  function updateDeployDecision(ready) {
+    const hero = document.getElementById('deployHero');
+    const verdict = document.getElementById('deployVerdict');
+    const sub = document.getElementById('deploySub');
+    const stats = document.getElementById('deployStats');
+
+    const count = ready.length;
+    const avgScore = count > 0
+      ? Math.round(ready.reduce((s, o) => s + (o.readinessScore || 0), 0) / count)
+      : 0;
+    const avgSpread = count > 0
+      ? (ready.reduce((s, o) => s + (o.grossSpread || 0), 0) / count * 100).toFixed(2)
+      : '0';
+    const topDailyPer1k = count > 0
+      ? ((ready[0].grossSpread || 0) * 3 * 1000).toFixed(2)
+      : '0';
+
+    hero.className = 'deploy-hero';
+
+    if (count >= 3) {
+      hero.classList.add('yes');
+      verdict.textContent = 'YES';
+      sub.textContent = '— DEPLOY NOW';
+    } else if (count >= 1) {
+      hero.classList.add('maybe');
+      verdict.textContent = 'MAYBE';
+      sub.textContent = '— PARTIAL DEPLOY';
+    } else {
+      hero.classList.add('no');
+      verdict.textContent = 'NOT YET';
+      sub.textContent = '— WAIT FOR BETTER CONDITIONS';
+    }
+
+    stats.innerHTML = `
+      <div class="deploy-stat">
+        <div class="deploy-stat-label">READY Opportunities</div>
+        <div class="deploy-stat-value ${count >= 3 ? 'green' : count >= 1 ? 'yellow' : 'red'}">${count}</div>
+      </div>
+      <div class="deploy-stat">
+        <div class="deploy-stat-label">Avg Readiness Score</div>
+        <div class="deploy-stat-value ${avgScore >= 75 ? 'green' : avgScore >= 50 ? 'yellow' : 'red'}">${avgScore}</div>
+      </div>
+      <div class="deploy-stat">
+        <div class="deploy-stat-label">Avg Spread</div>
+        <div class="deploy-stat-value">${avgSpread}%</div>
+      </div>
+      ${count > 0 ? `<div class="deploy-stat">
+        <div class="deploy-stat-label">Best $/day per $1k</div>
+        <div class="deploy-stat-value green">$${topDailyPer1k}</div>
+      </div>` : ''}
+    `;
+  }
+
+  // ─── READY TABLE ───
+  const SKIP = new Set(['drift']);
+  const SKIP_COINS = new Set(['SPYX','AAPLX','GOOGLX','MSFTX','TSLAX','AMZNX','NVDAX','METAX','MSTRX','QQQX','PAXG','XAUT','CRCLX']);
+
+  function filterOpportunities(opps) {
     return opps
       .filter(o => {
         const spread = o.grossSpread || o.spread || 0;
-        const isDrift = (o.tags || []).includes('drift') || o.isDrift;
-        const isTokenized = (o.tags || []).includes('tokenized') || o.isTokenized;
-        const isExecutable = o.executable === true || o.executable === null || o.executable === undefined;
-        return !isDrift && !isTokenized && spread > 0.003 && isExecutable;
+        return !SKIP.has(o.longExchange)
+          && !SKIP.has(o.shortExchange)
+          && !SKIP_COINS.has(o.coin)
+          && spread > 0.002;
       })
-      .sort((a, b) => {
-        const sa = a.grossSpread || a.spread || 0;
-        const sb = b.grossSpread || b.spread || 0;
-        return sb - sa;
-      })
-      .slice(0, 10);
+      .sort((a, b) => (b.readinessScore || 0) - (a.readinessScore || 0));
   }
 
-  function estPerDay(spread, margin) {
-    // 3 funding periods/day × spread × margin
-    return spread * 3 * margin;
+  function getLabelClass(label) {
+    if (label === 'READY') return 'ready';
+    if (label === 'PROMISING') return 'promising';
+    return 'risky';
   }
 
-  function renderTable(opps) {
+  function getExchangesNeeded(opp) {
+    const exs = new Set([opp.longExchange, opp.shortExchange]);
+    return Array.from(exs).map(e => `<span class="exchange-badge">${e.toUpperCase()}</span>`).join('');
+  }
+
+  function renderReadyTable(opps) {
     const dot = document.getElementById('tableDot');
     const status = document.getElementById('tableStatus');
 
-    if (!opps || opps.length === 0) {
+    const ready = opps.filter(o => (o.readinessScore || 0) >= 75);
+    readyOpportunities = ready;
+
+    if (ready.length === 0) {
       dot.className = 'live-dot error';
-      status.textContent = 'No qualifying opportunities (spread > 0.3%, executable)';
-      document.getElementById('tableContainer').innerHTML = `<div class="empty-state">No qualifying pairs found. Market may be compressed right now — check back later.</div>`;
+      status.textContent = 'No READY opportunities (score ≥ 75) right now';
+      document.getElementById('readyTableContainer').innerHTML = `
+        <div class="empty-state">No READY-scored opportunities at the moment.<br>Check the full opportunities list or wait for better market conditions.</div>`;
+      updateDeployDecision([]);
+      recalcPlan();
       return;
     }
 
     dot.className = 'live-dot';
-    status.textContent = `${opps.length} qualifying pairs · updated ${new Date().toLocaleTimeString()}`;
+    status.textContent = `${ready.length} READY opportunities · refreshes every 60s`;
 
-    const margin = 1000; // per $1000
     let rows = '';
-    opps.forEach((o, i) => {
+    ready.forEach(o => {
       const spread = o.grossSpread || o.spread || 0;
-      const daily = estPerDay(spread, margin);
-      const monthly = daily * 30;
       const spreadPct = (spread * 100).toFixed(3);
-      const isBest = i < 3;
-      const coin = o.coin || o.symbol || o.pair || '—';
-      const longEx = o.longExchange || o.long_exchange || o.longEx || '—';
-      const shortEx = o.shortExchange || o.short_exchange || o.shortEx || '—';
+      const apr = (o.apr || spread * 3 * 365 * 100).toFixed(1);
+      const daily1k = (spread * 3 * 1000).toFixed(2);
+      const score = o.readinessScore || 0;
+      const label = o.readinessLabel || 'RISKY';
+      const labelClass = getLabelClass(label);
 
       rows += `
         <tr>
-          <td class="td-coin">${coin}${isBest ? '<span class="best-bet">BEST BET</span>' : ''}</td>
-          <td class="td-exchange" style="color:var(--green)">${longEx}</td>
-          <td class="td-exchange" style="color:var(--red)">${shortEx}</td>
+          <td class="td-coin">${o.coin}</td>
+          <td class="td-route" style="color:var(--green)">${o.longExchange}</td>
+          <td class="td-route" style="color:var(--red)">${o.shortExchange}</td>
           <td class="td-spread">${spreadPct}%</td>
-          <td class="td-earn">$${daily.toFixed(2)}</td>
-          <td class="td-earn" style="color:var(--orange)">$${monthly.toFixed(0)}</td>
+          <td class="td-earn">${apr}%</td>
+          <td class="td-earn">$${daily1k}</td>
+          <td>
+            <span class="score-pill ${labelClass}">${score} — ${label}</span>
+          </td>
+          <td>${getExchangesNeeded(o)}</td>
         </tr>`;
     });
 
-    document.getElementById('tableContainer').innerHTML = `
+    document.getElementById('readyTableContainer').innerHTML = `
       <table>
         <thead>
           <tr>
             <th>Coin</th>
             <th>Long (collect)</th>
             <th>Short (pay)</th>
-            <th>Spread %</th>
+            <th>Spread%</th>
+            <th>APR%</th>
             <th>$/day per $1k</th>
-            <th>$/mo per $1k</th>
+            <th>Readiness</th>
+            <th>Accounts Needed</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>`;
 
-    liveOpportunities = opps;
-    recalc();
+    updateDeployDecision(ready);
+    recalcPlan();
   }
 
-  async function loadOpportunities() {
-    const dot = document.getElementById('tableDot');
-    const status = document.getElementById('tableStatus');
+  // ─── DEPLOY PLAN CALCULATOR ───
+  function recalcPlan() {
+    const capital = parseFloat(document.getElementById('capital').value) || 3000;
+    const maxPct = parseFloat(document.getElementById('maxPct').value) || 20;
+    const maxPerTrade = capital * (maxPct / 100);
 
-    dot.className = 'live-dot loading';
-    status.textContent = 'Fetching live data...';
+    const container = document.getElementById('allocRows');
+    const totalDailyEl = document.getElementById('totalDaily');
+    const totalMonthlyEl = document.getElementById('totalMonthly');
 
-    if (!activeEndpoint) {
-      dot.className = 'live-dot error';
-      status.textContent = 'No API connection — showing no data';
-      document.getElementById('tableContainer').innerHTML = `<div class="empty-state">Could not reach API. Is the server running?</div>`;
+    // Update risk max loss
+    const maxLoss = 5 * 0.01 * 3 * 7 * (capital / 5);
+    document.getElementById('maxLossNum').textContent = `-$${Math.round(maxLoss).toLocaleString()}`;
+
+    if (readyOpportunities.length === 0) {
+      container.innerHTML = `<div class="alloc-empty">No READY opportunities to allocate to. Wait for better conditions.</div>`;
+      totalDailyEl.textContent = '—';
+      totalMonthlyEl.textContent = '—';
       return;
     }
 
+    // Spread capital across READY opportunities
+    const numTrades = readyOpportunities.length;
+    const evenAlloc = Math.min(maxPerTrade, capital / numTrades);
+    let totalDaily = 0;
+    let rows = '';
+
+    readyOpportunities.forEach(o => {
+      const spread = o.grossSpread || o.spread || 0;
+      const alloc = evenAlloc;
+      const dailyEarn = spread * 3 * alloc;
+      totalDaily += dailyEarn;
+
+      rows += `
+        <div class="alloc-row">
+          <div class="alloc-coin">${o.coin}</div>
+          <div class="alloc-route">
+            <span style="color:var(--green)">${o.longExchange}</span>
+            <span style="color:var(--muted2)"> → </span>
+            <span style="color:var(--red)">${o.shortExchange}</span>
+            <br>
+            <span style="color:var(--muted); font-size:11px">${(spread * 100).toFixed(3)}% spread</span>
+          </div>
+          <div class="alloc-amount">$${Math.round(alloc).toLocaleString()}</div>
+          <div class="alloc-daily">+$${dailyEarn.toFixed(2)}/day</div>
+        </div>`;
+    });
+
+    container.innerHTML = rows;
+    totalDailyEl.textContent = `$${totalDaily.toFixed(2)}`;
+    totalMonthlyEl.textContent = `$${Math.round(totalDaily * 30).toLocaleString()}`;
+  }
+
+  // ─── MAIN DATA LOAD ───
+  async function loadOpportunities() {
+    if (!activeEndpoint) return;
+
     try {
-      const res = await fetch(`${activeEndpoint}/api/opportunities`, { signal: AbortSignal.timeout(10000) });
+      const res = await fetch(`${activeEndpoint}/api/opportunities`, { signal: AbortSignal.timeout(12000) });
       const data = await res.json();
-      const opps = Array.isArray(data) ? data : (data.opportunities || data.data || []);
-      const filtered = filterAndSort(opps);
-      renderTable(filtered);
+      allOpportunities = Array.isArray(data) ? data : (data.opportunities || data.data || []);
+      const filtered = filterOpportunities(allOpportunities);
+      renderReadyTable(filtered);
+      document.getElementById('lastUpdated').textContent = `updated ${new Date().toLocaleTimeString()}`;
+      document.getElementById('footerTimestamp').textContent = new Date().toLocaleString();
     } catch (err) {
-      dot.className = 'live-dot error';
-      status.textContent = `Error: ${err.message}`;
-      document.getElementById('tableContainer').innerHTML = `<div class="empty-state">API error: ${err.message}</div>`;
+      document.getElementById('tableDot').className = 'live-dot error';
+      document.getElementById('tableStatus').textContent = `Error: ${err.message}`;
     }
-  }
-
-  // ─── CALCULATOR ───
-  function onLeverageChange() {
-    const lev = parseFloat(document.getElementById('leverage').value);
-    document.getElementById('leverageDisplay').textContent = `${lev}x`;
-    const warn = document.getElementById('leverageWarning');
-    warn.classList.toggle('visible', lev > 1);
-    recalc();
-  }
-
-  function recalc() {
-    const capital = parseFloat(document.getElementById('capital').value) || 3000;
-    const maxTrades = parseInt(document.getElementById('maxTrades').value) || 15;
-    const leverage = parseFloat(document.getElementById('leverage').value) || 1;
-
-    const marginPerTrade = (capital / maxTrades) * leverage;
-    document.getElementById('outMargin').textContent = `$${Math.round(marginPerTrade).toLocaleString()}`;
-
-    // Avg spread from live data
-    let avgSpread = 0;
-    if (liveOpportunities.length > 0) {
-      const spreads = liveOpportunities.map(o => o.grossSpread || o.spread || 0);
-      avgSpread = spreads.reduce((a, b) => a + b, 0) / spreads.length;
-    }
-
-    if (avgSpread > 0) {
-      document.getElementById('outSpread').textContent = `${(avgSpread * 100).toFixed(3)}%`;
-      const dailyPerTrade = estPerDay(avgSpread, marginPerTrade);
-      const totalDaily = dailyPerTrade * Math.min(maxTrades, liveOpportunities.length || maxTrades);
-      const monthly = totalDaily * 30;
-      document.getElementById('outDaily').textContent = `$${totalDaily.toFixed(2)}`;
-      document.getElementById('outMonthly').textContent = `$${Math.round(monthly).toLocaleString()}`;
-    } else {
-      document.getElementById('outSpread').textContent = 'no live data';
-      document.getElementById('outDaily').textContent = '—';
-      document.getElementById('outMonthly').textContent = '—';
-    }
-
-    // Max loss: 10 trades × -1% spread × 3 periods/day × 7 days × margin
-    const marginUsed = (capital / maxTrades) * leverage;
-    const maxLoss = 10 * 0.01 * 3 * 7 * marginUsed;
-    document.getElementById('maxLossNumber').textContent = `-$${Math.round(maxLoss).toLocaleString()}`;
   }
 
   // ─── INIT ───
   async function init() {
-    loadChecks();
-    recalc();
+    loadExchangeChecks();
+    recalcPlan();
 
-    // Detect API
     const apiDot = document.getElementById('apiDot');
-    const apiEndpoint = document.getElementById('apiEndpoint');
+    const apiEndpointEl = document.getElementById('apiEndpoint');
     const apiStatusText = document.getElementById('apiStatusText');
 
     const ep = await detectEndpoint();
     if (ep) {
       activeEndpoint = ep;
       apiDot.className = 'live-dot';
-      apiEndpoint.textContent = ep;
+      apiEndpointEl.textContent = ep;
       apiStatusText.textContent = '✓ connected';
     } else {
       apiDot.className = 'live-dot error';
-      apiEndpoint.textContent = 'none';
-      apiStatusText.textContent = '✗ offline';
+      apiEndpointEl.textContent = 'none';
+      apiStatusText.textContent = '✗ offline — showing cached state';
+      document.getElementById('tableDot').className = 'live-dot error';
+      document.getElementById('tableStatus').textContent = 'No API connection';
+      document.getElementById('readyTableContainer').innerHTML = `<div class="empty-state">Could not reach API. Is the server running?</div>`;
+      updateDeployDecision([]);
+      return;
     }
 
     await loadOpportunities();
-
-    // Timestamp
-    document.getElementById('footerTimestamp').textContent = new Date().toLocaleString();
-
-    // Refresh every 60s
     setInterval(loadOpportunities, 60000);
   }
 
