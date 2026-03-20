@@ -752,7 +752,8 @@
           ? '<span class="exec-yes">✓</span>'
           : '<span class="exec-no">✗</span>';
 
-        return `<tr>
+        const pairUrl = `pair.html?coin=${encodeURIComponent(coin)}&long=${encodeURIComponent((r.longExchange ?? r.long_exchange ?? '').toLowerCase())}&short=${encodeURIComponent((r.shortExchange ?? r.short_exchange ?? '').toLowerCase())}`;
+        return `<tr style="cursor:pointer;" onclick="window.open('${pairUrl}','_blank')" title="Deep dive: ${coin}">
           <td class="coin">${coin}</td>
           <td class="exchange">${longEx}</td>
           <td class="exchange">${shortEx}</td>

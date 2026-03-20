@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAIR DEEP DIVE // ARB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --yellow: #ffe135;
+      --green: #00ff87;
+      --red: #ff3b3b;
+      --orange: #ff8c00;
+      --blue: #4da6ff;
+      --white: #f5f2eb;
+      --muted: #555;
+      --border: #2a2a2a;
+      --surface: #111111;
+      --surface2: #161616;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 44px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--yellow);
+      letter-spacing: 2px;
+      margin-right: 32px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 16px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav a:hover { color: var(--white); }
+    nav a.active {
+      color: var(--yellow);
+      border-bottom-color: var(--yellow);
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 24px 60px;
+    }
+
+    /* BACK LINK */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--white); }
+
+    /* HERO HEADER */
+    .hero {
+      margin-bottom: 32px;
+    }
+
+    .hero-coin {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 80px;
+      letter-spacing: 6px;
+      color: var(--yellow);
+      line-height: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .hero-route {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .hero-route .long-ex { color: var(--blue); }
+    .hero-route .arrow { color: var(--muted); margin: 0 8px; }
+    .hero-route .short-ex { color: var(--orange); }
+
+    .hero-spread {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 56px;
+      letter-spacing: 4px;
+      line-height: 1;
+    }
+
+    .hero-spread.pos { color: var(--green); }
+    .hero-spread.neg { color: var(--red); }
+    .hero-spread.zero { color: var(--muted); }
+
+    .hero-spread-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--yellow);
+    }
+
+    /* CHART */
+    .chart-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px;
+      position: relative;
+      height: 340px;
+    }
+
+    .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 18px;
+    }
+
+    .stat-card-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-card-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 1px;
+      color: var(--white);
+      line-height: 1;
+    }
+
+    .stat-card-value.pos { color: var(--green); }
+    .stat-card-value.neg { color: var(--red); }
+    .stat-card-value.accent { color: var(--yellow); }
+    .stat-card-value.blue { color: var(--blue); }
+
+    /* VERDICT BOX */
+    .verdict-box {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px 24px;
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      line-height: 1.6;
+    }
+
+    .verdict-box.strong {
+      background: rgba(0, 255, 135, 0.06);
+      border-color: rgba(0, 255, 135, 0.3);
+      color: var(--green);
+    }
+
+    .verdict-box.moderate {
+      background: rgba(255, 225, 53, 0.06);
+      border-color: rgba(255, 225, 53, 0.3);
+      color: var(--yellow);
+    }
+
+    .verdict-box.weak {
+      background: rgba(255, 59, 59, 0.06);
+      border-color: rgba(255, 59, 59, 0.3);
+      color: var(--red);
+    }
+
+    .verdict-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .verdict-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--surface2);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #1a1a1a;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+    td {
+      padding: 10px 14px;
+      white-space: nowrap;
+      color: var(--white);
+    }
+
+    td.coin-cell {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: var(--yellow);
+    }
+
+    td.exch { font-size: 11px; letter-spacing: 1px; color: var(--muted); }
+    .spread-green { color: var(--green); }
+    .spread-yellow { color: var(--yellow); }
+    .spread-white { color: var(--white); }
+
+    /* TRADE GUIDE */
+    .trade-guide {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px;
+    }
+
+    .trade-guide-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .accounts-needed {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .account-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 8px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: var(--white);
+    }
+
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .steps-list li {
+      display: flex;
+      gap: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--white);
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--yellow);
+      font-weight: 600;
+    }
+
+    .risk-callout {
+      background: rgba(255, 140, 0, 0.08);
+      border: 1px solid rgba(255, 140, 0, 0.3);
+      border-radius: 3px;
+      padding: 12px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--orange);
+      line-height: 1.6;
+    }
+
+    .risk-callout strong {
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* EMPTY / ERROR */
+    .empty-state {
+      padding: 32px;
+      text-align: center;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    .error-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--red);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(255,59,59,0.2);
+      border-radius: 4px;
+      background: rgba(255,59,59,0.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.4s ease forwards; }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 3px;
+      height: 24px;
+      width: 120px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-brand">ARB//</span>
+    <a href="/">HUB</a>
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="rates.html">RATE CHARTS</a>
+    <a href="report.html">TRADE REPORT</a>
+    <a href="pnl.html">P&L HISTORY</a>
+    <a href="golive.html">GO LIVE</a>
+    <a href="explainer.html">EXPLAINER</a>
+  </nav>
+
+  <div class="container">
+
+    <a href="dashboard.html" class="back-link">← BACK TO DASHBOARD</a>
+
+    <!-- HERO HEADER -->
+    <div class="hero" id="hero">
+      <div class="hero-coin" id="heroCoin"><span class="skeleton" style="width:200px;height:70px;display:inline-block;"></span></div>
+      <div class="hero-route" id="heroRoute">Loading…</div>
+      <div class="hero-spread" id="heroSpread">—</div>
+      <div class="hero-spread-label">CURRENT SPREAD</div>
+    </div>
+
+    <!-- SPREAD HISTORY CHART -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">SPREAD HISTORY</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;">Last 8 days • hourly</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="spreadChart"></canvas>
+      </div>
+    </div>
+
+    <!-- SPREAD STATS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">SPREAD STATS</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;">Computed from history</span>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-card-label">Loading…</div><div class="stat-card-value">—</div></div>
+      </div>
+    </div>
+
+    <!-- OPPORTUNITY ASSESSMENT -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">OPPORTUNITY ASSESSMENT</span>
+      </div>
+      <div id="verdictBox" class="verdict-box weak">
+        <div class="verdict-title">Analyzing…</div>
+        <div class="verdict-sub">Loading history data…</div>
+      </div>
+    </div>
+
+    <!-- SIMILAR PAIRS -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">SIMILAR PAIRS</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;">Same long or short exchange</span>
+      </div>
+      <div id="similarTable">
+        <div class="empty-state">Loading…</div>
+      </div>
+    </div>
+
+    <!-- ENTER THIS TRADE -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">ENTER THIS TRADE</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;">Paper trading guidance</span>
+      </div>
+      <div class="trade-guide" id="tradeGuide">
+        <div class="trade-guide-heading">ACCOUNTS YOU NEED</div>
+        <div class="accounts-needed" id="accountsNeeded">
+          <span class="account-badge">Loading…</span>
+        </div>
+        <div class="trade-guide-heading">STEP-BY-STEP</div>
+        <ul class="steps-list" id="stepsList"></ul>
+        <div class="risk-callout" id="riskCallout">Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ─── API BASE ───────────────────────────────────────────────────────────
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API = isLocal
+      ? 'http://localhost:3124'
+      : 'https://mvp-polymarket-alpha-bot.onrender.com';
+
+    // ─── PARSE URL PARAMS ───────────────────────────────────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const COIN = (params.get('coin') || 'UNKNOWN').toUpperCase();
+    const LONG_EX = (params.get('long') || '?').toLowerCase();
+    const SHORT_EX = (params.get('short') || '?').toLowerCase();
+
+    // ─── HELPERS ────────────────────────────────────────────────────────────
+    const fmt = (n, d=2) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) : '—';
+    const fmtPct = (n, d=4) => (typeof n === 'number' && isFinite(n)) ? n.toFixed(d) + '%' : '—';
+    const fmtUSD = (n, d=2) => (typeof n === 'number' && isFinite(n))
+      ? '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:d, maximumFractionDigits:d})
+      : '—';
+
+    function getSpreadClass(pct) {
+      if (typeof pct !== 'number') return 'spread-white';
+      if (pct > 1) return 'spread-green';
+      if (pct >= 0.5) return 'spread-yellow';
+      return 'spread-white';
+    }
+
+    // ─── INIT HEADER ────────────────────────────────────────────────────────
+    document.title = `${COIN} DEEP DIVE // ARB`;
+    document.getElementById('heroCoin').textContent = COIN;
+    document.getElementById('heroRoute').innerHTML =
+      `LONG: <span class="long-ex">${LONG_EX.toUpperCase()}</span><span class="arrow">→</span>SHORT: <span class="short-ex">${SHORT_EX.toUpperCase()}</span>`;
+
+    // ─── FETCH HISTORY ───────────────────────────────────────────────────────
+    async function fetchHistory(exchange) {
+      try {
+        const r = await fetch(`${API}/api/history?coin=${COIN}&exchange=${exchange}&limit=200`);
+        if (!r.ok) return [];
+        const data = await r.json();
+        // Support array or { history: [...] } shape
+        return Array.isArray(data) ? data : (data.history ?? data.data ?? []);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // ─── FETCH OPPORTUNITIES ─────────────────────────────────────────────────
+    async function fetchOpps() {
+      try {
+        const r = await fetch(`${API}/api/opportunities`);
+        if (!r.ok) return [];
+        const data = await r.json();
+        return Array.isArray(data) ? data : (data.opportunities ?? data.data ?? []);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // ─── PROCESS HISTORY ────────────────────────────────────────────────────
+    function processHistoryPoint(pt) {
+      // Extract timestamp and rate from various API shapes
+      const ts = pt.timestamp ?? pt.ts ?? pt.time ?? pt.createdAt ?? pt.created_at ?? pt.t;
+      const rate = pt.fundingRate ?? pt.funding_rate ?? pt.rate ?? pt.value ?? pt.r ?? 0;
+      return { ts: ts ? new Date(ts).getTime() : null, rate: Number(rate) };
+    }
+
+    // ─── BUILD CHART ─────────────────────────────────────────────────────────
+    let chartInstance = null;
+
+    function buildChart(longHistory, shortHistory) {
+      // Align by timestamp: build a time-indexed map
+      const now = Date.now();
+      const eightDaysAgo = now - 8 * 24 * 3600 * 1000;
+
+      // Process and filter
+      const longPts = longHistory
+        .map(processHistoryPoint)
+        .filter(p => p.ts && p.ts >= eightDaysAgo)
+        .sort((a, b) => a.ts - b.ts);
+
+      const shortPts = shortHistory
+        .map(processHistoryPoint)
+        .filter(p => p.ts && p.ts >= eightDaysAgo)
+        .sort((a, b) => a.ts - b.ts);
+
+      // If both empty, show error
+      if (longPts.length === 0 && shortPts.length === 0) {
+        document.querySelector('.chart-wrap').innerHTML =
+          '<div class="empty-state">No history data available for this pair.</div>';
+        return [];
+      }
+
+      // Build unified timeline using all unique timestamps
+      const allTs = [...new Set([...longPts.map(p=>p.ts), ...shortPts.map(p=>p.ts)])].sort((a,b)=>a-b);
+
+      // Interpolate / nearest-match rates for each timestamp
+      function getRate(pts, ts) {
+        if (pts.length === 0) return null;
+        // Find nearest
+        let best = pts[0];
+        let bestDiff = Math.abs(pts[0].ts - ts);
+        for (const p of pts) {
+          const d = Math.abs(p.ts - ts);
+          if (d < bestDiff) { bestDiff = d; best = p; }
+        }
+        // Only use if within 2 hours
+        if (bestDiff > 2 * 3600 * 1000) return null;
+        return best.rate;
+      }
+
+      const labels = allTs.map(ts => {
+        const d = new Date(ts);
+        const mo = (d.getMonth()+1).toString().padStart(2,'0');
+        const dy = d.getDate().toString().padStart(2,'0');
+        const hr = d.getHours().toString().padStart(2,'0');
+        return `${mo}/${dy} ${hr}:00`;
+      });
+
+      const longRates = allTs.map(ts => {
+        const r = getRate(longPts, ts);
+        return r !== null ? r * 100 : null; // convert to percent if needed
+      });
+
+      const shortRates = allTs.map(ts => {
+        const r = getRate(shortPts, ts);
+        return r !== null ? r * 100 : null;
+      });
+
+      // Auto-detect if values are already in percent (>0.01) or need *100
+      // Heuristic: if max abs value < 0.5, likely raw decimal, multiply by 100
+      const allRates = [...longRates, ...shortRates].filter(r => r !== null);
+      const maxAbs = Math.max(...allRates.map(r => Math.abs(r)));
+      const scale = maxAbs < 0.5 ? 100 : 1; // if already percentage (like 0.05), scale x100
+
+      const longRatesScaled = longRates.map(r => r !== null ? r * scale : null);
+      const shortRatesScaled = shortRates.map(r => r !== null ? r * scale : null);
+
+      // Compute spreads (long rate % - short rate %)
+      const spreads = allTs.map((_, i) => {
+        const l = longRatesScaled[i];
+        const s = shortRatesScaled[i];
+        if (l === null || s === null) return null;
+        return l - s;
+      });
+
+      const ctx = document.getElementById('spreadChart').getContext('2d');
+
+      if (chartInstance) chartInstance.destroy();
+
+      // Build fill plugin for positive/negative spread zones
+      const fillPlugin = {
+        id: 'spreadFill',
+        beforeDraw(chart) {
+          const { ctx: c, chartArea, scales } = chart;
+          if (!chartArea) return;
+          const yScale = scales.y;
+          const y0 = yScale.getPixelForValue(0);
+          const datasets = chart.data.datasets;
+          if (datasets.length < 2) return;
+
+          const ds0 = chart.getDatasetMeta(0); // long
+          const ds1 = chart.getDatasetMeta(1); // short
+
+          c.save();
+          c.beginPath();
+          c.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+          c.clip();
+
+          const n = ds0.data.length;
+          if (n < 2) { c.restore(); return; }
+
+          for (let i = 0; i < n - 1; i++) {
+            const p0l = ds0.data[i];
+            const p0s = ds1.data[i];
+            const p1l = ds0.data[i+1];
+            const p1s = ds1.data[i+1];
+
+            if (!p0l || !p0s || !p1l || !p1s) continue;
+
+            const lv0 = chart.data.datasets[0].data[i];
+            const sv0 = chart.data.datasets[1].data[i];
+            if (lv0 === null || sv0 === null) continue;
+
+            const isPos = lv0 >= sv0;
+            c.beginPath();
+            c.moveTo(p0l.x, p0l.y);
+            c.lineTo(p1l.x, p1l.y);
+            c.lineTo(p1s.x, p1s.y);
+            c.lineTo(p0s.x, p0s.y);
+            c.closePath();
+            c.fillStyle = isPos ? 'rgba(0,255,135,0.08)' : 'rgba(255,59,59,0.08)';
+            c.fill();
+          }
+          c.restore();
+        }
+      };
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        plugins: [fillPlugin],
+        data: {
+          labels,
+          datasets: [
+            {
+              label: `${LONG_EX.toUpperCase()} (LONG)`,
+              data: longRatesScaled,
+              borderColor: '#4da6ff',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              tension: 0.3,
+              spanGaps: true,
+            },
+            {
+              label: `${SHORT_EX.toUpperCase()} (SHORT)`,
+              data: shortRatesScaled,
+              borderColor: '#ff8c00',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              tension: 0.3,
+              spanGaps: true,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                color: '#888',
+                font: { family: 'DM Mono', size: 11 },
+                boxWidth: 16,
+                padding: 16,
+              }
+            },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              titleColor: '#888',
+              bodyColor: '#f5f2eb',
+              titleFont: { family: 'DM Mono', size: 10 },
+              bodyFont: { family: 'DM Mono', size: 12 },
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y !== null ? ctx.parsed.y.toFixed(4) + '%' : '—'}`
+              }
+            },
+            annotation: {
+              annotations: {
+                zeroLine: {
+                  type: 'line',
+                  yMin: 0,
+                  yMax: 0,
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  borderWidth: 1,
+                  borderDash: [4, 4],
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: {
+                color: '#555',
+                font: { family: 'DM Mono', size: 9 },
+                maxTicksLimit: 16,
+                maxRotation: 30,
+              }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              ticks: {
+                color: '#555',
+                font: { family: 'DM Mono', size: 10 },
+                callback: v => v.toFixed(3) + '%'
+              }
+            }
+          }
+        }
+      });
+
+      return spreads;
+    }
+
+    // ─── COMPUTE STATS ────────────────────────────────────────────────────────
+    function computeStats(spreads, longRates, shortRates) {
+      const valid = spreads.filter(s => s !== null);
+      if (valid.length === 0) return null;
+
+      const current = valid[valid.length - 1];
+      const avg = valid.reduce((a, b) => a + b, 0) / valid.length;
+      const min = Math.min(...valid);
+      const max = Math.max(...valid);
+      const pctPositive = (valid.filter(s => s > 0).length / valid.length) * 100;
+      const pctStrong = (valid.filter(s => s > 0.5).length / valid.length) * 100;
+
+      // Earnings: funding paid every 8h. spread% / 100 * notional / 3 per 8h
+      // Funding rate is periodic (usually 8h), so per 8h earnings = spread% / 100 * notional
+      const notional = 1000;
+      const per8h = (current / 100) * notional;
+      const perDay = per8h * 3;
+      const perMonth = perDay * 30;
+
+      return { current, avg, min, max, pctPositive, pctStrong, per8h, perDay, perMonth };
+    }
+
+    // ─── RENDER STATS GRID ────────────────────────────────────────────────────
+    function renderStatsGrid(stats) {
+      if (!stats) {
+        document.getElementById('statsGrid').innerHTML =
+          '<div class="empty-state">No stats available.</div>';
+        return;
+      }
+
+      const cards = [
+        { label: 'Current Spread', value: fmtPct(stats.current), cls: stats.current > 0.5 ? 'pos' : stats.current < 0 ? 'neg' : 'accent' },
+        { label: 'Avg Spread (7d)', value: fmtPct(stats.avg), cls: stats.avg > 0.5 ? 'pos' : stats.avg < 0 ? 'neg' : 'accent' },
+        { label: 'Min Spread (Worst)', value: fmtPct(stats.min), cls: stats.min < 0 ? 'neg' : 'accent' },
+        { label: 'Max Spread (Best)', value: fmtPct(stats.max), cls: 'pos' },
+        { label: 'Reliability Score', value: fmt(stats.pctPositive, 1) + '%', cls: stats.pctPositive > 80 ? 'pos' : stats.pctPositive > 60 ? 'accent' : 'neg' },
+        { label: 'Strong Signal Score', value: fmt(stats.pctStrong, 1) + '%', cls: stats.pctStrong > 50 ? 'pos' : stats.pctStrong > 25 ? 'accent' : 'neg' },
+        { label: 'Est $/8h @ $1k', value: fmtUSD(stats.per8h), cls: stats.per8h > 0 ? 'pos' : 'neg' },
+        { label: 'Est $/Day @ $1k', value: fmtUSD(stats.perDay), cls: stats.perDay > 0 ? 'pos' : 'neg' },
+        { label: 'Est $/Month @ $1k', value: fmtUSD(stats.perMonth), cls: stats.perMonth > 0 ? 'pos' : 'neg' },
+      ];
+
+      document.getElementById('statsGrid').innerHTML = cards.map(c => `
+        <div class="stat-card fade-in">
+          <div class="stat-card-label">${c.label}</div>
+          <div class="stat-card-value ${c.cls}">${c.value}</div>
+        </div>
+      `).join('');
+    }
+
+    // ─── RENDER VERDICT ───────────────────────────────────────────────────────
+    function renderVerdict(stats) {
+      const box = document.getElementById('verdictBox');
+      if (!stats) {
+        box.className = 'verdict-box weak';
+        box.innerHTML = `<div class="verdict-title">🔴 NO DATA</div><div class="verdict-sub">Could not load history data for this pair.</div>`;
+        return;
+      }
+
+      let cls, title, sub;
+      if (stats.avg > 0.5 && stats.pctPositive > 80) {
+        cls = 'strong';
+        title = '🟢 STRONG';
+        sub = 'Consistent spread, high reliability. Good entry candidate.';
+      } else if (stats.avg > 0.2 && stats.pctPositive > 60) {
+        cls = 'moderate';
+        title = '🟡 MODERATE';
+        sub = 'Decent spread but some volatility. Paper trade first.';
+      } else {
+        cls = 'weak';
+        title = '🔴 WEAK';
+        sub = 'Spread too thin or unreliable for real money.';
+      }
+
+      box.className = `verdict-box ${cls}`;
+      box.innerHTML = `
+        <div class="verdict-title">${title}</div>
+        <div class="verdict-sub">${sub}</div>
+        <div style="margin-top:12px;font-size:11px;color:var(--muted);">
+          Avg: ${fmtPct(stats.avg)} &nbsp;|&nbsp;
+          Reliability: ${fmt(stats.pctPositive,1)}% &nbsp;|&nbsp;
+          Strong Signal: ${fmt(stats.pctStrong,1)}% time > 0.5%
+        </div>`;
+    }
+
+    // ─── RENDER SIMILAR PAIRS ─────────────────────────────────────────────────
+    function renderSimilarPairs(opps) {
+      const container = document.getElementById('similarTable');
+      if (!opps || opps.length === 0) {
+        container.innerHTML = '<div class="empty-state">No opportunity data.</div>';
+        return;
+      }
+
+      // Find pairs with same long or short exchange (exclude self)
+      const similar = opps
+        .filter(o => {
+          const c = (o.coin ?? o.symbol ?? '').replace('-PERP','').replace('/USDT','').toUpperCase();
+          const l = (o.longExchange ?? o.long_exchange ?? '').toLowerCase();
+          const s = (o.shortExchange ?? o.short_exchange ?? '').toLowerCase();
+          if (c === COIN && l === LONG_EX && s === SHORT_EX) return false; // exclude self
+          return l === LONG_EX || s === SHORT_EX;
+        })
+        .sort((a, b) => {
+          const ag = a.grossSpread ?? a.gross_spread ?? a.spread ?? 0;
+          const bg = b.grossSpread ?? b.gross_spread ?? b.spread ?? 0;
+          return bg - ag;
+        })
+        .slice(0, 15);
+
+      if (similar.length === 0) {
+        container.innerHTML = '<div class="empty-state">No similar pairs found.</div>';
+        return;
+      }
+
+      const rows = similar.map(r => {
+        const coin = (r.coin ?? r.symbol ?? '—').replace('-PERP','').replace('/USDT','').toUpperCase();
+        const longEx = (r.longExchange ?? r.long_exchange ?? '—').toLowerCase();
+        const shortEx = (r.shortExchange ?? r.short_exchange ?? '—').toLowerCase();
+        const gross = r.grossSpread ?? r.gross_spread ?? r.spread ?? 0;
+        const spreadCls = getSpreadClass(gross);
+        const href = `pair.html?coin=${encodeURIComponent(coin)}&long=${encodeURIComponent(longEx)}&short=${encodeURIComponent(shortEx)}`;
+        return `<tr onclick="window.open('${href}','_blank')" title="Open ${coin} deep dive">
+          <td class="coin-cell">${coin}</td>
+          <td class="exch">${longEx.toUpperCase()}</td>
+          <td class="exch">${shortEx.toUpperCase()}</td>
+          <td class="${spreadCls}">${fmt(gross,4)}%</td>
+        </tr>`;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="table-wrap fade-in">
+          <table>
+            <thead>
+              <tr>
+                <th>Coin</th>
+                <th>Long Exchange</th>
+                <th>Short Exchange</th>
+                <th>Gross Spread</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    // ─── RENDER TRADE GUIDE ───────────────────────────────────────────────────
+    function renderTradeGuide() {
+      const longUp = LONG_EX.toUpperCase();
+      const shortUp = SHORT_EX.toUpperCase();
+      const coinUp = COIN;
+
+      document.getElementById('accountsNeeded').innerHTML = `
+        <span class="account-badge">✓ ${longUp} ACCOUNT</span>
+        <span class="account-badge">✓ ${shortUp} ACCOUNT</span>
+        <span class="account-badge">✓ USDT FOR COLLATERAL</span>`;
+
+      document.getElementById('stepsList').innerHTML = `
+        <li><span class="step-num">1</span><span>On <strong style="color:var(--blue)">${longUp}</strong>: Buy ${coinUp} perp long at market. Post USDT as collateral.</span></li>
+        <li><span class="step-num">2</span><span>On <strong style="color:var(--orange)">${shortUp}</strong>: Sell ${coinUp} perp short at market. Post USDT as collateral.</span></li>
+        <li><span class="step-num">3</span><span>Hold both positions. Collect funding payments every 8 hours. Monitor spread daily.</span></li>
+        <li><span class="step-num">4</span><span>When spread compresses (approaches 0%), close both legs simultaneously to lock in profit.</span></li>`;
+
+      document.getElementById('riskCallout').innerHTML = `
+        <strong>⚠ DELTA NEUTRAL RISK NOTE:</strong><br>
+        If ${coinUp} price drops 20%, both positions cancel out (delta neutral). Your only real risk is spread compression — if the short exchange's funding rate rises above the long's, the spread goes negative and you pay instead of earn. Set a stop-loss at −0.1% spread.`;
+    }
+
+    // ─── MAIN INIT ───────────────────────────────────────────────────────────
+    async function init() {
+      // Kick off all fetches in parallel
+      const [longHistory, shortHistory, opps] = await Promise.all([
+        fetchHistory(LONG_EX),
+        fetchHistory(SHORT_EX),
+        fetchOpps(),
+      ]);
+
+      // Build chart, get spreads
+      const spreads = buildChart(longHistory, shortHistory);
+
+      // Compute stats
+      const stats = computeStats(spreads);
+
+      // Update hero spread
+      if (stats) {
+        const el = document.getElementById('heroSpread');
+        el.textContent = fmtPct(stats.current);
+        el.className = 'hero-spread ' + (stats.current > 0 ? 'pos' : stats.current < 0 ? 'neg' : 'zero');
+      }
+
+      // Render all sections
+      renderStatsGrid(stats);
+      renderVerdict(stats);
+      renderSimilarPairs(opps);
+      renderTradeGuide();
+    }
+
+    init();
+  </script>
+</body>
+</html>
